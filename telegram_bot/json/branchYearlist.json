@@ -1,0 +1,33 @@
+{
+    "branch" : ["CSE","ECE"],
+    "year" : [2016,2017,2018,2019],
+    "teacher" : {
+        "IIITT015":"Dr.V.Sindhu",
+        "IIITT006":"Dr.JagadeeshwarPashikanti",
+        "IIITT009":"Dr.K.Kamakshi",
+        "IIITT004":"Dr.Ujwal.O.Bhagwat",
+        "IIITT028":"Dr.Dharmalingam",
+        "IIITT012":"Dr.N.Renugadevi",
+        "IIITT029":"Dr.Sishaj.P.Simon",
+        "IIITT007":"Dr.Velmurugan.C",
+        "IIITT013":"Dr.G.Devasena", 
+        "IIITT030":"Mr.D.Murugan",
+        "IIITT002":"Dr.R.Dhanalakshmi",
+        "IIITT031":"Ms.R.Shathanaa",
+        "IIITT014":"Dr.AnoopJacobThomas",
+        "IIITT008":"Dr.Rinshu",
+        "IIITT032":"Dr.C.Balaji",
+        "IIITT016":"Ms.R.Yamini",
+        "IIITT010":"Dr.M.SenthilKumar",
+        "IIITT018":"NewFaculty",
+        "IIITT005":"Dr.R.Krishnamurthy",
+        "IIITT003":"Dr.G.Seetharaman",
+        "IIITT021":"Dr.V.Sudha",
+        "IIITT011":"Dr.SureshBalanethiram",
+        "IIITT023":"Dr.M.SenthilSivakumar",
+        "IIITT024":"Ms.V.Bharathi",
+        "IIITT025":"Dr.P.Muthuchidambaranathan",
+        "IIITT026":"Dr.S.S.Karthikeyan",
+        "IIITT027":"Dr.G.ThavasiRaja"
+    }
+}

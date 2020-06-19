@@ -1,0 +1,312 @@
+[
+    {
+        "subject" : "HSIR12",
+        "grade"   : "CSE19",
+        "teacher" : "Dr.V.Sindhu"
+    },
+    {
+        "subject" : "MAIR12",
+        "grade"   : "CSE19",
+        "teacher" : "Dr.JagadeeshwarPashikanti"
+    },
+    {
+        "subject" : "PHIR13",
+        "grade"   : "CSE19",
+        "teacher" : "Dr.K.Kamakshi"
+    },
+    {
+        "subject" : "CHIR13",
+        "grade"   : "CSE19",
+        "teacher" : "Dr.Ujwal.O.Bhagwat"
+    },
+    {
+        "subject" : "ENIR11",
+        "grade"   : "CSE19",
+        "teacher" : "Dr.Dharmalingam"
+    },
+    {
+        "subject" : "CSPC11",
+        "grade"   : "CSE19",
+        "teacher" : "Dr.N.Renugadevi"
+    },
+    {
+        "subject" : "PRIR11",
+        "grade"   : "CSE19",
+        "teacher" : "Dr.Velmurugan.C"
+    },
+    {
+        "subject" : "HSIR12",
+        "grade"   : "ECE19",
+        "teacher" : "Dr.V.Sindhu"
+    },
+    {
+        "subject" : "MAIR12",
+        "grade"   : "ECE19",
+        "teacher" : "Dr.JagadeeshwarPashikanti"
+    },
+    {
+        "subject" : "PHIR13",
+        "grade"   : "ECE19",
+        "teacher" : "Dr.K.Kamakshi"
+    },
+    {
+        "subject" : "CHIR13",
+        "grade"   : "ECE19",
+        "teacher" : "Dr.Ujwal.O.Bhagwat"
+    },
+    {
+        "subject" : "ENIR11",
+        "grade"   : "ECE19",
+        "teacher" : "Dr.Dharmalingam"
+    },
+    {
+        "subject" : "ECPC21",
+        "grade"   : "ECE19",
+        "teacher" : "Dr.Sishaj.P.Simon"
+    },
+    {
+        "subject" : "PRIR11",
+        "grade"   : "ECE19",
+        "teacher" : "Dr.Velmurugan.C"
+    },
+    {
+        "subject" : "CSPC26",
+        "grade"   : "CSE18",
+        "teacher" : "Dr.G.Devasena"
+    },
+    {
+        "subject" : "MAIR14",
+        "grade"   : "CSE18",
+        "teacher" : "Mr.D.Murugan"
+    },
+    {
+        "subject" : "CSPC27",
+        "grade"   : "CSE18",
+        "teacher" : "Dr.R.Dhanalakshmi"
+    },
+    {
+        "subject" : "CSPC28",
+        "grade"   : "CSE18",
+        "teacher" : "Ms.R.Shathanaa"
+    },
+    {
+        "subject" : "CSPC29",
+        "grade"   : "CSE18",
+        "teacher" : "Dr.AnoopJacobThomas"
+    },
+    {
+        "subject" : "HSIR14",
+        "grade"   : "CSE18",
+        "teacher" : "Dr.Rinshu"
+    },
+    {
+        "subject" : "CSLR23",
+        "grade"   : "CSE18",
+        "teacher" : "Dr.AnoopJacobThomas"
+    },
+    {
+        "subject" : "CSLR24",
+        "grade"   : "CSE18",
+        "teacher" : "Dr.G.Devasena"
+    },
+    {
+        "subject" : "T&P",
+        "grade"   : "CSE18",
+        "teacher" : "Ms.R.Yamini"
+    },
+    {
+        "subject" : "MAIR45",
+        "grade"   : "ECE18",
+        "teacher" : "Dr.R.Krishnamurthy"
+    },
+    {
+        "subject" : "HSIR14",
+        "grade"   : "ECE18",
+        "teacher" : "Dr.V.Sindhu"
+    },
+    {
+        "subject" : "ECPC41",
+        "grade"   : "ECE18",
+        "teacher" : "Dr.G.Seetharaman"
+    },
+    {
+        "subject" : "ECPC42",
+        "grade"   : "ECE18",
+        "teacher" : "Dr.V.Sudha"
+    },
+    {
+        "subject" : "ECPC43",
+        "grade"   : "ECE18",
+        "teacher" : "Dr.SureshBalanethiram"
+    },
+    {
+        "subject" : "ECPC44",
+        "grade"   : "ECE18",
+        "teacher" : "Dr.M.SenthilSivakumar"
+    },
+    {
+        "subject" : "ECLR41",
+        "grade"   : "ECE18",
+        "teacher" : "Dr.SureshBalanethiram"
+    },
+    {
+        "subject" : "ECLR42",
+        "grade"   : "ECE18",
+        "teacher" : "Dr.M.SenthilSivakumar"
+    },
+    {
+        "subject" : "T&P",
+        "grade"   : "ECE18",
+        "teacher" : "Ms.R.Yamini"
+    },
+    {
+        "subject" : "CSPC35",
+        "grade"   : "CSE17",
+        "teacher" : "Dr.C.Balaji"
+    },
+    {
+        "subject" : "CSPC36",
+        "grade"   : "CSE17",
+        "teacher" : "Dr.M.SenthilKumar"
+    },
+    {
+        "subject" : "CSPC37",
+        "grade"   : "CSE17",
+        "teacher" : "NewFaculty"
+    },
+    {
+        "subject" : "CSPE14",
+        "grade"   : "CSE17",
+        "teacher" : "Dr.G.Devasena"
+    },
+    {
+        "subject" : "CSOE21",
+        "grade"   : "CSE17",
+        "teacher" : "Dr.JagadeeshwarPashikanti"
+    },
+    {
+        "subject" : "CSPE22",
+        "grade"   : "CSE17",
+        "teacher" : "Ms.R.Shathanaa"
+    },
+    {
+        "subject" : "CSLR33",
+        "grade"   : "CSE17",
+        "teacher" : "NewFaculty"
+    },
+    {
+        "subject" : "CSLR34",
+        "grade"   : "CSE17",
+        "teacher" : "Dr.M.SenthilKumar"
+    },
+    {
+        "subject" : "CSIR16",
+        "grade"   : "CSE17",
+        "teacher" : "Dr.G.Devasena"
+    },
+    {
+        "subject" : "CSIR19",
+        "grade"   : "CSE17",
+        "teacher" : "Ms.R.Yamini"
+    },
+    {
+        "subject" : "ECPC61",
+        "grade"   : "ECE17",
+        "teacher" : "Dr.R.Krishnamurthy"
+    },
+    {
+        "subject" : "ECPC62",
+        "grade"   : "ECE17",
+        "teacher" : "Dr.P.Muthuchidambaranathan"
+    },
+    {
+        "subject" : "ECPC63",
+        "grade"   : "ECE17",
+        "teacher" : "Dr.SureshBalanethiram"
+    },
+    {
+        "subject" : "ECPC64",
+        "grade"   : "ECE17",
+        "teacher" : "Dr.S.S.Karthikeyan"
+    },
+    {
+        "subject" : "ECOE14",
+        "grade"   : "ECE17",
+        "teacher" : "Dr.R.Dhanalakshmi"
+    },
+    {
+        "subject" : "E3",
+        "grade"   : "ECE17",
+        "teacher" : "Dr.G.Seetharaman"
+    },
+    {
+        "subject" : "ECLR61",
+        "grade"   : "ECE17",
+        "teacher" : "Dr.R.Krishnamurthy"
+    },
+    {
+        "subject" : "ECLR62",
+        "grade"   : "ECE17",
+        "teacher" : "Dr.SureshBalanethiram"
+    },
+    {
+        "subject" : "ECIR16",
+        "grade"   : "ECE17",
+        "teacher" : "Dr.SureshBalanethiram"
+    },
+    {
+        "subject" : "ECIR19",
+        "grade"   : "ECE17",
+        "teacher" : "Ms.R.Yamini"
+    },
+    {
+        "subject" : "CSPE23",
+        "grade"   : "CSE16",
+        "teacher" : "Dr.AnoopJacobThomas"
+    },
+    {
+        "subject" : "CSOE17",
+        "grade"   : "CSE16",
+        "teacher" : "Dr.N.Renugadevi"
+    },
+    {
+        "subject" : "CSOE20",
+        "grade"   : "CSE16",
+        "teacher" : "NewFaculty"
+    },
+    {
+        "subject" : "ECOE20",
+        "grade"   : "CSE16",
+        "teacher" : "Dr.Rinshu"
+    },
+    {
+        "subject" : "CSIR17",
+        "grade"   : "CSE16",
+        "teacher" : "Dr.R.Dhanalakshmi"
+    },
+    {
+        "subject" : "ECPC81",
+        "grade"   : "ECE16",
+        "teacher" : "Dr.G.ThavasiRaja"
+    },
+    {
+        "subject" : "E7",
+        "grade"   : "ECE16",
+        "teacher" : "Dr.N.Renugadevi"
+    },
+    {
+        "subject" : "E8",
+        "grade"   : "ECE16",
+        "teacher" : "NewFaculty"
+    },
+    {
+        "subject" : "E9",
+        "grade"   : "ECE16",
+        "teacher" : "Dr.Rinshu"
+    },
+    {
+        "subject" : "ECIR17",
+        "grade"   : "ECE16",
+        "teacher" : "Dr.G.Seetharaman"
+    }
+]
