@@ -104,26 +104,32 @@ class teleDb:
         fttdata = json.loads(ftt)
         gradelst = fttdata.keys()
         self.day = day
-        for i in gradelst:
-            daylst = fttdata[i].keys()
-            j = self.day
-            if j in daylst:
-                periodlst = fttdata[i][j].keys()
-                for k in periodlst:
+        try:
+            self.cur.execute('SELECT id FROM DAY_TB WHERE day = ? ', (self.day.capitalize(), ))
+            day_id = self.cur.fetchone()[0]
+            self.cur.execute('''DELETE FROM TIMETABLE_TB WHERE day_id = ?''',(day_id,))#delete the present day timetable 
+            for i in gradelst:
+                daylst = fttdata[i].keys()
+                j = self.day
+                if j in daylst:
+                    periodlst = fttdata[i][j].keys()
+                    for k in periodlst:
 
-                    subject = fttdata[i][j][k]
+                        subject = fttdata[i][j][k]
 
-                    self.cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (i, ))
-                    grade_id = self.cur.fetchone()[0]
-                    self.cur.execute('SELECT id FROM DAY_TB WHERE day = ? ', (j.capitalize(), ))
-                    day_id = self.cur.fetchone()[0]
-                    self.cur.execute('SELECT id FROM PERIOD_TB WHERE period = ? ', (k, ))
-                    period_id = self.cur.fetchone()[0]
-                    self.cur.execute('SELECT id FROM SUBJECT_TB WHERE subject = ? AND grade_id = ?', (subject, grade_id))
-                    subject_id = self.cur.fetchone()[0]
-                    self.cur.execute('''INSERT OR IGNORE INTO TIMETABLE_TB (day_id,period_id,subject_id) VALUES ( ?, ?, ?)''', (day_id,period_id,subject_id) ) #TimeTable
-        self.conn.commit()
-
+                        self.cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (i, ))
+                        grade_id = self.cur.fetchone()[0]
+                        self.cur.execute('SELECT id FROM DAY_TB WHERE day = ? ', (j.capitalize(), ))
+                        day_id = self.cur.fetchone()[0]
+                        self.cur.execute('SELECT id FROM PERIOD_TB WHERE period = ? ', (k, ))
+                        period_id = self.cur.fetchone()[0]
+                        self.cur.execute('SELECT id FROM SUBJECT_TB WHERE subject = ? AND grade_id = ?', (subject, grade_id))
+                        subject_id = self.cur.fetchone()[0]
+                        self.cur.execute('''INSERT OR IGNORE INTO TIMETABLE_TB (day_id,period_id,subject_id) VALUES ( ?, ?, ?)''', (day_id,period_id,subject_id) ) #insert next week same day TimeTable
+            self.conn.commit()
+        except:
+            pass
+        
     def getStdtt(self,grade,day = datetime.datetime.now().strftime("%A")):
         '''
         Returns the students time table of the given day
