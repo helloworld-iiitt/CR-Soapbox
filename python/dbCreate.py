@@ -1,6 +1,7 @@
 import json
 import sqlite3
 import datetime
+from pytz import timezone
 
 class teleDb:
     
@@ -96,7 +97,7 @@ class teleDb:
                     self.cur.execute('''INSERT OR IGNORE INTO TIMETABLE_TB (day_id,period_id,subject_id) VALUES ( ?, ?, ?)''', (day_id,period_id,subject_id) ) #TimeTable
         self.conn.commit()
 
-    def upddaytt(self,day = datetime.datetime.now().strftime("%A")): #Update timetable
+    def upddaytt(self,day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")): #Update timetable
         '''
         Updates table - TIMETABLE_TB
         '''
@@ -130,7 +131,7 @@ class teleDb:
         except:
             pass
         
-    def getStdtt(self,grade,day = datetime.datetime.now().strftime("%A")):
+    def getStdtt(self,grade,day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")):
         '''
         Returns the students time table of the given day
             --default day is set to the present day
@@ -146,7 +147,7 @@ class teleDb:
             WHERE GRADE_TB.grade = ? AND DAY_TB.day = ? ORDER BY PERIOD_TB.id''', (self.grade,self.day))
         return self.cur.fetchall()
 
-    def getTeachtt(self,chat_id,day = datetime.datetime.now().strftime("%A")):
+    def getTeachtt(self,chat_id,day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")):
         '''
         Returns the teachers time table of the given day
             --default day is set to the present day
@@ -162,7 +163,7 @@ class teleDb:
             AND SUBJECT_TB.teacher_id = TEACHER_TB.id
             WHERE TEACHER_TB.emp_id = ? AND DAY_TB.day = ? ORDER BY PERIOD_TB.id''', (self.emp_id,self.day))
         return self.cur.fetchall()
-    def delcls (self,subject,period,day = datetime.datetime.now().strftime("%A")):
+    def delcls (self,subject,period,day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")):
         '''
         Delete the period of the given grade and day
             --default day is set to present day
@@ -183,7 +184,7 @@ class teleDb:
         except:
             return -1
 
-    def crecls (self,subject,period,day = datetime.datetime.now().strftime("%A")):
+    def crecls (self,subject,period,day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")):
         '''
         Create the period on the given day for the given subject
             --default day is set to present day
