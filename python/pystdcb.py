@@ -154,7 +154,7 @@ class stdchat:
         '''
         update.message.reply_text(text='''Please Send a \n*Valid Option*''', parse_mode= 'Markdown')
         update.message.reply_text(text='''Please prefer using\n*CUSTOM KEYBOARD* ''', parse_mode= 'Markdown')
-        return Menu_opt_MH
+        return self.Menu_opt_MH
 
 
     # Go Back functions
