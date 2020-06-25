@@ -1,4 +1,4 @@
-import datetime, json, re, time, urllib, requests
+import datetime, json, re, time, urllib, requests, json
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, PicklePersistence
 import logging, pytz
@@ -698,6 +698,7 @@ class tchchat:
             persublst = self.db.getStdtt(grade,context.user_data['tkeday'])
             perlst = list()
             tchperlst = list()
+            fbydata = json.loads(open('json/branchYearlist.json').read()) #access json file
             text = [["Back"]]
             for i in persublst:
                 perlst.append(i[0])
@@ -705,7 +706,7 @@ class tchchat:
                 tchperlst.append(i[0])
             self.perchklst = ['Back']
             for i in periodlst:
-                if (i not in perlst) and (i not in tchperlst):
+                if (i not in perlst) and ((i not in tchperlst) or (grade[3:] == str(max(fbydata['year']%100)))):
                     text.append([i])
                     self.perchklst.append(i)
             update.message.reply_text(text=''' For "{}" Select a Period from the\ngiven list'''.format(context.user_data['tkegrd']), reply_markup=telegram.ReplyKeyboardMarkup(text))
