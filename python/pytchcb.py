@@ -706,7 +706,7 @@ class tchchat:
                 tchperlst.append(i[0])
             self.perchklst = ['Back']
             for i in periodlst:
-                if (i not in perlst) and ((i not in tchperlst) or (grade[3:] == str(max(fbydata['year']%100)))):
+                if (i not in perlst) and ((i not in tchperlst) or (grade[3:] == str(max(fbydata['year'])%100))):
                     text.append([i])
                     self.perchklst.append(i)
             update.message.reply_text(text=''' For "{}" Select a Period from the\ngiven list'''.format(context.user_data['tkegrd']), reply_markup=telegram.ReplyKeyboardMarkup(text))
@@ -719,9 +719,9 @@ class tchchat:
         '''
             Create class in the timetable
         '''
-        sub = context.user_data['tkegrd'].split(':')[1].upper()
+        sub = context.user_data['tkegrd'].split(':')
         if update.message.text in self.perchklst:
-            k = self.db.crecls(sub,update.message.text,context.user_data['tkeday']) 
+            k = self.db.crecls(sub[0].upper(),sub[1].upper(),update.message.text,context.user_data['tkeday']) 
         else:
             k=-1
         
@@ -787,7 +787,7 @@ class tchchat:
         if update.message.text in self.pgschklst:
             context.user_data['ccdata'] = update.message.text.split(':')
             ccdata = context.user_data['ccdata']
-            chk = self.db.delcls(ccdata[2].upper(),ccdata[0],context.user_data['ccday']) 
+            chk = self.db.delcls(ccdata[1].upper(),ccdata[2].upper(),ccdata[0],context.user_data['ccday']) 
         else:
             chk = -1
         if chk == 1:
