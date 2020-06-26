@@ -554,14 +554,13 @@ class tchchat:
         '''
         tchgrd = self.db.tchgrdsub(update.effective_chat.id)
         tchgrdlst = [["Back"]]
-        index = 0
         self.grdgrdchklst = ['Back']
+        tchgrdset = set()
         for i in tchgrd:
-            tchgrd.pop(index)
-            index = index +1
-            if i not in tchgrd:
-                self.grdgrdchklst.append(i[0])
-                tchgrdlst.append([i[0]])
+            tchgrdset.add(i[0])
+        for i in tchgrdset:
+            tchgrdlst.append([i])
+            self.grdgrdchklst.append(i)
         update.message.reply_text(text='''Select a Grade from the\ngiven list''', reply_markup=telegram.ReplyKeyboardMarkup(tchgrdlst))
         return self.Grade_btt_MH
 
@@ -604,14 +603,13 @@ class tchchat:
         '''
         tchgrd = self.db.tchgrdsub(update.effective_chat.id)
         tchgrdlst = [["Back"]]
-        index = 0
         self.anngrdchklst = ['Back']
+        tchgrdset = set()
         for i in tchgrd:
-            tchgrd.pop(index)
-            index = index +1
-            if i not in tchgrd:
-                self.anngrdchklst.append(i[0])
-                tchgrdlst.append([i[0]])   
+            tchgrdset.add(i[0])
+        for i in tchgrdset:
+            tchgrdlst.append([i])
+            self.anngrdchklst.append(i)  
         update.message.reply_text(text='''Select a Grade from the\ngiven list''', reply_markup=telegram.ReplyKeyboardMarkup(tchgrdlst))
         return self.Announce_grd_MH
 
