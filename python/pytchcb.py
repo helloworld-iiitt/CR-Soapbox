@@ -1,7 +1,8 @@
-import datetime, json, re, time, urllib, requests
+import datetime, json, re, time, urllib, requests, json
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, PicklePersistence
-import logging
+import logging, pytz
+from pytz import timezone
 from python.dbCreate import teleDb
 #from dbCreate import teleDb
 stdtkn = open('data/stdtkn.txt').read()
@@ -34,8 +35,8 @@ class tchchat:
         self.updater = Updater(token=tchtkn,persistence=pp,use_context=True)
         dp =  self.updater.dispatcher
         j =  self.updater.job_queue
-        j.run_daily(self.updaytt,datetime.time(11,0,0,0),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.callback_daily,datetime.time(18,47,0,0),(0,1,2,3,6),context=telegram.ext.CallbackContext)
+        j.run_daily(self.updaytt,datetime.time(hour = 16, minute = 30, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.callback_daily,datetime.time(hour = 00, minute = 5, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
 
         # daily timetable cov
 
@@ -255,7 +256,7 @@ class tchchat:
         tchlst = self.db.gettchlst()
 
         for i in tchlst:
-            text = "Sir/Madam Next {} \n timetable was updated.\nYou can make changes in the timetable now".format(datetime.datetime.now().strftime("%A"))
+            text = "Sir/Madam Next {} \n timetable was updated.\nYou can make changes in the timetable now".format( datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
             time.sleep(1)
 
@@ -496,7 +497,7 @@ class tchchat:
 
     # Teacher Timetable Functions
 
-    def tchtt(self,chat_id,day= datetime.datetime.now().strftime("%A")):
+    def tchtt(self,chat_id,day= datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")):
         '''
             Return Teacher Timetable as a string
         '''
@@ -553,14 +554,13 @@ class tchchat:
         '''
         tchgrd = self.db.tchgrdsub(update.effective_chat.id)
         tchgrdlst = [["Back"]]
-        index = 0
         self.grdgrdchklst = ['Back']
+        tchgrdset = set()
         for i in tchgrd:
-            tchgrd.pop(index)
-            index = index +1
-            if i not in tchgrd:
-                self.grdgrdchklst.append(i[0])
-                tchgrdlst.append([i[0]])
+            tchgrdset.add(i[0])
+        for i in tchgrdset:
+            tchgrdlst.append([i])
+            self.grdgrdchklst.append(i)
         update.message.reply_text(text='''Select a Grade from the\ngiven list''', reply_markup=telegram.ReplyKeyboardMarkup(tchgrdlst))
         return self.Grade_btt_MH
 
@@ -603,14 +603,13 @@ class tchchat:
         '''
         tchgrd = self.db.tchgrdsub(update.effective_chat.id)
         tchgrdlst = [["Back"]]
-        index = 0
         self.anngrdchklst = ['Back']
+        tchgrdset = set()
         for i in tchgrd:
-            tchgrd.pop(index)
-            index = index +1
-            if i not in tchgrd:
-                self.anngrdchklst.append(i[0])
-                tchgrdlst.append([i[0]])   
+            tchgrdset.add(i[0])
+        for i in tchgrdset:
+            tchgrdlst.append([i])
+            self.anngrdchklst.append(i)  
         update.message.reply_text(text='''Select a Grade from the\ngiven list''', reply_markup=telegram.ReplyKeyboardMarkup(tchgrdlst))
         return self.Announce_grd_MH
 
@@ -696,12 +695,16 @@ class tchchat:
             grade = context.user_data['tkegrd'].split(':')[0]
             persublst = self.db.getStdtt(grade,context.user_data['tkeday'])
             perlst = list()
+            tchperlst = list()
+            fbydata = json.loads(open('json/branchYearlist.json').read()) #access json file
             text = [["Back"]]
             for i in persublst:
                 perlst.append(i[0])
+            for i in self.db.getTeachtt(update.effective_chat.id,context.user_data['tkeday']):
+                tchperlst.append(i[0])
             self.perchklst = ['Back']
             for i in periodlst:
-                if i not in perlst:
+                if (i not in perlst) and ((i not in tchperlst) or (grade[3:] == str(max(fbydata['year'])%100))):
                     text.append([i])
                     self.perchklst.append(i)
             update.message.reply_text(text=''' For "{}" Select a Period from the\ngiven list'''.format(context.user_data['tkegrd']), reply_markup=telegram.ReplyKeyboardMarkup(text))
@@ -714,9 +717,9 @@ class tchchat:
         '''
             Create class in the timetable
         '''
-        sub = context.user_data['tkegrd'].split(':')[1].upper()
+        sub = context.user_data['tkegrd'].split(':')
         if update.message.text in self.perchklst:
-            k = self.db.crecls(sub,update.message.text,context.user_data['tkeday']) 
+            k = self.db.crecls(sub[0].upper(),sub[1].upper(),update.message.text,context.user_data['tkeday']) 
         else:
             k=-1
         
@@ -782,7 +785,7 @@ class tchchat:
         if update.message.text in self.pgschklst:
             context.user_data['ccdata'] = update.message.text.split(':')
             ccdata = context.user_data['ccdata']
-            chk = self.db.delcls(ccdata[2].upper(),ccdata[0],context.user_data['ccday']) 
+            chk = self.db.delcls(ccdata[1].upper(),ccdata[2].upper(),ccdata[0],context.user_data['ccday']) 
         else:
             chk = -1
         if chk == 1:
@@ -812,6 +815,6 @@ class tchchat:
 if __name__ == '__main__':
     db = teleDb()
     hi = tchchat(db)
-    self.updater.start_polling()
+    hi.updater.start_polling()
     print("Getting Updates of CR_ALT(TCH)")
-    self.updater.idle()
+    hi.updater.idle()

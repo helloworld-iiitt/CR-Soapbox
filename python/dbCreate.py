@@ -1,6 +1,7 @@
 import json
 import sqlite3
 import datetime
+from pytz import timezone
 
 class teleDb:
     
@@ -96,7 +97,7 @@ class teleDb:
                     self.cur.execute('''INSERT OR IGNORE INTO TIMETABLE_TB (day_id,period_id,subject_id) VALUES ( ?, ?, ?)''', (day_id,period_id,subject_id) ) #TimeTable
         self.conn.commit()
 
-    def upddaytt(self,day = datetime.datetime.now().strftime("%A")): #Update timetable
+    def upddaytt(self,day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")): #Update timetable
         '''
         Updates table - TIMETABLE_TB
         '''
@@ -104,27 +105,33 @@ class teleDb:
         fttdata = json.loads(ftt)
         gradelst = fttdata.keys()
         self.day = day
-        for i in gradelst:
-            daylst = fttdata[i].keys()
-            j = self.day
-            if j in daylst:
-                periodlst = fttdata[i][j].keys()
-                for k in periodlst:
+        try:
+            self.cur.execute('SELECT id FROM DAY_TB WHERE day = ? ', (self.day.capitalize(), ))
+            day_id = self.cur.fetchone()[0]
+            self.cur.execute('''DELETE FROM TIMETABLE_TB WHERE day_id = ?''',(day_id,))#delete the present day timetable 
+            for i in gradelst:
+                daylst = fttdata[i].keys()
+                j = self.day
+                if j in daylst:
+                    periodlst = fttdata[i][j].keys()
+                    for k in periodlst:
 
-                    subject = fttdata[i][j][k]
+                        subject = fttdata[i][j][k]
 
-                    self.cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (i, ))
-                    grade_id = self.cur.fetchone()[0]
-                    self.cur.execute('SELECT id FROM DAY_TB WHERE day = ? ', (j.capitalize(), ))
-                    day_id = self.cur.fetchone()[0]
-                    self.cur.execute('SELECT id FROM PERIOD_TB WHERE period = ? ', (k, ))
-                    period_id = self.cur.fetchone()[0]
-                    self.cur.execute('SELECT id FROM SUBJECT_TB WHERE subject = ? AND grade_id = ?', (subject, grade_id))
-                    subject_id = self.cur.fetchone()[0]
-                    self.cur.execute('''INSERT OR IGNORE INTO TIMETABLE_TB (day_id,period_id,subject_id) VALUES ( ?, ?, ?)''', (day_id,period_id,subject_id) ) #TimeTable
-        self.conn.commit()
-
-    def getStdtt(self,grade,day = datetime.datetime.now().strftime("%A")):
+                        self.cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (i, ))
+                        grade_id = self.cur.fetchone()[0]
+                        self.cur.execute('SELECT id FROM DAY_TB WHERE day = ? ', (j.capitalize(), ))
+                        day_id = self.cur.fetchone()[0]
+                        self.cur.execute('SELECT id FROM PERIOD_TB WHERE period = ? ', (k, ))
+                        period_id = self.cur.fetchone()[0]
+                        self.cur.execute('SELECT id FROM SUBJECT_TB WHERE subject = ? AND grade_id = ?', (subject, grade_id))
+                        subject_id = self.cur.fetchone()[0]
+                        self.cur.execute('''INSERT OR IGNORE INTO TIMETABLE_TB (day_id,period_id,subject_id) VALUES ( ?, ?, ?)''', (day_id,period_id,subject_id) ) #insert next week same day TimeTable
+            self.conn.commit()
+        except:
+            pass
+        
+    def getStdtt(self,grade,day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")):
         '''
         Returns the students time table of the given day
             --default day is set to the present day
@@ -140,7 +147,7 @@ class teleDb:
             WHERE GRADE_TB.grade = ? AND DAY_TB.day = ? ORDER BY PERIOD_TB.id''', (self.grade,self.day))
         return self.cur.fetchall()
 
-    def getTeachtt(self,chat_id,day = datetime.datetime.now().strftime("%A")):
+    def getTeachtt(self,chat_id,day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")):
         '''
         Returns the teachers time table of the given day
             --default day is set to the present day
@@ -156,7 +163,7 @@ class teleDb:
             AND SUBJECT_TB.teacher_id = TEACHER_TB.id
             WHERE TEACHER_TB.emp_id = ? AND DAY_TB.day = ? ORDER BY PERIOD_TB.id''', (self.emp_id,self.day))
         return self.cur.fetchall()
-    def delcls (self,subject,period,day = datetime.datetime.now().strftime("%A")):
+    def delcls (self,grade,subject,period,day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")):
         '''
         Delete the period of the given grade and day
             --default day is set to present day
@@ -164,8 +171,11 @@ class teleDb:
         self.subject = subject
         self.period = period
         self.day = day
+        self.grade = grade
         try:
-            self.cur.execute('SELECT id FROM SUBJECT_TB WHERE subject = ? ', (self.subject, ))
+            self.cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (self.grade, ))
+            grade_id = self.cur.fetchone()[0]
+            self.cur.execute('SELECT id FROM SUBJECT_TB WHERE subject = ? AND grade_id  = ?', (self.subject,grade_id))
             subject_id = self.cur.fetchone()[0]
             self.cur.execute('SELECT id FROM DAY_TB WHERE day = ? ', (self.day, ))
             day_id = self.cur.fetchone()[0]
@@ -177,7 +187,7 @@ class teleDb:
         except:
             return -1
 
-    def crecls (self,subject,period,day = datetime.datetime.now().strftime("%A")):
+    def crecls (self,grade,subject,period,day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")):
         '''
         Create the period on the given day for the given subject
             --default day is set to present day
@@ -186,11 +196,12 @@ class teleDb:
         self.subject = subject
         self.period = period
         self.day = day
+        self.grade = grade
         try:
-            self.cur.execute('SELECT id FROM SUBJECT_TB WHERE subject = ? ', (self.subject, ))
-            subject_id = self.cur.fetchone()[0]
-            self.cur.execute('SELECT grade_id FROM SUBJECT_TB WHERE subject = ? ', (self.subject, ))
+            self.cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (self.grade, ))
             grade_id = self.cur.fetchone()[0]
+            self.cur.execute('SELECT id FROM SUBJECT_TB WHERE subject = ? AND grade_id = ?', (self.subject,grade_id))
+            subject_id = self.cur.fetchone()[0]
             self.cur.execute('SELECT id FROM DAY_TB WHERE day = ? ', (self.day, ))
             day_id = self.cur.fetchone()[0]
             self.cur.execute('SELECT id FROM PERIOD_TB WHERE period = ? ', (self.period, ))

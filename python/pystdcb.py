@@ -1,7 +1,8 @@
 import datetime, json, re, time
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler,  PicklePersistence
-import logging
+import logging, pytz
+from pytz import timezone
 from python.dbCreate import teleDb
 #from dbCreate import teleDb
 tkn = open('data/stdtkn.txt').read()
@@ -30,8 +31,8 @@ class stdchat:
         self.updater = Updater(token=tkn,persistence=pp,use_context=True)
         dp =  self.updater.dispatcher
         j =  self.updater.job_queue
-        j.run_daily(self.callback_daily,datetime.time(18,47,0,0),(0,1,2,3,6),context=telegram.ext.CallbackContext)
-        
+        j.run_daily(self.callback_daily,datetime.time(hour = 00, minute = 15, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+
         # Daily timetable conv
 
         Daily_tt_cov = ConversationHandler(
@@ -153,7 +154,7 @@ class stdchat:
         '''
         update.message.reply_text(text='''Please Send a \n*Valid Option*''', parse_mode= 'Markdown')
         update.message.reply_text(text='''Please prefer using\n*CUSTOM KEYBOARD* ''', parse_mode= 'Markdown')
-        return Menu_opt_MH
+        return self.Menu_opt_MH
 
 
     # Go Back functions
@@ -186,7 +187,6 @@ class stdchat:
         for i in usrlst:
             text = "*Today's Timetable*\n"+self.stdtt(i[0])
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
-            time.sleep(1)
         context.bot.send_message(chat_id="1122913247", text="Total no of users using\nCR ATL\n = *{}*".format(self.usrcnt), parse_mode= 'Markdown')
 
     # Setup Functions or Start Functions
@@ -242,7 +242,7 @@ class stdchat:
 
     # Student timetable Functions
 
-    def stdtt(self,chat_id,day= datetime.datetime.now().strftime("%A")):
+    def stdtt(self,chat_id,day= datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")):
         '''
             Return student Timetable as a string
         '''
@@ -368,6 +368,6 @@ class stdchat:
 if __name__ == '__main__':
     db = teleDb()
     hi = stdchat(db)
-    self.updater.start_polling()
+    hi.updater.start_polling()
     print("Getting Updates of CR_ALT")
-    self.updater.idle()
+    hi.updater.idle()
