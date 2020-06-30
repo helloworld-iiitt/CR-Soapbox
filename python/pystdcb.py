@@ -1,8 +1,9 @@
 import datetime, json, re, time
 import telegram
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler,  PicklePersistence
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler,  PicklePersistence, CallbackContext, CallbackQueryHandler
 import logging, pytz
 from pytz import timezone
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from python.dbCreate import teleDb
 #from dbCreate import teleDb
 tkn = open('data/stdtkn.txt').read()
@@ -31,7 +32,13 @@ class stdchat:
         self.updater = Updater(token=tkn,persistence=pp,use_context=True)
         dp =  self.updater.dispatcher
         j =  self.updater.job_queue
-        j.run_daily(self.callback_daily,datetime.time(hour = 00, minute = 15, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.callback_daily,datetime.time(hour = 1, minute = 15, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_11_00,datetime.time(hour = 11, minute = 00, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_11_50,datetime.time(hour = 11, minute = 50, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_12_40,datetime.time(hour = 12, minute = 40, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_14_20,datetime.time(hour = 14, minute = 20, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_15_10,datetime.time(hour = 15, minute = 10, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_16_00,datetime.time(hour = 16, minute = 00, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
 
         # Daily timetable conv
 
@@ -112,6 +119,7 @@ class stdchat:
                 )
         
         dp.add_handler(Setup_cov)
+        dp.add_handler(CallbackQueryHandler(self.inlinesetatt))
         dp.add_error_handler(self.error)
         
 
@@ -188,6 +196,48 @@ class stdchat:
             text = "*Today's Timetable*\n"+self.stdtt(i[0])
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
         context.bot.send_message(chat_id="1122913247", text="Total no of users using\nCR ATL\n = *{}*".format(self.usrcnt), parse_mode= 'Markdown')
+
+    def daily (self,pernm,context):
+        '''
+            Jobqueue's daily_11_00 function to Ask for attendance
+        '''
+        stdchtidlst = self.db.getusrlst()
+        for k in stdchtidlst:
+            persublst=self.db.getStdtt(self.db.getusrgrd(k[0]))
+            perlst = list()
+            for i in persublst:
+                if i[0] == pernm:
+                    keyboard = [
+                        [InlineKeyboardButton("Yes",callback_data= str('1'+i[1])),
+                        InlineKeyboardButton("No",callback_data= str('0'+i[1]))]
+                    ]
+                    reply_markup = InlineKeyboardMarkup(keyboard)
+                    context.bot.send_message(chat_id=k[0], text= "Did you attend the class of subject {}".format(i[1]),
+                        reply_markup=reply_markup)
+                    break
+        # Tell ConversationHandler that we're in state `FIRST` now
+    def daily_11_00 (self,context: telegram.ext.CallbackContext):
+        self.daily('10.10-11.00',context)
+    def daily_11_50 (self,context: telegram.ext.CallbackContext):
+        self.daily('11.00-11.50',context)
+    def daily_12_40 (self,context: telegram.ext.CallbackContext):
+        self.daily('11.50-12.40',context)
+    def daily_14_20 (self,context: telegram.ext.CallbackContext):
+        self.daily('01.30-02.20',context)
+    def daily_15_10 (self,context: telegram.ext.CallbackContext):
+        self.daily('02.20-03.10',context)
+    def daily_16_00 (self,context: telegram.ext.CallbackContext):
+        self.daily('03.10-04.00',context)
+    # Inline function for set attendance
+
+    def inlinesetatt(self,update,context):
+        query = update.callback_query
+        query.answer()
+        self.db.setstdatt(update.effective_chat.id,query.data[1:],int(query.data[:1]),1)
+        if query.data[:1] == '1':
+            query.edit_message_text(text="You were PRESENT for {} class".format(query.data[1:]))
+        else:
+            query.edit_message_text(text="You were ABSENT for {} class".format(query.data[1:]))
 
     # Setup Functions or Start Functions
 

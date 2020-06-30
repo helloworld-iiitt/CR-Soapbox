@@ -68,11 +68,11 @@ CREATE TABLE IF NOT EXISTS USER_TB(
 
 CREATE TABLE IF NOT EXISTS ATTEND_TB(
 
-    user_id INTEGER,
+    chat_id INTEGER,
     subject_id INTEGER,
     attend_pcls INTEGER,
     attend_tcls INTEGER,
-    PRIMARY KEY (user_id,subject_id)
+    PRIMARY KEY (chat_id,subject_id)
 );
 
 CREATE TABLE IF NOT EXISTS TCHUSR_TB(

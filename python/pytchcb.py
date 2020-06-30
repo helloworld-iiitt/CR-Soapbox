@@ -35,8 +35,8 @@ class tchchat:
         self.updater = Updater(token=tchtkn,persistence=pp,use_context=True)
         dp =  self.updater.dispatcher
         j =  self.updater.job_queue
-        j.run_daily(self.updaytt,datetime.time(hour = 16, minute = 30, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.callback_daily,datetime.time(hour = 00, minute = 5, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.updaytt,datetime.time(hour = 18, minute = 00, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.callback_daily,datetime.time(hour = 2, minute = 0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
 
         # daily timetable cov
 

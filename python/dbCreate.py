@@ -235,9 +235,9 @@ class teleDb:
             self.cur.execute('SELECT id FROM SUBJECT_TB WHERE grade_id = ?',(grade_id,))
             sublst = self.cur.fetchall()
             self.cur.execute('SELECT id FROM USER_TB WHERE roll_no = ? AND chat_id = ?',(self.roll_no,self.chat_id))
-            user_id = self.cur.fetchone()[0]
+            chat_id = self.cur.fetchone()[0]
             for i in sublst:
-                self.cur.execute('''INSERT OR IGNORE INTO ATTEND_TB (user_id,subject_id,attend_pcls,attend_tcls) VALUES ( ?, ?, ?, ?)''', (user_id,i[0],0,0) )
+                self.cur.execute('''INSERT OR IGNORE INTO ATTEND_TB (chat_id,subject_id,attend_pcls,attend_tcls) VALUES ( ?, ?, ?, ?)''', (chat_id,i[0],0,0) )
         except:
             return self.chkusr(self.chat_id)
         self.conn.commit()
@@ -278,13 +278,13 @@ class teleDb:
         self.cur.execute('SELECT id FROM SUBJECT_TB WHERE subject = ? ', (self.subject, ))
         subject_id = self.cur.fetchone()[0]
         self.cur.execute('SELECT id FROM USER_TB WHERE chat_id = ?',(self.chat_id,))
-        user_id = self.cur.fetchone()[0]
-        self.cur.execute('SELECT attend_pcls,attend_tcls FROM ATTEND_TB WHERE user_id = ? AND subject_id =?',(user_id,subject_id))
+        chat_id = self.cur.fetchone()[0]
+        self.cur.execute('SELECT attend_pcls,attend_tcls FROM ATTEND_TB WHERE chat_id = ? AND subject_id =?',(chat_id,subject_id))
         attend = self.cur.fetchall()
         if ((self.attend_pcls == 0 or self.attend_pcls == 1) and self.attend_tcls == 1 ):
             self.attend_pcls = self.attend_pcls + int(attend[0][0])
             self.attend_tcls = self.attend_tcls + int(attend[0][1])
-        self.cur.execute('UPDATE ATTEND_TB SET attend_pcls = ? , attend_tcls = ? WHERE user_id = ? AND subject_id =?',(self.attend_pcls,self.attend_tcls,user_id,subject_id ))
+        self.cur.execute('UPDATE ATTEND_TB SET attend_pcls = ? , attend_tcls = ? WHERE chat_id = ? AND subject_id =?',(self.attend_pcls,self.attend_tcls,chat_id,subject_id ))
         self.conn.commit()
 
     def getstdatt(self,chat_id):
@@ -293,9 +293,9 @@ class teleDb:
         '''
         self.chat_id = chat_id
         self.cur.execute('SELECT id FROM USER_TB WHERE chat_id = ?',(self.chat_id,))
-        user_id = self.cur.fetchone()[0]
+        chat_id = self.cur.fetchone()[0]
         self.cur.execute('''SELECT SUBJECT_TB.subject,ATTEND_TB.attend_pcls,ATTEND_TB.attend_tcls
-            FROM ATTEND_TB JOIN SUBJECT_TB ON ATTEND_TB.subject_id = SUBJECT_TB.id WHERE user_id = ?''',(user_id,))
+            FROM ATTEND_TB JOIN SUBJECT_TB ON ATTEND_TB.subject_id = SUBJECT_TB.id WHERE chat_id = ?''',(chat_id,))
         return self.cur.fetchall()
     
     def getusrgrd(self,chat_id):
