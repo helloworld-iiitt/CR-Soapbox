@@ -234,10 +234,11 @@ class stdchat:
     def inlinesetatt(self,update,context):
         query = update.callback_query
         query.answer()
-        self.db.setstdatt(update.effective_chat.id,query.data[1:],int(query.data[:1]),1)
         if query.data[:1] == '1':
+            self.db.setstdatt(update.effective_chat.id,query.data[1:],int(query.data[:1]),1)
             query.edit_message_text(text="You were PRESENT for {} class".format(query.data[1:]))
         elif query.data[:1] == '0':
+            self.db.setstdatt(update.effective_chat.id,query.data[1:],int(query.data[:1]),1)
             query.edit_message_text(text="You were ABSENT for {} class".format(query.data[1:]))
         else:
             query.edit_message_text(text="{} class was CANCELED".format(query.data[1:]))
