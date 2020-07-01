@@ -209,7 +209,8 @@ class stdchat:
                 if i[0] == pernm:
                     keyboard = [
                         [InlineKeyboardButton("Yes",callback_data= str('1'+i[1])),
-                        InlineKeyboardButton("No",callback_data= str('0'+i[1]))]
+                        InlineKeyboardButton("No",callback_data= str('0'+i[1]))],
+                        [InlineKeyboardButton("Cancel",callback_data= str('2'+i[1]))]
                     ]
                     reply_markup = InlineKeyboardMarkup(keyboard)
                     context.bot.send_message(chat_id=k[0], text= "Did you attend the class of subject {}".format(i[1]),
@@ -236,8 +237,10 @@ class stdchat:
         self.db.setstdatt(update.effective_chat.id,query.data[1:],int(query.data[:1]),1)
         if query.data[:1] == '1':
             query.edit_message_text(text="You were PRESENT for {} class".format(query.data[1:]))
-        else:
+        elif query.data[:1] == '0':
             query.edit_message_text(text="You were ABSENT for {} class".format(query.data[1:]))
+        else:
+            query.edit_message_text(text="{} class was CANCELED".format(query.data[1:]))
 
     # Setup Functions or Start Functions
 
