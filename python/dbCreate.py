@@ -370,6 +370,20 @@ class teleDb:
                             ON SUBJECT_TB.grade_id = GRADE_TB.id AND SUBJECT_TB.teacher_id = TEACHER_TB.id WHERE TEACHER_TB.emp_id = ?''',(emp_id,))
         return self.cur.fetchall()
 
+    def getalstduid(self):
+        '''
+            Returns List of tuple of chat_id of students in bot 
+        '''
+        self.cur.execute('''SELECT chat_id FROM USER_TB ''')
+        return self.cur.fetchall()
+    
+    def getaltchuid(self):
+        '''
+            Returns List of tuple of chat_id of Teachers in bot 
+        '''
+        self.cur.execute('''SELECT chat_id FROM TCHUSR_TB''')
+        return self.cur.fetchall()
+
 if __name__ == '__main__':
     db = teleDb()
     db.crecls("CSPC29","03.10-04.00","Monday")

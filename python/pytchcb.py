@@ -1,8 +1,9 @@
 import datetime, json, re, time, urllib, requests, json
 import telegram
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, PicklePersistence
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, PicklePersistence,  CallbackContext, CallbackQueryHandler
 import logging, pytz
 from pytz import timezone
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from python.dbCreate import teleDb
 #from dbCreate import teleDb
 stdtkn = open('data/stdtkn.txt').read()
@@ -62,7 +63,7 @@ class tchchat:
                                         ]
                     },
                     allow_reentry= True,
-                    fallbacks = [MessageHandler((~Filters.regex(".*[dD][aA][yY]$") & ~Filters.text('Back') & ~Filters.command('menu')),self.ivgrdday)],#
+                    fallbacks = [MessageHandler((~Filters.regex(".*[dD][aA][yY]$") & ~Filters.text('Back') & Filters.command('devann') & ~Filters.command('menu')),self.ivgrdday)],#
                     map_to_parent={ self.STOPPING : END,
                                     self.Grade_btt_MH: self.Grade_btt_MH},
                     name= "gradesubcov",
@@ -91,7 +92,7 @@ class tchchat:
                                         MessageHandler(Filters.text('Back'),self.menucall),CommandHandler('menu', self.menucall)]
                     },
                     allow_reentry= True,
-                    fallbacks = [MessageHandler((~Filters.text('Send') & ~Filters.text('Back') & ~Filters.command('menu')),self.ivanncon)],
+                    fallbacks = [MessageHandler((~Filters.text('Send') & ~Filters.text('Back') & Filters.command('devann') & ~Filters.command('menu')),self.ivanncon)],
                     map_to_parent={ self.STOPPING : self.STOPPING,
                                     self.Announce_grd_MH: self.Announce_grd_MH},
                     name= "annconfcov",
@@ -106,7 +107,7 @@ class tchchat:
                                         MessageHandler((Filters.text('Back')),self.bckanngrdkb),CommandHandler('menu', self.menucall)]
                     },
                     allow_reentry= True,
-                    fallbacks = [MessageHandler((~Filters.regex('^MSG-.*') & ~Filters.text('Back') & ~Filters.command('menu')),self.ivannmsg)],
+                    fallbacks = [MessageHandler((~Filters.regex('^MSG-.*') & ~Filters.text('Back') & Filters.command('devann') & ~Filters.command('menu')),self.ivannmsg)],
                     map_to_parent={ self.STOPPING : END,
                                     self.Announce_grd_MH: self.Announce_grd_MH},
                     name= "annmsgcov",
@@ -135,7 +136,7 @@ class tchchat:
                                         MessageHandler((Filters.text('Back')),self.bcktkedaykb),CommandHandler('menu', self.menucall)]
                     },
                     allow_reentry= True,
-                    fallbacks = [MessageHandler((~Filters.regex(r"^[0-9][0-9].[0-9][0-9]-[0-9][0-9].[0-9][0-9]$") & ~Filters.text('Back') & ~Filters.command('menu')),self.ivtkper)],
+                    fallbacks = [MessageHandler((~Filters.regex(r"^[0-9][0-9].[0-9][0-9]-[0-9][0-9].[0-9][0-9]$") & ~Filters.text('Back') & Filters.command('devann') & ~Filters.command('menu')),self.ivtkper)],
                     map_to_parent={ self.STOPPING : self.STOPPING},
                     name= "tkedaycov",
                     persistent=True
@@ -149,7 +150,7 @@ class tchchat:
                                         MessageHandler((Filters.text('Back')),self.bcktkegrdkb),CommandHandler('menu', self.menucall)]
                     },
                     allow_reentry= True,
-                    fallbacks = [MessageHandler((~Filters.regex(".*[dD][aA][yY]$") & ~Filters.text('Back') & ~Filters.command('menu')),self.ivtkday)],#
+                    fallbacks = [MessageHandler((~Filters.regex(".*[dD][aA][yY]$") & ~Filters.text('Back') & Filters.command('devann') & ~Filters.command('menu')),self.ivtkday)],#
                     map_to_parent={ self.STOPPING : END},
                     name= "tkegrdcov",
                     persistent=True
@@ -186,7 +187,7 @@ class tchchat:
                         (~Filters.regex(r"^[0-9][0-9].[0-9][0-9]-[0-9][0-9].[0-9][0-9]:[CEce][SsCc][Ee][0-9][0-9]:[A-Za-z][A-Za-z][A-Za-z][A-Za-z][0-9][0-9]$")) &
                         (~Filters.regex(r"^[0-9][0-9].[0-9][0-9]-[0-9][0-9].[0-9][0-9]:[CEce][SsCc][Ee][0-9][0-9]:[Ee][0-9]$")) &
                         (~Filters.regex(r"^[0-9][0-9].[0-9][0-9]-[0-9][0-9].[0-9][0-9]:[CEce][SsCc][Ee][0-9][0-9]:T&P$")),self.ivccpgs)),
-                        MessageHandler((~Filters.text('Back') & ~Filters.command('menu')),self.ivccpgs)],
+                        MessageHandler((~Filters.text('Back') & Filters.command('devann') & ~Filters.command('menu')),self.ivccpgs)],
                     map_to_parent={self.STOPPING : END
                                     },
                     name= "ccldaycov",
@@ -218,7 +219,7 @@ class tchchat:
                                                 ]
                     },
                     allow_reentry= True,
-                    fallbacks = [MessageHandler((~Filters.command('menu')) & ~Filters.text("Today's Timetable") 
+                    fallbacks = [MessageHandler((Filters.command('devann') & ~Filters.command('menu')) & ~Filters.text("Today's Timetable") 
                                     & ~Filters.text('Change Your EMPLOYEE ID') & ~Filters.text("Cancel Class") 
                                     & ~Filters.text("Take Class") & ~Filters.text("Announcement") 
                                     & ~Filters.text("Batch Timetable") & ~Filters.text("Daily Timetable"),self.ivmnuopt)],
@@ -236,13 +237,15 @@ class tchchat:
                                             Menu_cov]
                 },
                 allow_reentry= True,
-                fallbacks=[MessageHandler((~ Filters.regex('^[iI][Ii][Ii][Tt][tT]0[0-9][0-9]$')) & (~Filters.command('menu'))
+                fallbacks=[MessageHandler((~ Filters.regex('^[iI][Ii][Ii][Tt][tT]0[0-9][0-9]$')) & (Filters.command('devann') & ~Filters.command('menu'))
                                                 & ~Filters.text('Menu') & ~Filters.text('Cancel'),self.ivid)],
                 name= "setupcov",
                 persistent=True
             )
 
+        dp.add_handler(CommandHandler("devann", self.usrann, Filters.regex('MSG'),pass_args=True))
         dp.add_handler(Setup_cov)
+        dp.add_handler(CallbackQueryHandler(self.inlineannall))
         dp.add_error_handler(self.error)
         
 
@@ -812,6 +815,46 @@ class tchchat:
         update.message.reply_text(text=text,parse_mode= 'Markdown' )
         update.message.reply_text(text="Your Message was sent to *{}* students in *{}* Batch".format(cnt,ccdata[1]),parse_mode= 'Markdown')
         return self.menucall(update,context)
+
+    # Admin options
+    def usrann(self,update, context):
+        '''
+            conformation for Sending msg to all users in the bot using inlinekeyboard
+        '''
+        payload = context.args
+        text = 'You want to send this message to every one:\n'
+        msgtext = str()
+        chk = False
+        if payload[0] == 'MSG':
+            payload.pop(0)
+            for i in payload:
+                msgtext += i + ' '
+            text += msgtext
+            keyboard = [
+                            [InlineKeyboardButton("Send",callback_data= msgtext),
+                            InlineKeyboardButton("Cancel",callback_data= '4' ) ],
+                        ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            update.message.reply_text(text = text, reply_markup=reply_markup)
+
+    def inlineannall(self,update,context):
+        '''
+            Sending msg to all users in the bot
+        '''
+        query = update.callback_query
+        query.answer()
+        if not query.data == '4':
+            stdchtidlst = self.db.getaltchuid()
+            query.edit_message_text(text='''Please wait we are sending Your message to the users''')
+            text = urllib.parse.quote_plus("Message from CR_ALT Bot Developers : \n" + query.data)
+            cnt = 0
+            for i in stdchtidlst:
+                chat_id = i[0]
+                URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(tchtkn,text,chat_id)
+                requests.get(URL)
+                cnt = cnt + 1
+            query.edit_message_text(text="Your Message was sent to *{}* users".format(cnt),parse_mode= 'Markdown')
+
 if __name__ == '__main__':
     db = teleDb()
     hi = tchchat(db)

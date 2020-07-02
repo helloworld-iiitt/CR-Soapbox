@@ -1,13 +1,13 @@
-import datetime, json, re, time
+import datetime, json, re, time, urllib, requests
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler,  PicklePersistence, CallbackContext, CallbackQueryHandler
 import logging, pytz
 from pytz import timezone
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from python.dbCreate import teleDb
 #from dbCreate import teleDb
-tkn = open('data/stdtkn.txt').read()
-bot = telegram.Bot(token=tkn)
+stdtkn = open('data/stdtkn.txt').read()
+bot = telegram.Bot(token=stdtkn)
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 END = ConversationHandler.END
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class stdchat:
         self.db = db
         self.daylst = ['Monday','Tuesday','Wednesday','Thursday','Friday',"Back"]
         pp = PicklePersistence(filename='data/Stdcraltbot')
-        self.updater = Updater(token=tkn,persistence=pp,use_context=True)
+        self.updater = Updater(token=stdtkn,persistence=pp,use_context=True)
         dp =  self.updater.dispatcher
         j =  self.updater.job_queue
         j.run_daily(self.callback_daily,datetime.time(hour = 1, minute = 15, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
@@ -46,12 +46,12 @@ class stdchat:
                     entry_points=[MessageHandler((Filters.text("Daily Timetable")),self.daykb)],
                     states= {
                         self.Day_MH : [MessageHandler((Filters.text & (Filters.regex(r".*[Dd][Aa][Yy]") ) 
-                                                            & (~Filters.command)),self.stddtt),
+                                                            & (~Filters.command('devann'))),self.stddtt),
                                             MessageHandler((Filters.text('Back')),self.bckmenu)
                                             ]
                     },
                     allow_reentry= True,
-                    fallbacks = [MessageHandler((~ Filters.regex('.*[Dd][Aa][Yy]') & ~ Filters.text('Back')),self.ivdlyday)],
+                    fallbacks = [MessageHandler((~Filters.command('devann') & ~ Filters.regex('.*[Dd][Aa][Yy]') & ~ Filters.text('Back')),self.ivdlyday)],
                     name= "dailyttcov",
                     persistent=True
                 )
@@ -63,12 +63,12 @@ class stdchat:
                                     Filters.regex(r"^[Ee][0-9]$") | Filters.regex(r"^T&P$") ) ),self.selsubatd)],
                     states= {
                     self.Set_Atdpa_MH : [MessageHandler(((Filters.text("Present") | Filters.text("Absent") |
-                                        Filters.regex(r"..?:..?") ) & (~Filters.command)),self.setsubat),
+                                        Filters.regex(r"..?:..?") ) & (~Filters.command('devann'))),self.setsubat),
                                         MessageHandler((Filters.text('Back')),self.bckgetsublst)
                                         ]
                     },
                     allow_reentry= True,
-                    fallbacks = [MessageHandler(( ~Filters.text("Present") & ~Filters.text("Absent") & ~Filters.regex(r"..?:..?") & ~Filters.text('Back') ),self.ivatdpa)],
+                    fallbacks = [MessageHandler((~Filters.command('devann') & ~Filters.text("Present") & ~Filters.text("Absent") & ~Filters.regex(r"..?:..?") & ~Filters.text('Back') ),self.ivatdpa)],
                     name= "atdpacov",
                     persistent=True
                 )
@@ -80,7 +80,7 @@ class stdchat:
                                             ]
                     },
                     allow_reentry= True,
-                    fallbacks = [MessageHandler(((~ Filters.regex(r"^[A-Za-z][A-Za-z][A-Za-z][A-Za-z][0-9][0-9]$") & 
+                    fallbacks = [MessageHandler(((~Filters.command('devann') & ~ Filters.regex(r"^[A-Za-z][A-Za-z][A-Za-z][A-Za-z][0-9][0-9]$") & 
                                     ~ Filters.regex(r"^[Ee][0-9]$") & ~Filters.regex(r"^T&P$") & ~Filters.text('Back')) ),self.ivatdsub)],
                     name= "atdcov",                    
                     persistent=True
@@ -96,7 +96,7 @@ class stdchat:
                                                 Set_atd_cov,(MessageHandler(Filters.text('Change Your ROLL NO'),self.rollupd))]
                     },
                     allow_reentry= True,
-                    fallbacks = [MessageHandler(~Filters.text("Today's Timetable") & ~Filters.text("Get Attendance") 
+                    fallbacks = [MessageHandler(~Filters.command('devann') & ~Filters.text("Today's Timetable") & ~Filters.text("Get Attendance") 
                                         & ~Filters.text('Change Your ROLL NO') & ~Filters.text("Set Attendance") & ~Filters.text("Daily Timetable"),self.ivmnuopt)],
                     name= "menucov",
                     persistent=True
@@ -112,14 +112,16 @@ class stdchat:
                                                 Menu_cov]
                     },
                     allow_reentry= True,
-                    fallbacks=[MessageHandler(~Filters.regex(r'^[CcEe][SsCc][Ee][1-2][0-9][Uu]0[0-3][0-9]$') & ~Filters.text('Menu') & ~Filters.text('Cancel'), self.ivroll ),
+                    fallbacks=[MessageHandler(~Filters.command('devann') & ~Filters.regex(r'^[CcEe][SsCc][Ee][1-2][0-9][Uu]0[0-3][0-9]$') & ~Filters.text('Menu') & ~Filters.text('Cancel'), self.ivroll ),
                                 ],
                     name= "setupcov",
                     persistent=True,
                 )
         
         dp.add_handler(Setup_cov)
-        dp.add_handler(CallbackQueryHandler(self.inlinesetatt))
+        dp.add_handler(CommandHandler("devann", self.usrann, Filters.regex('MSG'),pass_args=True))
+        dp.add_handler(CallbackQueryHandler(self.inlinesetatt,pattern='^[012].*'))
+        dp.add_handler(CallbackQueryHandler(self.inlineannall,pattern='^[34].*'))
         dp.add_error_handler(self.error)
         
 
@@ -197,9 +199,10 @@ class stdchat:
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
         context.bot.send_message(chat_id="1122913247", text="Total no of users using\nCR ATL\n = *{}*".format(self.usrcnt), parse_mode= 'Markdown')
 
+    # job functions for asking attendance
     def daily (self,pernm,context):
         '''
-            Jobqueue's daily_11_00 function to Ask for attendance
+            Jobqueue's daily function to Ask for attendance
         '''
         stdchtidlst = self.db.getusrlst()
         for k in stdchtidlst:
@@ -216,7 +219,7 @@ class stdchat:
                     context.bot.send_message(chat_id=k[0], text= "Did you attend the class of subject {}".format(i[1]),
                         reply_markup=reply_markup)
                     break
-        # Tell ConversationHandler that we're in state `FIRST` now
+
     def daily_11_00 (self,context: telegram.ext.CallbackContext):
         self.daily('10.10-11.00',context)
     def daily_11_50 (self,context: telegram.ext.CallbackContext):
@@ -229,9 +232,11 @@ class stdchat:
         self.daily('02.20-03.10',context)
     def daily_16_00 (self,context: telegram.ext.CallbackContext):
         self.daily('03.10-04.00',context)
-    # Inline function for set attendance
-
+    
     def inlinesetatt(self,update,context):
+        '''
+            Inline function for set attendance
+        '''
         query = update.callback_query
         query.answer()
         if query.data[:1] == '1':
@@ -418,7 +423,46 @@ class stdchat:
         self.getstdatd(update,context)
         self.getsubkb( update, context)
         return END
-        
+
+    # Admin options
+    def usrann(self,update, context):
+        '''
+            conformation for Sending msg to all users in the bot using inlinekeyboard
+        '''
+        payload = context.args
+        text = 'You want to send this message to every one:\n'
+        msgtext = str()
+        chk = False
+        if payload[0] == 'MSG':
+            payload.pop(0)
+            for i in payload:
+                msgtext += i + ' '
+            text += msgtext
+            keyboard = [
+                            [InlineKeyboardButton("Send",callback_data= '3' + msgtext),
+                            InlineKeyboardButton("Cancel",callback_data= '4' ) ],
+                        ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            update.message.reply_text(text = text, reply_markup=reply_markup)
+
+    def inlineannall(self,update,context):
+        '''
+            Sending msg to all users in the bot
+        '''
+        query = update.callback_query
+        query.answer()
+        if not query.data == '4':
+            stdchtidlst = self.db.getalstduid()
+            query.edit_message_text(text='''Please wait we are sending Your message to the users''')
+            text = urllib.parse.quote_plus("Message from CR_ALT Bot Developers : \n" + query.data[1:])
+            cnt = 0
+            for i in stdchtidlst:
+                chat_id = i[0]
+                URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
+                requests.get(URL)
+                cnt = cnt + 1
+            query.edit_message_text(text="Your Message was sent to *{}* users".format(cnt),parse_mode= 'Markdown')
+    
 if __name__ == '__main__':
     db = teleDb()
     hi = stdchat(db)
