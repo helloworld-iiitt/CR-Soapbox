@@ -8,6 +8,8 @@ from python.dbCreate import teleDb
 #from dbCreate import teleDb
 stdtkn = open('data/stdtkn.txt').read()
 bot = telegram.Bot(token=stdtkn)
+fbhyr = open('json/developer.json').read() #access json file
+devjson = json.loads(fbhyr)
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 END = ConversationHandler.END
 logger = logging.getLogger(__name__)
@@ -197,7 +199,8 @@ class stdchat:
         for i in usrlst:
             text = "*Today's Timetable*\n"+self.stdtt(i[0])
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
-        context.bot.send_message(chat_id="1122913247", text="Total no of users using\nCR ATL\n = *{}*".format(self.usrcnt), parse_mode= 'Markdown')
+        for i in devjson["devChat_id"]:
+            context.bot.send_message(chat_id="i", text="Total no of users using\nCR ATL = *{}*".format(tchcnt), parse_mode= 'Markdown')
 
     # job functions for asking attendance
     def daily (self,pernm,context):
@@ -433,7 +436,7 @@ class stdchat:
         text = 'You want to send this message to every one:\n'
         msgtext = str()
         chk = False
-        if payload[0] == 'MSG':
+        if payload[0] == 'MSG' and (update.effective_chat.id in devjson['devChat_id']):
             payload.pop(0)
             for i in payload:
                 msgtext += i + ' '
@@ -454,14 +457,13 @@ class stdchat:
         if not query.data == '4':
             stdchtidlst = self.db.getalstduid()
             query.edit_message_text(text='''Please wait we are sending Your message to the users''')
-            text = urllib.parse.quote_plus("Message from CR_ALT Bot Developers : \n" + query.data[1:])
+            text = ("Message from CR_ALT Bot Developers : \n" + str(query.data[1:]))
             cnt = 0
             for i in stdchtidlst:
                 chat_id = i[0]
-                URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
-                requests.get(URL)
+                context.bot.send_message(chat_id= chat_id , text=text)
                 cnt = cnt + 1
-            query.edit_message_text(text="Your Message was sent to *{}* users".format(cnt),parse_mode= 'Markdown')
+            query.edit_message_text(text="Your Message was sent to *{}* users".format(cnt))
     
 if __name__ == '__main__':
     db = teleDb()

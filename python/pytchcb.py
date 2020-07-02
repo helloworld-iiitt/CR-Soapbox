@@ -8,6 +8,8 @@ from python.dbCreate import teleDb
 #from dbCreate import teleDb
 stdtkn = open('data/stdtkn.txt').read()
 tchtkn = open('data/tchtkn.txt').read()
+fbhyr = open('json/developer.json').read() #access json file
+devjson = json.loads(fbhyr)
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -88,8 +90,9 @@ class tchchat:
         Announce_conf_cov =  ConversationHandler(
                     entry_points=[MessageHandler((Filters.regex('^MSG-.*')),self.anncon)],
                     states= {
-                        self.Announce_conf_MH : [MessageHandler((Filters.text('Send')),self.annsnd),
-                                        MessageHandler(Filters.text('Back'),self.menucall),CommandHandler('menu', self.menucall)]
+                        self.Announce_conf_MH : [CallbackQueryHandler(self.annsnd,pattern='^[01]')
+                                                    ,CommandHandler('menu', self.menucall),
+                                                    MessageHandler((Filters.text('Back')),self.menucall)]
                     },
                     allow_reentry= True,
                     fallbacks = [MessageHandler((~Filters.text('Send') & ~Filters.text('Back') & Filters.command('devann') & ~Filters.command('menu')),self.ivanncon)],
@@ -245,7 +248,7 @@ class tchchat:
 
         dp.add_handler(CommandHandler("devann", self.usrann, Filters.regex('MSG'),pass_args=True))
         dp.add_handler(Setup_cov)
-        dp.add_handler(CallbackQueryHandler(self.inlineannall))
+        dp.add_handler(CallbackQueryHandler(self.inlineannall,pattern='^[45].*',))
         dp.add_error_handler(self.error)
         
 
@@ -274,7 +277,8 @@ class tchchat:
             text = "*Today's Timetable*\n"+self.tchtt(i[0])
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
             time.sleep(1)
-        context.bot.send_message(chat_id="1122913247", text="Total no of users using\nCR ATL(TCH)\n = *{}*".format(tchcnt), parse_mode= 'Markdown')
+        for i in devjson["devChat_id"]:
+            context.bot.send_message(chat_id="i", text="Total no of users using\nCR ATL(TCH)\n = *{}*".format(tchcnt), parse_mode= 'Markdown')
 
 
     # Invalid Input Functions
@@ -623,6 +627,7 @@ class tchchat:
         if (update.message.text).upper() in self.anngrdchklst:
             if not update.message.text == 'Back':
                 context.user_data['Annmsggrd'] = (update.message.text).upper()
+                context.user_data['Usrnm'] =  update.message.from_user.first_name
             update.message.reply_text(text="Please send the message you want us to pass to *{}* Batch".format(context.user_data['Annmsggrd']), parse_mode= 'Markdown') 
             update.message.reply_text(text="send the message starts with MSG-(YOUR MESSAGE). Example:")
             update.message.reply_text(text="MSG-Hi students welcome to CR ALT",reply_markup=telegram.ReplyKeyboardMarkup([["Back"]]))
@@ -636,27 +641,36 @@ class tchchat:
             Asks teacher to conform before sending the msg 
         '''
         context.user_data['Annmsg'] = (update.message.text)[4:]
-        update.message.reply_text(text='''You want us to send message *"{}"* to *{}* Batch'''.format(context.user_data['Annmsg'],context.user_data['Annmsggrd']), parse_mode= 'Markdown') 
-        update.message.reply_text(text="Please click on \nSend to send the message \nClick on cancel to cancel",reply_markup=telegram.ReplyKeyboardMarkup([['Send'],['Back']]))
-        
+        text='''You want us to send message *"{}"* to *{}* Batch'''.format(context.user_data['Annmsg'],context.user_data['Annmsggrd'])
+        #update.message.reply_text(text='''You want us to send message *"{}"* to *{}* Batch'''.format(context.user_data['Annmsg'],context.user_data['Annmsggrd']), parse_mode= 'Markdown') 
+        #update.message.reply_text(text="Please click on \nSend to send the message \nClick on cancel to cancel",reply_markup=telegram.ReplyKeyboardMarkup([['Send'],['Back']]))
+        keyboard = [
+                            [InlineKeyboardButton("Send",callback_data= '1'),
+                            InlineKeyboardButton("Cancel",callback_data= '0' ) ],
+                        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        update.message.reply_text(text = text, reply_markup=reply_markup, parse_mode= 'Markdown')
         return self.Announce_conf_MH
 
     def annsnd(self, update, context):
         '''
             Send teacher msg to students
         '''
-        text = urllib.parse.quote_plus(context.user_data['Annmsg'])
-        stdchtidlst = self.db.grdstdid(context.user_data['Annmsggrd'])
-        update.message.reply_text(text='''Please wait we are sending Your message to the students''')
-        text = "Sir/Madam {}, sends you this message -\n".format(update.message.from_user.first_name) + text
-        cnt = 0
-        for i in stdchtidlst:
-            chat_id = i[0]
-            URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
-            requests.get(URL)
-            cnt = cnt + 1
-        update.message.reply_text(text="Your Message was sent to *{}* students in *{}* Batch".format(cnt,context.user_data['Annmsggrd']),parse_mode= 'Markdown')
-        return self.menucall(update, context)
+        query = update.callback_query
+        query.answer()
+        if not query.data == '0':
+            text = urllib.parse.quote_plus(context.user_data['Annmsg'])
+            stdchtidlst = self.db.grdstdid(context.user_data['Annmsggrd'])
+            query.edit_message_text(text='''Please wait we are sending Your message to the students''')
+            text = "Sir/Madam {}, sends you this message -\n".format(context.user_data['Usrnm'] ) + text
+            cnt = 0
+            for i in stdchtidlst:
+                chat_id = i[0]
+                URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
+                requests.get(URL)
+                cnt = cnt + 1
+            query.edit_message_text(text="Your Message was sent to *{}* students in *{}* Batch".format(cnt,context.user_data['Annmsggrd']),parse_mode= 'Markdown')
+
 
     # take class functions
 
@@ -825,19 +839,19 @@ class tchchat:
         text = 'You want to send this message to every one:\n'
         msgtext = str()
         chk = False
-        if payload[0] == 'MSG':
+        if payload[0] == 'MSG' and (update.effective_chat.id in devjson['devChat_id']):
             payload.pop(0)
             for i in payload:
                 msgtext += i + ' '
             text += msgtext
             keyboard = [
-                            [InlineKeyboardButton("Send",callback_data= msgtext),
+                            [InlineKeyboardButton("Send",callback_data= '5' + msgtext),
                             InlineKeyboardButton("Cancel",callback_data= '4' ) ],
                         ]
             reply_markup = InlineKeyboardMarkup(keyboard)
             update.message.reply_text(text = text, reply_markup=reply_markup)
 
-    def inlineannall(self,update,context):
+    def inlineannall(self,update,context: telegram.ext.CallbackContext):
         '''
             Sending msg to all users in the bot
         '''
@@ -846,14 +860,13 @@ class tchchat:
         if not query.data == '4':
             stdchtidlst = self.db.getaltchuid()
             query.edit_message_text(text='''Please wait we are sending Your message to the users''')
-            text = urllib.parse.quote_plus("Message from CR_ALT Bot Developers : \n" + query.data)
+            text = ("Message from CR_ALT Bot Developers : \n" + query.data[1:])
             cnt = 0
             for i in stdchtidlst:
                 chat_id = i[0]
-                URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(tchtkn,text,chat_id)
-                requests.get(URL)
+                context.bot.send_message(chat_id= chat_id , text=text)
                 cnt = cnt + 1
-            query.edit_message_text(text="Your Message was sent to *{}* users".format(cnt),parse_mode= 'Markdown')
+            query.edit_message_text(text="Your Message was sent to *{}* users".format(cnt))
 
 if __name__ == '__main__':
     db = teleDb()
