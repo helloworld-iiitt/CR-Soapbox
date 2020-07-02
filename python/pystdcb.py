@@ -463,7 +463,7 @@ class stdchat:
                 chat_id = i[0]
                 context.bot.send_message(chat_id= chat_id , text=text)
                 cnt = cnt + 1
-            query.edit_message_text(text="Your Message was sent to *{}* users".format(cnt))
+            query.edit_message_text(text="Your Message was sent to {} users".format(cnt))
     
 if __name__ == '__main__':
     db = teleDb()
