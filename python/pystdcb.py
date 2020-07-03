@@ -439,7 +439,10 @@ class stdchat:
         if payload[0] == 'MSG' and (update.effective_chat.id in devjson['devChat_id']):
             payload.pop(0)
             for i in payload:
-                msgtext += i + ' '
+                if i == "<>":
+                    msgtext += '\n' 
+                else:
+                    msgtext += i + ' '
             text += msgtext
             keyboard = [
                             [InlineKeyboardButton("Send",callback_data= '3' + msgtext),
@@ -464,6 +467,8 @@ class stdchat:
                 context.bot.send_message(chat_id= chat_id , text=text)
                 cnt = cnt + 1
             query.edit_message_text(text="Your Message was sent to {} users".format(cnt))
+        else:
+            query.edit_message_text(text="You Cancelled your request")
     
 if __name__ == '__main__':
     db = teleDb()

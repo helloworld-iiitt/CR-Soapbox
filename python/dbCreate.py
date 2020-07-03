@@ -181,6 +181,8 @@ class teleDb:
             day_id = self.cur.fetchone()[0]
             self.cur.execute('SELECT id FROM PERIOD_TB WHERE period = ? ', (self.period, ))
             period_id = self.cur.fetchone()[0]
+            self.cur.execute('''SELECT day_id FROM TIMETABLE_TB WHERE day_id = ? AND subject_id = ? AND period_id = ?''',(day_id,subject_id,period_id))
+            self.cur.fetchone()[0]
             self.cur.execute('''DELETE FROM TIMETABLE_TB WHERE day_id = ? AND subject_id = ? AND period_id = ?''',(day_id,subject_id,period_id))
             self.conn.commit()
             return 1

@@ -86,27 +86,10 @@ class tchchat:
                 )
 
         # Announcement cov
-
-        Announce_conf_cov =  ConversationHandler(
-                    entry_points=[MessageHandler((Filters.regex('^MSG-.*')),self.anncon)],
-                    states= {
-                        self.Announce_conf_MH : [CallbackQueryHandler(self.annsnd,pattern='^[01]')
-                                                    ,CommandHandler('menu', self.menucall),
-                                                    MessageHandler((Filters.text('Back')),self.menucall)]
-                    },
-                    allow_reentry= True,
-                    fallbacks = [MessageHandler((~Filters.text('Send') & ~Filters.text('Back') & Filters.command('devann') & ~Filters.command('menu')),self.ivanncon)],
-                    map_to_parent={ self.STOPPING : self.STOPPING,
-                                    self.Announce_grd_MH: self.Announce_grd_MH},
-                    name= "annconfcov",
-                    persistent=True
-                )
-
-
         Announce_msg_cov = ConversationHandler(
                     entry_points=[MessageHandler((Filters.regex("^[CEce][SsCc][Ee][0-9][0-9]$") ),self.annmsg)],
                     states= {
-                        self.Announce_msg_MH : [Announce_conf_cov,
+                        self.Announce_msg_MH : [MessageHandler((Filters.regex('^MSG-.*')),self.anncon),
                                         MessageHandler((Filters.text('Back')),self.bckanngrdkb),CommandHandler('menu', self.menucall)]
                     },
                     allow_reentry= True,
@@ -248,7 +231,10 @@ class tchchat:
 
         dp.add_handler(CommandHandler("devann", self.usrann, Filters.regex('MSG'),pass_args=True))
         dp.add_handler(Setup_cov)
-        dp.add_handler(CallbackQueryHandler(self.inlineannall,pattern='^[45].*',))
+        dp.add_handler(CallbackQueryHandler(self.annsnd,pattern='^[01].*'))
+        dp.add_handler(CallbackQueryHandler(self.tkeclsmsg,pattern='^[23].*'))
+        dp.add_handler(CallbackQueryHandler(self.cclsmsg,pattern='^[45].*'))
+        dp.add_handler(CallbackQueryHandler(self.inlineannall,pattern='^[67].*',))
         dp.add_error_handler(self.error)
         
 
@@ -642,15 +628,14 @@ class tchchat:
         '''
         context.user_data['Annmsg'] = (update.message.text)[4:]
         text='''You want us to send message *"{}"* to *{}* Batch'''.format(context.user_data['Annmsg'],context.user_data['Annmsggrd'])
-        #update.message.reply_text(text='''You want us to send message *"{}"* to *{}* Batch'''.format(context.user_data['Annmsg'],context.user_data['Annmsggrd']), parse_mode= 'Markdown') 
-        #update.message.reply_text(text="Please click on \nSend to send the message \nClick on cancel to cancel",reply_markup=telegram.ReplyKeyboardMarkup([['Send'],['Back']]))
+        annikdata =  context.user_data['Usrnm']  + '<>' + context.user_data['Annmsggrd'] + '<>' + context.user_data['Annmsg']
         keyboard = [
-                            [InlineKeyboardButton("Send",callback_data= '1'),
+                            [InlineKeyboardButton("Send",callback_data= '1' + annikdata),
                             InlineKeyboardButton("Cancel",callback_data= '0' ) ],
                         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(text = text, reply_markup=reply_markup, parse_mode= 'Markdown')
-        return self.Announce_conf_MH
+        return self.bckanngrdkb(update, context)
 
     def annsnd(self, update, context):
         '''
@@ -658,19 +643,21 @@ class tchchat:
         '''
         query = update.callback_query
         query.answer()
-        if not query.data == '0':
-            text = urllib.parse.quote_plus(context.user_data['Annmsg'])
-            stdchtidlst = self.db.grdstdid(context.user_data['Annmsggrd'])
+        if query.data[:1] == '1':
+            anndata = query.data[1:].split('<>',2)
+            text = urllib.parse.quote_plus(anndata[2])
+            stdchtidlst = self.db.grdstdid(anndata[1].upper())
             query.edit_message_text(text='''Please wait we are sending Your message to the students''')
-            text = "Sir/Madam {}, sends you this message -\n".format(context.user_data['Usrnm'] ) + text
+            text = "Sir/Madam {}, sends you this message -\n".format(anndata[0] ) + text
             cnt = 0
             for i in stdchtidlst:
                 chat_id = i[0]
                 URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
                 requests.get(URL)
                 cnt = cnt + 1
-            query.edit_message_text(text="Your Message was sent to *{}* students in *{}* Batch".format(cnt,context.user_data['Annmsggrd']),parse_mode= 'Markdown')
-
+            query.edit_message_text(text="Your Message was sent to *{}* students in *{}* Batch".format(cnt,anndata[1]),parse_mode= 'Markdown')
+        else:
+            query.edit_message_text(text="You Cancelled your request")
 
     # take class functions
 
@@ -734,36 +721,46 @@ class tchchat:
         '''
             Create class in the timetable
         '''
-        sub = context.user_data['tkegrd'].split(':')
         if update.message.text in self.perchklst:
-            k = self.db.crecls(sub[0].upper(),sub[1].upper(),update.message.text,context.user_data['tkeday']) 
+            tcikdata = context.user_data['tkegrd'] + ':' + update.message.text + ':' + context.user_data['tkeday'] + ':' + update.message.from_user.first_name 
+            tcdata = tcikdata.split(':')
+            text='''You want us to Create Class for \nsubject {} of {} \non {} : {}'''.format(tcdata[1].upper(),tcdata[0].upper(),tcdata[3],tcdata[2])
+            # tcikdate = grade:subject:period:day:Name
+            keyboard = [
+                                [InlineKeyboardButton("Yes",callback_data= '3' + tcikdata),
+                                InlineKeyboardButton("No",callback_data= '2' ) ],
+                            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            update.message.reply_text(text = text, reply_markup=reply_markup, parse_mode= 'Markdown')
         else:
-            k=-1
-        
-        if not k == -1:
-            return self.tkeclsmsg(update,context)
-        else:
-            update.message.reply_text(text='''There was an error please try again with \n*a valid period*''',parse_mode= 'Markdown' )
-            return self.menucall(update, context)
+            update.message.reply_text(text = 'There was an error *Please try again*', parse_mode= 'Markdown')
+        return self.menucall(update, context)
 
-    def tkeclsmsg(self,update,context):
+    def tkeclsmsg(self,update,context: telegram.ext.CallbackContext):
         '''
             Send message to the students
         '''
-        update.message.reply_text(text='''Please wait we are sending Your message to the students''',parse_mode= 'Markdown' )
-        tcdata = context.user_data['tkegrd'].split(':')
-        text='''Class for subject {} of {} created on {} : {} by Sir/Mam {}'''.format(tcdata[1],tcdata[0],context.user_data['tkeday'],update.message.text,update.message.from_user.first_name)
-        stdchtidlst = self.db.grdstdid(tcdata[0])
-        text =text + '\nPlease Check your Timetable ' 
-        cnt = 0
-        for i in stdchtidlst:
-            chat_id = i[0]
-            URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
-            requests.get(URL)
-            cnt = cnt + 1
-        update.message.reply_text(text=text,parse_mode= 'Markdown' )
-        update.message.reply_text(text="Your Message was sent to *{}* students in *{}* Batch".format(cnt,tcdata[0]),parse_mode= 'Markdown')
-        return self.menucall(update,context)
+        query = update.callback_query
+        query.answer()
+        if query.data[:1] == '3':
+            tcdata = query.data[1:].split(':')
+            chk = self.db.crecls(tcdata[0].upper(),tcdata[1].upper(),tcdata[2],tcdata[3])
+            if not chk == -1:
+                query.edit_message_text(text='''Please wait we are sending Your message to the students''',parse_mode= 'Markdown' )
+                text='''Class for subject {} of {} created on {} : {} by Sir/Mam {}'''.format(tcdata[1],tcdata[0],tcdata[3],tcdata[2],tcdata[4])
+                stdchtidlst = self.db.grdstdid(tcdata[0])
+                text =text + '\nPlease Check your Timetable ' 
+                cnt = 0
+                for i in stdchtidlst:
+                    chat_id = i[0]
+                    URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
+                    requests.get(URL)
+                    cnt = cnt + 1
+                query.edit_message_text(text=text + "\nYour Message was sent to *{}* students in *{}* Batch".format(cnt,tcdata[0]),parse_mode= 'Markdown')
+            else:
+                query.edit_message_text(text='''There was an error :\n*Selected period slot is not empty*,\nplease try again ''',parse_mode= 'Markdown' )
+        else:
+            query.edit_message_text(text="You Cancelled your request")
 
     # Cancel class
 
@@ -800,35 +797,46 @@ class tchchat:
         Delete class from the gven day and period
         '''
         if update.message.text in self.pgschklst:
-            context.user_data['ccdata'] = update.message.text.split(':')
-            ccdata = context.user_data['ccdata']
-            chk = self.db.delcls(ccdata[1].upper(),ccdata[2].upper(),ccdata[0],context.user_data['ccday']) 
+            ccdata = update.message.text.split(':')
+            text='''You want us to Cancel Class for \nsubject {} of {} \non {} : {}'''.format(ccdata[2].upper(),ccdata[1],context.user_data['ccday'],ccdata[0])
+            ccikdata = update.message.text + ':' + context.user_data['ccday'] + ':' + update.message.from_user.first_name
+            #ccikdata = Period:Grade:Subject:Day:Name
+            keyboard = [
+                                [InlineKeyboardButton("Yes",callback_data= '5' + ccikdata),
+                                InlineKeyboardButton("No",callback_data= '4' ) ],
+                            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            update.message.reply_text(text = text, reply_markup=reply_markup, parse_mode= 'Markdown')
         else:
-            chk = -1
-        if chk == 1:
-            return self.cclsmsg(update,context)
-        else:
-            update.message.reply_text(text='''There was an error please try again \nby selecting from custom keyboard''',parse_mode= 'Markdown' )
-            return self.menucall(update,context)
+            update.message.reply_text(text = 'There was an error *Please try again*', parse_mode= 'Markdown')
+        return self.menucall(update, context)
 
-    def cclsmsg(self,update,context):
+    def cclsmsg(self,update,contextcontext: telegram.ext.CallbackContext):
         '''
             Send message to the students
         '''
-        ccdata = context.user_data['ccdata']
-        update.message.reply_text(text='''Please wait we are sending Your message to the students''',parse_mode= 'Markdown' )
-        text='''Class for subject {} of {} on {} : {} was Cancelled by Sir/Mam {}'''.format(ccdata[2].upper(),ccdata[1],context.user_data['ccday'],ccdata[0],update.message.from_user.first_name)
-        stdchtidlst = self.db.grdstdid(ccdata[1])
-        text =text + '\nPlease Check your Timetable ' 
-        cnt = 0
-        for i in stdchtidlst:
-            chat_id = i[0]
-            URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
-            requests.get(URL)
-            cnt = cnt + 1
-        update.message.reply_text(text=text,parse_mode= 'Markdown' )
-        update.message.reply_text(text="Your Message was sent to *{}* students in *{}* Batch".format(cnt,ccdata[1]),parse_mode= 'Markdown')
-        return self.menucall(update,context)
+        query = update.callback_query
+        query.answer()
+        if query.data[:1] == '5':
+            ccdata = query.data[1:].split(':')
+            chk = self.db.delcls(ccdata[1].upper(),ccdata[2].upper(),ccdata[0],ccdata[3])
+            if chk == 1:
+                query.edit_message_text(text='''Please wait we are sending Your message to the students''',parse_mode= 'Markdown' )
+                text='''Class for subject {} of {} on {} : {} was Cancelled by Sir/Mam {}'''.format(ccdata[2].upper(),ccdata[1],ccdata[3],ccdata[0],ccdata[4])
+                stdchtidlst = self.db.grdstdid(ccdata[1])
+                text =text + '\nPlease Check your Timetable ' 
+                cnt = 0
+                for i in stdchtidlst:
+                    chat_id = i[0]
+                    URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
+                    requests.get(URL)
+                    cnt = cnt + 1
+                query.edit_message_text(text=text + "\nYour Message was sent to *{}* students in *{}* Batch".format(cnt,ccdata[1]),parse_mode= 'Markdown')
+            else:
+                query.edit_message_text(text='''There was an error :\n*Selected period Does not exist*,\nplease try again ''',parse_mode= 'Markdown' )
+        else:
+            query.edit_message_text(text="You Cancelled your request")
+
 
     # Admin options
     def usrann(self,update, context):
@@ -842,11 +850,14 @@ class tchchat:
         if payload[0] == 'MSG' and (update.effective_chat.id in devjson['devChat_id']):
             payload.pop(0)
             for i in payload:
-                msgtext += i + ' '
+                if i == "<>":
+                    msgtext += '\n' 
+                else:
+                    msgtext += i + ' '
             text += msgtext
             keyboard = [
-                            [InlineKeyboardButton("Send",callback_data= '5' + msgtext),
-                            InlineKeyboardButton("Cancel",callback_data= '4' ) ],
+                            [InlineKeyboardButton("Send",callback_data= '7' + msgtext),
+                            InlineKeyboardButton("Cancel",callback_data= '6' ) ],
                         ]
             reply_markup = InlineKeyboardMarkup(keyboard)
             update.message.reply_text(text = text, reply_markup=reply_markup)
@@ -857,7 +868,7 @@ class tchchat:
         '''
         query = update.callback_query
         query.answer()
-        if not query.data == '4':
+        if query.data[:1] == '7':
             stdchtidlst = self.db.getaltchuid()
             query.edit_message_text(text='''Please wait we are sending Your message to the users''')
             text = ("Message from CR_ALT Bot Developers : \n" + query.data[1:])
@@ -867,6 +878,8 @@ class tchchat:
                 context.bot.send_message(chat_id= chat_id , text=text)
                 cnt = cnt + 1
             query.edit_message_text(text="Your Message was sent to {} users".format(cnt))
+        else:
+            query.edit_message_text(text="You Cancelled your request")
 
 if __name__ == '__main__':
     db = teleDb()
