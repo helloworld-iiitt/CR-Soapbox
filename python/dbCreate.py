@@ -315,19 +315,6 @@ class teleDb:
         self.grade = grade
         self.cur.execute('SELECT SUBJECT_TB.subject FROM SUBJECT_TB JOIN GRADE_TB ON SUBJECT_TB.grade_id = GRADE_TB.id WHERE GRADE_TB.grade = ?',(self.grade,))
         return self.cur.fetchall()
-    def getusrlst(self):
-        '''
-            Returns list of tuples of user id of students
-        '''
-        self.cur.execute('SELECT chat_id FROM USER_TB')
-        return self.cur.fetchall()
-
-    def gettchlst(self):
-        '''
-            Returns list of tuples of user id of teachers
-        '''
-        self.cur.execute('SELECT chat_id FROM TCHUSR_TB')
-        return self.cur.fetchall()
 
     def chkusr(self,chat_id):
         '''

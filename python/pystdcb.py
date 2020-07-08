@@ -193,21 +193,20 @@ class stdchat:
         '''
             Jobqueue's callback_daily function
         '''
-        usrlst = self.db.getusrlst()
-        self.usrcnt = len(usrlst)
+        usrlst = self.db.getalstduid()
 
         for i in usrlst:
             text = "*Today's Timetable*\n"+self.stdtt(i[0], datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
         for i in devjson["devChat_id"]:
-            context.bot.send_message(chat_id=i, text="Total no of users using\nCR ATL = *{}*".format(tchcnt), parse_mode= 'Markdown')
+            context.bot.send_message(chat_id=i, text="Total no of users using\nCR ATL = *{}*".format(len(usrlst)), parse_mode= 'Markdown')
 
     # job functions for asking attendance
     def daily (self,pernm,context):
         '''
             Jobqueue's daily function to Ask for attendance
         '''
-        stdchtidlst = self.db.getusrlst()
+        stdchtidlst = self.db.getalstduid()
         for k in stdchtidlst:
             persublst=self.db.getStdtt(self.db.getusrgrd(k[0]), datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
             perlst = list()

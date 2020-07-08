@@ -245,7 +245,7 @@ class tchchat:
             it will up date day timetable on working days after 04:30 pm
         '''
         self.db.upddaytt()
-        tchlst = self.db.gettchlst()
+        tchlst = self.db.getaltchuid()
 
         for i in tchlst:
             text = "Sir/Madam Next {} \n timetable was updated.\nYou can make changes in the timetable now".format( datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A") )
@@ -256,15 +256,13 @@ class tchchat:
         '''
             Jobqueue's callback_daily function
         '''
-        tchlst = self.db.gettchlst()
-        tchcnt = len(tchlst)
-
+        tchlst = self.db.getaltchuid()
         for i in tchlst:
             text = "*Today's Timetable*\n"+self.tchtt(chat_id = i[0],day= datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
             time.sleep(1)
         for i in devjson["devChat_id"]:
-            context.bot.send_message(chat_id=i, text="Total no of users using\nCR ATL(TCH)\n = *{}*".format(tchcnt), parse_mode= 'Markdown')
+            context.bot.send_message(chat_id=i, text="Total no of users using\nCR ATL(TCH)\n = *{}*".format(len(tchlst)), parse_mode= 'Markdown')
 
 
     # Invalid Input Functions
