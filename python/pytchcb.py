@@ -260,7 +260,7 @@ class tchchat:
         tchcnt = len(tchlst)
 
         for i in tchlst:
-            text = "*Today's Timetable*\n"+self.tchtt(i[0])
+            text = "*Today's Timetable*\n"+self.tchtt(chat_id = i[0],day= datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
             time.sleep(1)
         for i in devjson["devChat_id"]:

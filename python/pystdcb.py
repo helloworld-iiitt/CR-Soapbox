@@ -197,7 +197,7 @@ class stdchat:
         self.usrcnt = len(usrlst)
 
         for i in usrlst:
-            text = "*Today's Timetable*\n"+self.stdtt(i[0])
+            text = "*Today's Timetable*\n"+self.stdtt(i[0], datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
         for i in devjson["devChat_id"]:
             context.bot.send_message(chat_id=i, text="Total no of users using\nCR ATL = *{}*".format(tchcnt), parse_mode= 'Markdown')
@@ -209,7 +209,7 @@ class stdchat:
         '''
         stdchtidlst = self.db.getusrlst()
         for k in stdchtidlst:
-            persublst=self.db.getStdtt(self.db.getusrgrd(k[0]))
+            persublst=self.db.getStdtt(self.db.getusrgrd(k[0]), datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
             perlst = list()
             for i in persublst:
                 if i[0] == pernm:
