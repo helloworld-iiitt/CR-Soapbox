@@ -200,7 +200,7 @@ class stdchat:
             text = "*Today's Timetable*\n"+self.stdtt(i[0])
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
         for i in devjson["devChat_id"]:
-            context.bot.send_message(chat_id="i", text="Total no of users using\nCR ATL = *{}*".format(tchcnt), parse_mode= 'Markdown')
+            context.bot.send_message(chat_id=i, text="Total no of users using\nCR ATL = *{}*".format(tchcnt), parse_mode= 'Markdown')
 
     # job functions for asking attendance
     def daily (self,pernm,context):

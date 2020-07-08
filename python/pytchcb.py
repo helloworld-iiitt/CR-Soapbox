@@ -264,7 +264,7 @@ class tchchat:
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
             time.sleep(1)
         for i in devjson["devChat_id"]:
-            context.bot.send_message(chat_id="i", text="Total no of users using\nCR ATL(TCH)\n = *{}*".format(tchcnt), parse_mode= 'Markdown')
+            context.bot.send_message(chat_id=i, text="Total no of users using\nCR ATL(TCH)\n = *{}*".format(tchcnt), parse_mode= 'Markdown')
 
 
     # Invalid Input Functions
