@@ -34,13 +34,13 @@ class stdchat:
         self.updater = Updater(token=stdtkn,persistence=pp,use_context=True)
         dp =  self.updater.dispatcher
         j =  self.updater.job_queue
-        j.run_daily(self.callback_daily,datetime.time(hour = 1, minute = 15, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_11_00,datetime.time(hour = 11, minute = 00, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_11_50,datetime.time(hour = 11, minute = 50, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_12_40,datetime.time(hour = 12, minute = 40, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_14_20,datetime.time(hour = 14, minute = 20, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_15_10,datetime.time(hour = 15, minute = 10, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_16_00,datetime.time(hour = 16, minute = 00, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.callback_daily,datetime.time(hour = 1, minute = 15, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_11_00,datetime.time(hour = 11, minute = 00, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_11_50,datetime.time(hour = 11, minute = 50, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_12_40,datetime.time(hour = 12, minute = 40, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_14_20,datetime.time(hour = 14, minute = 20, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_15_10,datetime.time(hour = 15, minute = 10, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_16_00,datetime.time(hour = 16, minute = 00, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
 
         # Daily timetable conv
 
