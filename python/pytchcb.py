@@ -248,7 +248,7 @@ class tchchat:
         tchlst = self.db.gettchlst()
 
         for i in tchlst:
-            text = "Sir/Madam Next {} \n timetable was updated.\nYou can make changes in the timetable now".format( datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
+            text = "Sir/Madam Next {} \n timetable was updated.\nYou can make changes in the timetable now".format( datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A") )
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
             time.sleep(1)
 
@@ -490,7 +490,7 @@ class tchchat:
 
     # Teacher Timetable Functions
 
-    def tchtt(self,chat_id,day= datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")):
+    def tchtt(self,chat_id,day):
         '''
             Return Teacher Timetable as a string
         '''
@@ -507,7 +507,7 @@ class tchchat:
         '''
             Sends today's Timetable to the Teacher
         '''
-        text = self.tchtt(update.effective_chat.id)
+        text = self.tchtt(update.effective_chat.id, datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A") )
         if text == "No Classes":
             update.message.reply_text(text="No Classes Today")
             return self.Menu_opt_MH

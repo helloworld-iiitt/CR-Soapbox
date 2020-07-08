@@ -304,7 +304,7 @@ class stdchat:
 
     # Student timetable Functions
 
-    def stdtt(self,chat_id,day= datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")):
+    def stdtt(self,chat_id,day):
         '''
             Return student Timetable as a string
         '''
@@ -321,7 +321,7 @@ class stdchat:
         '''
             Sends today's Timetable to the student
         '''
-        text = self.stdtt(update.effective_chat.id)
+        text = self.stdtt(update.effective_chat.id,datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
         if text == "No Classes":
             update.message.reply_text(text="No Classes Today")
             return self.Menu_opt_MH
