@@ -662,7 +662,7 @@ class tchchat:
             anndata = query.data[1:].split('<>',2)
             stdchtidlst = self.db.grdstdid(anndata[1].upper())
             query.edit_message_text(text='''Please wait we are sending Your message to the students''')
-            text = "Sir/Madam {}, sends you this message -\n".format(anndata[0]) + text
+            text = "Sir/Madam {}, sends you this message -\n".format(anndata[0]) + anndata[2]
             cnt = 0
             for i in stdchtidlst:
                 chat_id = i[0]
