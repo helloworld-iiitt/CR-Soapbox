@@ -9,12 +9,12 @@ from python.dbCreate import teleDb
 stdtkn = open('data/stdtkn.txt').read()
 tchtkn = open('data/tchtkn.txt').read()
 fbhyr = open('json/developer.json').read() #access json file
+fbydata = json.loads(open('json/branchYearlist.json').read()) #access json file
 devjson = json.loads(fbhyr)
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 END = ConversationHandler.END
-periodlst = ['10.10-11.00','11.00-11.50','11.50-12.40','01.30-02.20','02.20-03.10','03.10-04.00']
 class tchchat:
     '''
         Class for telegram chat bot - CR_Alt (TEACHER VER)
@@ -33,13 +33,26 @@ class tchchat:
             starts polling
         '''
         self.db = db
-        self.daylst = ['Monday','Tuesday','Wednesday','Thursday','Friday',"Back"]
+        self.daylst = fbydata["daylst"]
+        self.daylst.append("Back")
+        self.dayinkb = list()
+        if len(self.daylst)%2 == 0 :
+            for i,j in zip(self.daylst[0::2],self.daylst[1::2]):
+                self.dayinkb.append([i,j])
+        else:
+            last = (self.daylst).pop()
+            for i,j in zip(self.daylst[0::2],self.daylst[1::2]):
+                self.dayinkb.append([i,j])
+            self.daylst.append(last)
+            self.dayinkb.append([last])
+        
         pp = PicklePersistence(filename='data/Tchcraltbot')
         self.updater = Updater(token=tchtkn,persistence=pp,use_context=True)
         dp =  self.updater.dispatcher
         j =  self.updater.job_queue
-        j.run_daily(self.updaytt,datetime.time(hour = 18, minute = 0, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.callback_daily,datetime.time(hour = 2, minute = 0, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        daytuple = tuple(range(len(self.daylst)-1))
+        j.run_daily(self.updaytt,datetime.time(hour = 18, minute = 00, tzinfo = timezone('Asia/Kolkata')),daytuple,context=telegram.ext.CallbackContext)
+        j.run_daily(self.callback_daily,datetime.time(hour = 2, minute = 0, tzinfo = timezone('Asia/Kolkata')),daytuple,context=telegram.ext.CallbackContext)
 
         # daily timetable cov
 
@@ -244,11 +257,11 @@ class tchchat:
             Jobqueue's Updaytt function
             it will up date day timetable on working days after 04:30 pm
         '''
-        self.db.upddaytt()
-        tchlst = self.db.getaltchuid()
+        self.db.upddaytt(datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A"))
+        tchlst = self.db.gettchlst()
 
         for i in tchlst:
-            text = "Sir/Madam Next {} \n timetable was updated.\nYou can make changes in the timetable now".format( datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A") )
+            text = "Sir/Madam Next {} \n timetable was updated.\nYou can make changes in the timetable now".format( datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
             time.sleep(1)
 
@@ -256,13 +269,15 @@ class tchchat:
         '''
             Jobqueue's callback_daily function
         '''
-        tchlst = self.db.getaltchuid()
+        tchlst = self.db.gettchlst()
+        tchcnt = len(tchlst)
+
         for i in tchlst:
-            text = "*Today's Timetable*\n"+self.tchtt(chat_id = i[0],day= datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
+            text = "*Today's Timetable*\n"+self.tchtt(i[0])
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
             time.sleep(1)
         for i in devjson["devChat_id"]:
-            context.bot.send_message(chat_id=i, text="Total no of users using\nCR ATL(TCH)\n = *{}*".format(len(tchlst)), parse_mode= 'Markdown')
+            context.bot.send_message(chat_id=i, text="Total no of users using\nCR ATL(TCH)\n = *{}*".format(tchcnt), parse_mode= 'Markdown')
 
 
     # Invalid Input Functions
@@ -481,14 +496,14 @@ class tchchat:
         '''
             Default Menu Function
         '''
-        logger.info("User %s is using CR ALT (Techer ver).", update.message.from_user.first_name)
+        logger.info("User %s is using CR ALT (Techer ver).", update.message.from_user.first_name) ### Comment out Before Launch
         text = [["Today's Timetable","Daily Timetable"],["Batch Timetable","Announcement"],["Take Class","Cancel Class"],['Change Your EMPLOYEE ID']]
         update.message.reply_text(text='''Select an option from the\ngiven menu''', reply_markup=telegram.ReplyKeyboardMarkup(text))
         return self.Menu_opt_MH
 
     # Teacher Timetable Functions
 
-    def tchtt(self,chat_id,day):
+    def tchtt(self,chat_id,day= datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")):
         '''
             Return Teacher Timetable as a string
         '''
@@ -505,7 +520,7 @@ class tchchat:
         '''
             Sends today's Timetable to the Teacher
         '''
-        text = self.tchtt(update.effective_chat.id, datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A") )
+        text = self.tchtt(update.effective_chat.id)
         if text == "No Classes":
             update.message.reply_text(text="No Classes Today")
             return self.Menu_opt_MH
@@ -533,7 +548,7 @@ class tchchat:
         '''
             Send Days as keyboard
         '''
-        text = [[self.daylst[0],self.daylst[1]],[self.daylst[2],self.daylst[3]],[self.daylst[4],self.daylst[5]]]
+        text = self.dayinkb
         update.message.reply_text(text='''Select a Day from the\ngiven list''', reply_markup=telegram.ReplyKeyboardMarkup(text))
         return self.Day_MH
 
@@ -561,7 +576,7 @@ class tchchat:
         '''
         if (update.message.text).upper() in self.grdgrdchklst:
             context.user_data['Grdttsub'] = (update.message.text).upper()
-            text = [[self.daylst[0],self.daylst[1]],[self.daylst[2],self.daylst[3]],[self.daylst[4],self.daylst[5]]]
+            text =  self.dayinkb
             update.message.reply_text(text='''Select a Day from the\ngiven list''', reply_markup=telegram.ReplyKeyboardMarkup(text))
             return self.Grade_sub_MH
         else:
@@ -680,7 +695,7 @@ class tchchat:
         if (update.message.text in self.gschklst):
             if (not update.message.text == 'Back'):
                 context.user_data['tkegrd'] = (update.message.text).upper()
-            text = [[self.daylst[0],self.daylst[1]],[self.daylst[2],self.daylst[3]],[self.daylst[4],self.daylst[5]]]#
+            text =  self.dayinkb
             update.message.reply_text(text='''Select a Day from the\ngiven list''', reply_markup=telegram.ReplyKeyboardMarkup(text))
             return self.Take_grd_MH
         else:
@@ -698,14 +713,13 @@ class tchchat:
             persublst = self.db.getStdtt(grade,context.user_data['tkeday'])
             perlst = list()
             tchperlst = list()
-            fbydata = json.loads(open('json/branchYearlist.json').read()) #access json file
             text = [["Back"]]
             for i in persublst:
                 perlst.append(i[0])
             for i in self.db.getTeachtt(update.effective_chat.id,context.user_data['tkeday']):
                 tchperlst.append(i[0])
             self.perchklst = ['Back']
-            for i in periodlst:
+            for i in fbydata["periodlst"]:
                 if (i not in perlst) and ((i not in tchperlst) or (grade[3:] == str(max(fbydata['year'])%100))):
                     text.append([i])
                     self.perchklst.append(i)
@@ -766,7 +780,7 @@ class tchchat:
         '''
             Send Days as keyboard for cancel class
         '''
-        text = [[self.daylst[0],self.daylst[1]],[self.daylst[2],self.daylst[3]],[self.daylst[4],self.daylst[5]]]
+        text =  self.dayinkb
         update.message.reply_text(text='''Select a Day from the\ngiven list''', reply_markup=telegram.ReplyKeyboardMarkup(text))
         return self.Ccl_cls_MH
 

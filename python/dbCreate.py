@@ -18,16 +18,6 @@ class teleDb:
 
         ftable = open('sqlite/tbCreateDb').read()
         self.cur.executescript(ftable)
-
-        daylst = ['Monday','Tuesday','Wednesday','Thursday','Friday']
-        periodlst = ['10.10-11.00','11.00-11.50','11.50-12.40','01.30-02.20','02.20-03.10','03.10-04.00']
-        
-        for i in daylst:
-            self.cur.execute('''INSERT OR IGNORE INTO DAY_TB (day) VALUES ( ? )''', ( i, ) ) #daytable
-        
-        for i in periodlst:
-            self.cur.execute('''INSERT OR IGNORE INTO PERIOD_TB (period) VALUES ( ? )''', ( i, ) ) #periodtable
-        
         self.conn.commit()
         self.setup()
         self.updatett()
@@ -40,6 +30,13 @@ class teleDb:
 
         fbhyr = open('json/branchYearlist.json').read() #access json file
         fbydata = json.loads(fbhyr)
+        
+        for i in fbydata["daylst"]:
+            self.cur.execute('''INSERT OR IGNORE INTO DAY_TB (day) VALUES ( ? )''', ( i, ) ) #daytable
+        
+        for i in fbydata["periodlst"]:
+            self.cur.execute('''INSERT OR IGNORE INTO PERIOD_TB (period) VALUES ( ? )''', ( i, ) ) #periodtable
+        
         for i in fbydata["branch"]:
             self.cur.execute('''INSERT OR IGNORE INTO BRANCH_TB (branch) VALUES ( ? )''', ( i, ) ) #Branchtable
         
@@ -314,6 +311,19 @@ class teleDb:
         '''
         self.grade = grade
         self.cur.execute('SELECT SUBJECT_TB.subject FROM SUBJECT_TB JOIN GRADE_TB ON SUBJECT_TB.grade_id = GRADE_TB.id WHERE GRADE_TB.grade = ?',(self.grade,))
+        return self.cur.fetchall()
+    def getusrlst(self):
+        '''
+            Returns list of tuples of user id of students
+        '''
+        self.cur.execute('SELECT chat_id FROM USER_TB')
+        return self.cur.fetchall()
+
+    def gettchlst(self):
+        '''
+            Returns list of tuples of user id of teachers
+        '''
+        self.cur.execute('SELECT chat_id FROM TCHUSR_TB')
         return self.cur.fetchall()
 
     def chkusr(self,chat_id):

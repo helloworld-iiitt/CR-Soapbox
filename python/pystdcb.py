@@ -9,6 +9,7 @@ from python.dbCreate import teleDb
 stdtkn = open('data/stdtkn.txt').read()
 bot = telegram.Bot(token=stdtkn)
 fbhyr = open('json/developer.json').read() #access json file
+fbydata = json.loads(open('json/branchYearlist.json').read()) #access json file
 devjson = json.loads(fbhyr)
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 END = ConversationHandler.END
@@ -29,18 +30,34 @@ class stdchat:
             starts polling
         '''
         self.db = db
-        self.daylst = ['Monday','Tuesday','Wednesday','Thursday','Friday',"Back"]
+        self.daylst = fbydata["daylst"]
+        self.daylst.append("Back")
+        self.dayinkb = list()
+        if len(self.daylst)%2 == 0 :
+            for i,j in zip(self.daylst[0::2],self.daylst[1::2]):
+                self.dayinkb.append([i,j])
+        else:
+            last = (self.daylst).pop()
+            for i,j in zip(self.daylst[0::2],self.daylst[1::2]):
+                self.dayinkb.append([i,j])
+            self.daylst.append(last)
+            self.dayinkb.append([last])
+        
         pp = PicklePersistence(filename='data/Stdcraltbot')
         self.updater = Updater(token=stdtkn,persistence=pp,use_context=True)
         dp =  self.updater.dispatcher
         j =  self.updater.job_queue
-        j.run_daily(self.callback_daily,datetime.time(hour = 1, minute = 15, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_11_00,datetime.time(hour = 11, minute = 00, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_11_50,datetime.time(hour = 11, minute = 50, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_12_40,datetime.time(hour = 12, minute = 40, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_14_20,datetime.time(hour = 14, minute = 20, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_15_10,datetime.time(hour = 15, minute = 10, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
-        j.run_daily(self.daily_16_00,datetime.time(hour = 16, minute = 00, second=0, tzinfo = timezone('Asia/Kolkata')),(0,1,2,3,4),context=telegram.ext.CallbackContext)
+        daytuple = tuple(range(len(self.daylst)-1))
+
+        ## Have to edit based on period list 
+        j.run_daily(self.callback_daily,datetime.time(hour = 1, minute = 15, tzinfo = timezone('Asia/Kolkata')),daytuple,context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_11_00,datetime.time(hour = 11, minute = 00, tzinfo = timezone('Asia/Kolkata')),daytuple,context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_11_50,datetime.time(hour = 11, minute = 50, tzinfo = timezone('Asia/Kolkata')),daytuple,context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_12_40,datetime.time(hour = 12, minute = 40, tzinfo = timezone('Asia/Kolkata')),daytuple,context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_14_20,datetime.time(hour = 14, minute = 20, tzinfo = timezone('Asia/Kolkata')),daytuple,context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_15_10,datetime.time(hour = 15, minute = 10, tzinfo = timezone('Asia/Kolkata')),daytuple,context=telegram.ext.CallbackContext)
+        j.run_daily(self.daily_16_00,datetime.time(hour = 16, minute = 00, tzinfo = timezone('Asia/Kolkata')),daytuple,context=telegram.ext.CallbackContext)
+        ##
 
         # Daily timetable conv
 
@@ -193,22 +210,23 @@ class stdchat:
         '''
             Jobqueue's callback_daily function
         '''
-        usrlst = self.db.getalstduid()
+        usrlst = self.db.getusrlst()
+        self.usrcnt = len(usrlst)
 
         for i in usrlst:
-            text = "*Today's Timetable*\n"+self.stdtt(i[0], datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
+            text = "*Today's Timetable*\n"+self.stdtt(i[0])
             context.bot.send_message(chat_id=i[0], text=text, parse_mode= 'Markdown')
         for i in devjson["devChat_id"]:
-            context.bot.send_message(chat_id=i, text="Total no of users using\nCR ATL = *{}*".format(len(usrlst)), parse_mode= 'Markdown')
+            context.bot.send_message(chat_id=i, text="Total no of users using\nCR ATL = *{}*".format(tchcnt), parse_mode= 'Markdown')
 
     # job functions for asking attendance
     def daily (self,pernm,context):
         '''
             Jobqueue's daily function to Ask for attendance
         '''
-        stdchtidlst = self.db.getalstduid()
+        stdchtidlst = self.db.getusrlst()
         for k in stdchtidlst:
-            persublst=self.db.getStdtt(self.db.getusrgrd(k[0]), datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
+            persublst=self.db.getStdtt(self.db.getusrgrd(k[0]),datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
             perlst = list()
             for i in persublst:
                 if i[0] == pernm:
@@ -218,7 +236,7 @@ class stdchat:
                         [InlineKeyboardButton("Cancel",callback_data= str('2'+i[1]))]
                     ]
                     reply_markup = InlineKeyboardMarkup(keyboard)
-                    context.bot.send_message(chat_id=k[0], text= "Did you attend the class of subject {}".format(i[1]),
+                    context.bot.send_message(chat_id=k[0], text= "Did you attend the class of subject {} @ {}".format(i[1],pernm),
                         reply_markup=reply_markup)
                     break
 
@@ -296,14 +314,14 @@ class stdchat:
         '''
             Default Menu Function
         '''
-        logger.info("User %s is using CR ALT.", update.message.from_user.first_name)
+        logger.info("User %s is using CR ALT.", update.message.from_user.first_name) ### Comment out Before Launch
         text = [["Today's Timetable","Daily Timetable"],["Get Attendance","Set Attendance"],["Change Your ROLL NO"]]
         update.message.reply_text(text='''Select an option from the\ngiven menu''', reply_markup=telegram.ReplyKeyboardMarkup(text))
         return self.Menu_opt_MH
 
     # Student timetable Functions
 
-    def stdtt(self,chat_id,day):
+    def stdtt(self,chat_id,day= datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")):
         '''
             Return student Timetable as a string
         '''
@@ -320,7 +338,7 @@ class stdchat:
         '''
             Sends today's Timetable to the student
         '''
-        text = self.stdtt(update.effective_chat.id,datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
+        text = self.stdtt(update.effective_chat.id)
         if text == "No Classes":
             update.message.reply_text(text="No Classes Today")
             return self.Menu_opt_MH
@@ -346,7 +364,7 @@ class stdchat:
         '''
             Send Days as keyboard
         '''
-        text = [[self.daylst[0],self.daylst[1]],[self.daylst[2],self.daylst[3]],[self.daylst[4],self.daylst[5]]]
+        text = self.dayinkb
         update.message.reply_text(text='''Select a Day from the\ngiven list''', reply_markup=telegram.ReplyKeyboardMarkup(text))
         return self.Day_MH
 
@@ -380,11 +398,21 @@ class stdchat:
             Send subjects as keyboard
         '''
         sublst=self.db.getsubgrd(self.db.getusrgrd(update.effective_chat.id))
-        text = [["Back"]]
-        self.subchklst = ['Back']
-        for i in sublst:
-            text.append([i[0]])
-            self.subchklst.append(i[0])
+        text = list()
+        self.subchklst = list()
+        if len(sublst)%2 == 0:
+            for i,j in zip(sublst[0::2],sublst[1::2]):
+                text.append([i[0],j[0]])
+                self.subchklst.append(i[0])
+                self.subchklst.append(j[0])
+            text.append(['Back'])
+            self.subchklst.append('Back')
+        else:
+            sublst.append(['Back'])
+            for i,j in zip(sublst[0::2],sublst[1::2]):
+                text.append([i[0],j[0]])
+                self.subchklst.append(i[0])
+                self.subchklst.append(j[0])
         update.message.reply_text(text='''Select a Subject from the\ngiven list''', reply_markup=telegram.ReplyKeyboardMarkup(text))
         return self.Set_Atd_MH
     

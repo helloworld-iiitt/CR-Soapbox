@@ -29,5 +29,7 @@
         "IIITT025":"Dr.P.Muthuchidambaranathan",
         "IIITT026":"Dr.S.S.Karthikeyan",
         "IIITT027":"Dr.G.ThavasiRaja"
-    }
+    },
+    "daylst" : ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+    "periodlst" : ["10.10-11.00","11.00-11.50","11.50-12.40","01.30-02.20","02.20-03.10","03.10-04.00"]
 }
