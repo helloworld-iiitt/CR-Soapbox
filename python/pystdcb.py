@@ -1,4 +1,4 @@
-import datetime, json, re, time, urllib, requests
+import datetime, json, re, time
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler,  PicklePersistence, CallbackContext, CallbackQueryHandler
 import logging, pytz

@@ -1,4 +1,4 @@
-import datetime, json, re, time, urllib, requests, json
+import datetime, json, re, time, json
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, PicklePersistence,  CallbackContext, CallbackQueryHandler
 import logging, pytz
@@ -7,6 +7,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from python.dbCreate import teleDb
 #from dbCreate import teleDb
 stdtkn = open('data/stdtkn.txt').read()
+stdbot = telegram.Bot(stdtkn)
 tchtkn = open('data/tchtkn.txt').read()
 fbhyr = open('json/developer.json').read() #access json file
 fbydata = json.loads(open('json/branchYearlist.json').read()) #access json file
@@ -15,6 +16,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 END = ConversationHandler.END
+
 class tchchat:
     '''
         Class for telegram chat bot - CR_Alt (TEACHER VER)
@@ -658,15 +660,13 @@ class tchchat:
         query.answer()
         if query.data[:1] == '1':
             anndata = query.data[1:].split('<>',2)
-            text = urllib.parse.quote_plus(anndata[2])
             stdchtidlst = self.db.grdstdid(anndata[1].upper())
             query.edit_message_text(text='''Please wait we are sending Your message to the students''')
-            text = "Sir/Madam {}, sends you this message -\n".format(anndata[0] ) + text
+            text = "Sir/Madam {}, sends you this message -\n".format(anndata[0]) + text
             cnt = 0
             for i in stdchtidlst:
                 chat_id = i[0]
-                URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
-                requests.get(URL)
+                stdbot.sendMessage(chat_id,text)
                 cnt = cnt + 1
             query.edit_message_text(text="Your Message was sent to *{}* students in *{}* Batch".format(cnt,anndata[1]),parse_mode= 'Markdown')
         else:
@@ -765,8 +765,7 @@ class tchchat:
                 cnt = 0
                 for i in stdchtidlst:
                     chat_id = i[0]
-                    URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
-                    requests.get(URL)
+                    stdbot.sendMessage(chat_id,text)
                     cnt = cnt + 1
                 query.edit_message_text(text=text + "\nYour Message was sent to *{}* students in *{}* Batch".format(cnt,tcdata[0]),parse_mode= 'Markdown')
             else:
@@ -840,8 +839,7 @@ class tchchat:
                 cnt = 0
                 for i in stdchtidlst:
                     chat_id = i[0]
-                    URL = "http://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}".format(stdtkn,text,chat_id)
-                    requests.get(URL)
+                    stdbot.sendMessage(chat_id,text)
                     cnt = cnt + 1
                 query.edit_message_text(text=text + "\nYour Message was sent to *{}* students in *{}* Batch".format(cnt,ccdata[1]),parse_mode= 'Markdown')
             else:
