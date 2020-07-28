@@ -44,7 +44,7 @@ def start(update, context):
     
     if emp_id != None and rollno == None :
         text = [['Menu']]
-        update.message.reply_text(text='''Welcome Back! {}\nYou have logged in as\na *Student* with Roll no:*{}*.'''.format(update.message.from_user.first_name,emp_id), parse_mode= 'Markdown')
+        update.message.reply_text(text='''Welcome Back ! {}\nYou have logged in as\na *Student* with Roll no:*{}*.'''.format(update.message.from_user.first_name,emp_id), parse_mode= 'Markdown')
         update.message.reply_text("Select *Menu* to see the list of things that you can ask me.", parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
         return tb.MAIN_MENU_KEY
     elif emp_id == None and rollno != None :
@@ -54,8 +54,8 @@ def start(update, context):
         return sb.MAIN_MENU_KEY
     else:
         text = [['Professor'],['Student']]
-        update.message.reply_text(text='''Hi ! {}\nWelcome to your Personal\nTimetable and Announcement Manager - \n" *CR ALT*."'''.format(update.message.from_user.first_name), parse_mode= 'Markdown')
-        update.message.reply_text(text='''Please tell me *who you are*.''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+        update.message.reply_text(text='''Hi! {}\nWelcome to your Personal\nTimetable Manager - \n" *CR ALT*."'''.format(update.message.from_user.first_name), parse_mode= 'Markdown')
+        update.message.reply_text(text='''Please tell me, *who are you ?*.''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
         return SETUP_KEY
 
 ## Invalid functions
@@ -74,7 +74,7 @@ def ivstart (update, context):
         return sb.MAIN_MENU_KEY
     else:
         text = [['Professor'],['Student']]
-        update.message.reply_text(text='''Please tell me *who you are*\nPlease prefer using\n*CUSTOM KEYBOARD*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+        update.message.reply_text(text='''Please tell me, *who are you?*\nPlease prefer using\n*CUSTOM KEYBOARD*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
         return SETUP_KEY
 
 ## Back Functions
@@ -84,7 +84,7 @@ def bkSAC(update, context):
         Function to send back from std_auth_cov to start
     '''
     text = [['Professor'],['Student']]
-    update.message.reply_text(text='''Please tell me *who you are*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+    update.message.reply_text(text='''Please tell me *who are you?*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
     return cs.END
 
 @cs.send_action(action=telegram.ChatAction.TYPING)
@@ -93,7 +93,7 @@ def bkTAC(update, context):
         Function to send back from tch_auth_cov to start
     '''
     text = [['Professor'],['Student']]
-    update.message.reply_text(text='''Please tell me *who you are*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+    update.message.reply_text(text='''Please tell me *who are you?*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
     return cs.END
 
 

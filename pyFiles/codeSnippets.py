@@ -52,7 +52,8 @@ def error(update, context):
 
     if update.effective_message:
         text = "Hey. I'm sorry to inform you that an error happened while I tried to handle your update. " \
-               "My developer(s) will be notified."
+               "My developer(s) will be notified." \
+               "Try restarting the bot. If the problem presists Contact developer about it with a screenshot "
         update.effective_message.reply_text(text)
     
     trace = "".join(traceback.format_tb(sys.exc_info()[2]))

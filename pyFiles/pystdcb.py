@@ -83,7 +83,7 @@ def tt_Menu(update,context):
         Function to send Student Timetable Menu to the user
     '''
     menu = cs.build_menu(buttons=["Today's Timetable","Daily Timetable","Back"])
-    update.message.reply_text(text='''Tell me, what you want to know about *Your Timetable*?''',parse_mode = 'Markdown',
+    update.message.reply_text(text='''what do you want to know about *Your Timetable*?''',parse_mode = 'Markdown',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return TT_MENU_KEY
 
@@ -146,7 +146,7 @@ def dayKb_DTMC (update,context):
         Function to send KeyBoard of Days to the user in Student Timetable/Daily_Timetable path
     '''
     text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-    update.message.reply_text(text='''Tell me, Which day Timetable do you want ?''', reply_markup=telegram.ReplyKeyboardMarkup(text))
+    update.message.reply_text(text='''Which day Timetable do you want ?''', reply_markup=telegram.ReplyKeyboardMarkup(text))
     return DAILY_TT_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -191,7 +191,7 @@ def atd_Menu(update,context):
         Function to send Student Attendance Menu to the user
     '''
     menu = cs.build_menu(buttons=["Get Attendance","Set Attendance","Back"])
-    update.message.reply_text(text='''Tell me, what do you want to know about *Your Attendance*?''',parse_mode = 'Markdown',
+    update.message.reply_text(text='''what do you want to know about *Your Attendance*?''',parse_mode = 'Markdown',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return ATD_MENU_KEY
 
