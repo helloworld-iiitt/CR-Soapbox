@@ -28,7 +28,7 @@ def update_Day_tt(context: telegram.ext.CallbackContext):
         time.sleep(1)
 
 @run_async
-def callback_daily(self,context: telegram.ext.CallbackContext):
+def callback_daily(context: telegram.ext.CallbackContext):
     '''
         Jobqueue's callback_daily function
     '''
