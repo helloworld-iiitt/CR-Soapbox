@@ -599,7 +599,8 @@ def avgrdkb_MSGC(update,context):
     '''  
     tchgrdsublst = db.tchgrdsub(update.effective_chat.id)
     context.user_data['tchMsgStdGrdLst'] = list({grd[0] for grd in tchgrdsublst})
-    update.message.reply_text(text='''Tell me, Which Grade Timetable do you want ?''', reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['tchGrdTTGrdLst']+['Message All','Back'])))
+
+    update.message.reply_text(text='''For which grade do you want to dend the message ?''', reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['tchMsgStdGrdLst']+['Message All','Back'])))
     return MSGSTD_GRD_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
