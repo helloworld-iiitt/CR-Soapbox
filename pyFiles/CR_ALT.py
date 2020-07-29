@@ -247,7 +247,7 @@ std_Menu_cov        =   ConversationHandler(
                                                         std_More_Menu_cov]
                         },
     allow_reentry   =   True,
-    fallbacks       =   [MessageHandler((~Filters.text("Back")),sb.ivmenu)],
+    fallbacks       =   [MessageHandler((~Filters.text(['Timetable','Attendance','More'])),sb.ivmenu)],
     name            =   "stdMenucov",
     persistent      =   True,
     map_to_parent   =   {
@@ -536,7 +536,7 @@ tch_Menu_cov        =      ConversationHandler(
                             tb.MAIN_MENU_KEY    :   [   tch_TT_Menu_cov,tch_Ann_Menu_cov,tch_More_Menu_cov]
                         },
     allow_reentry   =   True,
-    fallbacks       =   [MessageHandler((~Filters.text("Back")),tb.ivmenu)],
+    fallbacks       =   [MessageHandler((~Filters.text(['Timetable','Announcements','More'])),tb.ivmenu)],
     name            =   "tchMenucov",
     persistent      =   True,
     map_to_parent   =   {
