@@ -42,19 +42,19 @@ def start(update, context):
     context.user_data['updtch'] = False
     context.user_data['updusr'] = False
     
-    if emp_id != None and rollno == None :
+    if emp_id == None and rollno != None :
         text = [['Menu']]
-        update.message.reply_text(text='''Welcome Back ! {}\nYou have logged in as\na *Student* with Roll no:*{}*.'''.format(update.message.from_user.first_name,emp_id), parse_mode= 'Markdown')
-        update.message.reply_text("Select *Menu* to see the list of things that you can ask me.", parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
-        return tb.MAIN_MENU_KEY
-    elif emp_id == None and rollno != None :
-        text = [['Menu']]
-        update.message.reply_text(text='''Welcome Back! {}\nYou have logged in as\na *Professor* with Employee Id *{}*.'''.format(update.message.from_user.first_name,emp_id), parse_mode= 'Markdown')
+        update.message.reply_text(text='''Welcome Back ! {}\nYou have logged in as\na *Student* with Roll no: *{}*.'''.format(update.message.from_user.first_name,rollno), parse_mode= 'Markdown')
         update.message.reply_text("Select *Menu* to see the list of things that you can ask me.", parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
         return sb.MAIN_MENU_KEY
+    elif emp_id != None and rollno == None :
+        text = [['Menu']]
+        update.message.reply_text(text='''Welcome Back! {}\nYou have logged in as\na *Professor* with Employee Id: *{}*.'''.format(update.message.from_user.first_name,emp_id), parse_mode= 'Markdown')
+        update.message.reply_text("Select *Menu* to see the list of things that you can ask me.", parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+        return tb.MAIN_MENU_KEY
     else:
         text = [['Professor'],['Student']]
-        update.message.reply_text(text='''Hi! {}\nWelcome to your Personal\nTimetable Manager - \n" *CR ALT*."'''.format(update.message.from_user.first_name), parse_mode= 'Markdown')
+        update.message.reply_text(text='''Hi! {}\nWelcome to your Personal\nTimetable Manager - \n"*CR ALT*"'''.format(update.message.from_user.first_name), parse_mode= 'Markdown')
         update.message.reply_text(text='''Please tell me, *who are you ?*.''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
         return SETUP_KEY
 
