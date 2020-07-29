@@ -8,8 +8,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, Chat
 import dbCreate as db
 import codeSnippets as cs
 ## Conversation dict Constants keys
-MAIN_MENU_KEY, AUTH_KEY, TT_MENU_KEY, DAILY_TT_KEY, ATD_MENU_KEY = range(0,5)
-SETATD_SUB_KEY, SETATD_STAT_KEY, MORE_MENU_KEY, CT_MENU_KEY, STOPPING, DEV_MSG_KEY= range(5,11)
+MAIN_MENU_KEY, AUTH_KEY, TT_MENU_KEY, DAILY_TT_KEY, ATD_MENU_KEY, SETATD_SUB_KEY= range(0,6)
+SETATD_STAT_KEY, MORE_MENU_KEY, CT_MENU_KEY, STOPPING, DEV_MSG_KEY, RETURN_MENU= range(6,12)
 
 
 
@@ -53,8 +53,9 @@ def Authentication(update, context):
         return ivrollno(update, context)
 
 ##
-##   Student Menu Functions (Level 1)
+##  Student Menu Functions (Level 1)
 ##
+
 # @cs.userauthorized(db.getallstduid())
 @cs.send_action(action=ChatAction.TYPING)
 def Menu(update,context):
@@ -518,3 +519,13 @@ def std_logout(update,context):
     update.message.reply_text(text='''Send */start* to restart the bot''',parse_mode = 'Markdown')
     
     return STOPPING
+
+##  Return To Menu Function
+
+@cs.send_action(action=ChatAction.TYPING)
+def Return_menu(update,context):
+    '''
+        Functon to return to menu to the user
+    '''
+    Menu(update,context)
+    return RETURN_MENU

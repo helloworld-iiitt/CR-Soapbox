@@ -10,7 +10,7 @@ import codeSnippets as cs
 
 ## Conversation dict Constants keys
 MAIN_MENU_KEY, AUTH_KEY, MAIN_MENU_KEY, TT_MENU_KEY, DAILY_TT_KEY, STOPPING, GRADE_TT_GRD_KEY, GRADE_TT_DAY_KEY, ANN_MENU_KEY, CR8CLS_GRD_KEY= range(20,30)
-CR8CLS_Day_KEY, CR8CLS_Perd_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, MSGSTD_GRD_KEY, MSGSTD_MSG_KEY, MORE_MENU_KEY, CT_MENU_KEY, DEV_MSG_KEY= range(30,39)
+CR8CLS_Day_KEY, CR8CLS_Perd_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, MSGSTD_GRD_KEY, MSGSTD_MSG_KEY, MORE_MENU_KEY, CT_MENU_KEY, DEV_MSG_KEY, RETURN_MENU= range(30,40)
 
 ## Jobqueue Functions
 @run_async
@@ -809,3 +809,13 @@ def tch_logout(update,context):
     update.message.reply_text(text='''Send */start* to restart the bot''',parse_mode = 'Markdown')
     
     return STOPPING
+
+#   Return To Menu Functon
+
+@cs.send_action(action=ChatAction.TYPING)
+def Return_menu(update,context):
+    '''
+        Functon to return to menu to the user
+    '''
+    Menu(update,context)
+    return RETURN_MENU

@@ -111,7 +111,8 @@ def bkTAC(update, context):
 std_Dev_Msg_cov    =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Message All\n(Dev option)")),sb.std_dev_msg)],
     states          =   {
-                            sb.DEV_MSG_KEY    :   [    MessageHandler(~Filters.text("Back") & ~Filters.command,sb.snd_dev_msg),
+                            sb.DEV_MSG_KEY      :   [    MessageHandler(~Filters.text("Back") & ~Filters.command,sb.snd_dev_msg),
+                                                        CommandHandler('menu',sb.Return_menu),
                                                         MessageHandler(Filters.text("Back"),sb.bkSDMC)]
                         },
     allow_reentry   =   True,
@@ -119,14 +120,16 @@ std_Dev_Msg_cov    =   ConversationHandler(
     name            =   'stdDevMsgcov',
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   sb.MORE_MENU_KEY
+                            cs.END              :   sb.MORE_MENU_KEY,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
                         }
 )
 
 std_CT_Dev_cov    =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Contact\nDeveloper(s)")),sb.std_CT_dev)],
     states          =   {
-                            sb.CT_MENU_KEY    :   [    MessageHandler(~Filters.text("Back") & ~Filters.poll ,sb.Snd_Msg_Dev),
+                            sb.CT_MENU_KEY      :   [   MessageHandler(~Filters.text("Back") & ~Filters.poll ,sb.Snd_Msg_Dev),
+                                                        CommandHandler('menu',sb.Return_menu),
                                                         MessageHandler(Filters.text("Back"),sb.bkSCDC)]
                         },
     allow_reentry   =   True,
@@ -134,7 +137,8 @@ std_CT_Dev_cov    =   ConversationHandler(
     name            =   'stdCTDevcov',
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   sb.MORE_MENU_KEY
+                            cs.END              :   sb.MORE_MENU_KEY,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
                         }
 )
 
@@ -144,6 +148,7 @@ std_More_Menu_cov   =   ConversationHandler(
                             sb.MORE_MENU_KEY    :   [   MessageHandler(( Filters.text('Know about\nDeveloper(s)')),sb.Std_Know_Abt_Dev),
                                                         MessageHandler(( Filters.text('Logout')),sb.std_logout),
                                                         std_CT_Dev_cov,std_Dev_Msg_cov,
+                                                        CommandHandler('menu',sb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),sb.bkSMMC)]
                         },
     allow_reentry   =   True,
@@ -152,7 +157,8 @@ std_More_Menu_cov   =   ConversationHandler(
     persistent      =   True,
     map_to_parent   =   {
                             cs.END              :   sb.MAIN_MENU_KEY,
-                            sb.STOPPING         :   sb.STOPPING
+                            sb.STOPPING         :   sb.STOPPING,
+                            sb.RETURN_MENU      :   sb.MAIN_MENU_KEY
                         }
 )
 
@@ -163,6 +169,7 @@ std_setAtd_Stat_cov  =   ConversationHandler(
     states          =   {
                             sb.SETATD_STAT_KEY   :   [   MessageHandler(( Filters.text(['Present','Absent']) | 
                                                         Filters.regex(r"[0-9][0-9]?:[0-9][0-9]?")),sb.set_atd),
+                                                        CommandHandler('menu',sb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),sb.bkSSASTC)]
                         },
     allow_reentry   =   True,
@@ -170,7 +177,8 @@ std_setAtd_Stat_cov  =   ConversationHandler(
     name            =   "stdSetStdStatcov",
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   sb.SETATD_SUB_KEY
+                            cs.END              :   sb.SETATD_SUB_KEY,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
                         }
 
 )
@@ -179,6 +187,7 @@ std_setAtd_Sub_cov  =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Set Attendance")),sb.subkb_SASUC)],
     states          =   {
                             sb.SETATD_SUB_KEY   :   [   std_setAtd_Stat_cov,
+                                                        CommandHandler('menu',sb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),sb.bkSSASC)]
                         },
     allow_reentry   =   True,
@@ -186,7 +195,8 @@ std_setAtd_Sub_cov  =   ConversationHandler(
     name            =   "stdSetAtdSubcov",
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   sb.ATD_MENU_KEY
+                            cs.END              :   sb.ATD_MENU_KEY,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
                         }
 )
 
@@ -194,6 +204,7 @@ std_Atd_Menu_cov    =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Attendance")),sb.atd_Menu)],
     states          =   {
                             sb.ATD_MENU_KEY     :   [   MessageHandler((Filters.text("Get Attendance")),sb.get_Std_Atd),
+                                                        CommandHandler('menu',sb.Return_menu),
                                                         std_setAtd_Sub_cov, MessageHandler((Filters.text("Back")),sb.bkSAMC)]
                         },
     allow_reentry   =   True,
@@ -201,7 +212,8 @@ std_Atd_Menu_cov    =   ConversationHandler(
     name            =   "stdAtdMenucov",
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   sb.MAIN_MENU_KEY
+                            cs.END              :   sb.MAIN_MENU_KEY,
+                            sb.RETURN_MENU      :   sb.MAIN_MENU_KEY
                         }
 ) 
 
@@ -211,6 +223,7 @@ std_DailyTT_Menu_cov=   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Daily Timetable")),sb.dayKb_DTMC)],
     states          =   {
                             sb.DAILY_TT_KEY     :   [   MessageHandler((Filters.text(cs.datajson['daylst'])),sb.day_std_tt),
+                                                        CommandHandler('menu',sb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),sb.bkDTMC)]
                         },
     allow_reentry   =   True,
@@ -218,7 +231,8 @@ std_DailyTT_Menu_cov=   ConversationHandler(
     name            =   "stdDailyTtMenuCov",
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   sb.TT_MENU_KEY
+                            cs.END              :   sb.TT_MENU_KEY,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
                         }
 )
 
@@ -226,6 +240,7 @@ std_TT_Menu_cov     =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Timetable")),sb.tt_Menu)],
     states          =   {
                             sb.TT_MENU_KEY      :   [   MessageHandler((Filters.text("Today's Timetable")),sb.td_Std_TT),
+                                                        CommandHandler('menu',sb.Return_menu),
                                                         std_DailyTT_Menu_cov,MessageHandler((Filters.text("Back")),sb.bkSTMC)]
                         },
     allow_reentry   =   True,
@@ -233,7 +248,8 @@ std_TT_Menu_cov     =   ConversationHandler(
     name            =   "stdTtMenucov",
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   sb.MAIN_MENU_KEY
+                            cs.END              :   sb.MAIN_MENU_KEY,
+                            sb.RETURN_MENU      :   sb.MAIN_MENU_KEY
                         }
 )
 
@@ -261,7 +277,7 @@ std_Menu_cov        =   ConversationHandler(
 std_auth_cov     =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Student")),sb.rollno)],
     states          =   {
-                            sb.AUTH_KEY      :    [  (MessageHandler(Filters.regex('^[CcEe][SsCc][Ee][1-2][0-9][Uu]0[0-3][0-9]$'),sb.Authentication)),
+                            sb.AUTH_KEY         :   [  (MessageHandler(Filters.regex('^[CcEe][SsCc][Ee][1-2][0-9][Uu]0[0-3][0-9]$'),sb.Authentication)),
                                                         MessageHandler((Filters.text("Back")),bkSAC)]
                         },
     allow_reentry   =   True,
@@ -285,7 +301,8 @@ std_auth_cov     =   ConversationHandler(
 tch_Dev_Msg_cov    =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Message All\n(Dev option)")),tb.std_dev_msg)],
     states          =   {
-                            tb.DEV_MSG_KEY    :   [    MessageHandler(~Filters.text("Back") & ~Filters.command,tb.snd_dev_msg),
+                            tb.DEV_MSG_KEY      :   [    MessageHandler(~Filters.text("Back") & ~Filters.command,tb.snd_dev_msg),
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler(Filters.text("Back"),tb.bkTDMC)]
                         },
     allow_reentry   =   True,
@@ -293,14 +310,16 @@ tch_Dev_Msg_cov    =   ConversationHandler(
     name            =   'tchDevMsgcov',
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   tb.MORE_MENU_KEY
+                            cs.END              :   tb.MORE_MENU_KEY,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
 tch_CT_Dev_cov      =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Contact\nDeveloper(s)")),tb.tch_CT_dev)],
     states          =   {
-                            tb.CT_MENU_KEY    :   [    MessageHandler(~Filters.text("Back") & ~Filters.poll ,tb.Snd_Msg_Dev),
+                            tb.CT_MENU_KEY      :   [    MessageHandler(~Filters.text("Back") & ~Filters.poll ,tb.Snd_Msg_Dev),
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler(Filters.text("Back"),tb.bkTCDC)]
                         },
     allow_reentry   =   True,
@@ -308,7 +327,8 @@ tch_CT_Dev_cov      =   ConversationHandler(
     name            =   'tchCTDevcov',
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   tb.MORE_MENU_KEY
+                            cs.END              :   tb.MORE_MENU_KEY,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
@@ -318,6 +338,7 @@ tch_More_Menu_cov   =   ConversationHandler(
                             tb.MORE_MENU_KEY    :   [   MessageHandler(( Filters.text('Know about\nDeveloper(s)')),tb.Tch_Know_Abt_Dev),
                                                         MessageHandler(( Filters.text('Logout')),tb.tch_logout),
                                                         tch_CT_Dev_cov,tch_Dev_Msg_cov,
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),tb.bkTMMC)]
                         },
     allow_reentry   =   True,
@@ -326,7 +347,8 @@ tch_More_Menu_cov   =   ConversationHandler(
     persistent      =   True,
     map_to_parent   =   {
                             cs.END              :   tb.MAIN_MENU_KEY,
-                            tb.STOPPING         :   tb.STOPPING
+                            tb.STOPPING         :   tb.STOPPING,
+                            tb.RETURN_MENU      :   tb.MAIN_MENU_KEY
                         }
 )
 
@@ -334,6 +356,7 @@ tch_MsgStd_Msg_cov   =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text(list({grade[0] for grade in db.getallgrdsub()})+['Message All'])),tb.msgstd_MSMC)],
     states          =   {
                             tb.MSGSTD_MSG_KEY   :   [   MessageHandler(~Filters.text("Back") & ~Filters.command,tb.snd_MsgStd_msg),
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),tb.bkMSMC)]
                         },
     allow_reentry   =   True,
@@ -342,7 +365,8 @@ tch_MsgStd_Msg_cov   =   ConversationHandler(
     persistent      =   True,
     map_to_parent   =   {
                             cs.END              :   tb.MSGSTD_GRD_KEY,
-                            tb.STOPPING         :   tb.STOPPING
+                            tb.STOPPING         :   tb.STOPPING,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
@@ -350,6 +374,7 @@ tch_MsgStd_Grd_cov  =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Message Students")),tb.avgrdkb_MSGC)],
     states          =   {
                             tb.MSGSTD_GRD_KEY   :   [   tch_MsgStd_Msg_cov,
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler(Filters.text("Back"),tb.bkMSGC)]
                         },
     allow_reentry   =   True,
@@ -358,7 +383,8 @@ tch_MsgStd_Grd_cov  =   ConversationHandler(
     persistent      =   True,
     map_to_parent   =   {
                             cs.END              :   tb.ANN_MENU_KEY,
-                            tb.STOPPING         :   cs.END
+                            tb.STOPPING         :   cs.END,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
@@ -369,6 +395,7 @@ tch_CXLCls_GSP_cov  =   ConversationHandler(
     states          =   {
                             tb.CXLCLS_GSP_KEY   :   [   MessageHandler((Filters.text([(P + ":" + G + ":" + S) for P in cs.datajson['periodlst'] 
                                                                         for (G,S) in db.getallgrdsub() ])),tb.conf_CXLcls_CxCGC),
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),tb.bkCxCGC)]
                         },
     allow_reentry   =   True,
@@ -377,14 +404,17 @@ tch_CXLCls_GSP_cov  =   ConversationHandler(
     persistent      =   True,
     map_to_parent   =   {
                             cs.END              :   tb.CXLCLS_DAY_KEY,
-                            tb.STOPPING         :   tb.STOPPING
+                            tb.STOPPING         :   tb.STOPPING,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
 tch_CXLCls_Day_cov  =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Cancel Class")),tb.daykb_CxCDC)],
     states          =   {
-                            tb.CXLCLS_DAY_KEY   :   [   tch_CXLCls_GSP_cov,MessageHandler((Filters.text("Back")),tb.bkCxCDC)]
+                            tb.CXLCLS_DAY_KEY   :   [   tch_CXLCls_GSP_cov,
+                                                        CommandHandler('menu',tb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),tb.bkCxCDC)]
                         },
     allow_reentry   =   True,
     fallbacks       =   [MessageHandler((~Filters.text("Back")),tb.ivday_CxCDC)],
@@ -392,7 +422,8 @@ tch_CXLCls_Day_cov  =   ConversationHandler(
     persistent      =   True,
     map_to_parent   =   {
                             cs.END              :   tb.ANN_MENU_KEY,
-                            tb.STOPPING         :   cs.END
+                            tb.STOPPING         :   cs.END,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
@@ -403,6 +434,7 @@ tch_CR8Cls_Perd_cov =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text(cs.datajson['daylst'])),tb.period_CCPC)],
     states          =   {
                             tb.CR8CLS_Perd_KEY  :   [   MessageHandler((Filters.text(cs.datajson['periodlst'])),tb.conf_CR8cls_CCPC),
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),tb.bkCCPC)]
                         },
     allow_reentry   =   True,
@@ -411,14 +443,17 @@ tch_CR8Cls_Perd_cov =   ConversationHandler(
     persistent      =   True,
     map_to_parent   =   {
                             cs.END              :   tb.CR8CLS_Day_KEY,
-                            tb.STOPPING         :   tb.STOPPING
+                            tb.STOPPING         :   tb.STOPPING,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
 tch_CR8Cls_Day_cov  =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text([(grdsub[0] + ":" + grdsub[1]) for grdsub in db.getallgrdsub()])),tb.dayKb_CCDC)],
     states          =   {
-                            tb.CR8CLS_Day_KEY   :   [   tch_CR8Cls_Perd_cov,MessageHandler((Filters.text("Back")),tb.bkCCDC)]
+                            tb.CR8CLS_Day_KEY   :   [   tch_CR8Cls_Perd_cov,
+                                                        CommandHandler('menu',tb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),tb.bkCCDC)]
                         },
     allow_reentry   =   True,
     fallbacks       =   [MessageHandler((~Filters.text("Back")),tb.ivday_CCDC)],
@@ -426,14 +461,17 @@ tch_CR8Cls_Day_cov  =   ConversationHandler(
     persistent      =   True,
     map_to_parent   =   {
                             cs.END              :   tb.CR8CLS_GRD_KEY,
-                            tb.STOPPING         :   tb.STOPPING
+                            tb.STOPPING         :   tb.STOPPING,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
 tch_CR8Cls_Grd_cov  =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Create Class")),tb.grdsubkb_CCGC)],
     states          =   {
-                            tb.CR8CLS_GRD_KEY   :   [   tch_CR8Cls_Day_cov,MessageHandler((Filters.text("Back")),tb.bkCCGC)]
+                            tb.CR8CLS_GRD_KEY   :   [   tch_CR8Cls_Day_cov,
+                                                        CommandHandler('menu',tb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),tb.bkCCGC)]
                         },
     allow_reentry   =   True,
     fallbacks       =   [MessageHandler((~Filters.text("Back")),tb.ivgrdsub_CCGC)],
@@ -441,7 +479,8 @@ tch_CR8Cls_Grd_cov  =   ConversationHandler(
     persistent      =   True,
     map_to_parent   =   {
                             cs.END              :   tb.ANN_MENU_KEY,
-                            tb.STOPPING         :   cs.END
+                            tb.STOPPING         :   cs.END,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
@@ -452,6 +491,7 @@ tch_Ann_Menu_cov    =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Announcements")),tb.ann_Menu)],
     states          =   {
                             tb.ANN_MENU_KEY     :   [   tch_CR8Cls_Grd_cov,tch_CXLCls_Day_cov,tch_MsgStd_Grd_cov,
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),tb.bkAnnMC)]
                         },
     allow_reentry   =   True,
@@ -459,7 +499,8 @@ tch_Ann_Menu_cov    =   ConversationHandler(
     name            =   "tchAnnMenucov",
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   tb.MAIN_MENU_KEY
+                            cs.END              :   tb.MAIN_MENU_KEY,
+                            tb.RETURN_MENU      :   tb.MAIN_MENU_KEY
                         }
 )
 
@@ -470,6 +511,7 @@ tch_GrdTT_Day_cov   =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text(list({grade[0] for grade in db.getallgrdsub()}))),tb.dayKb_GTDC)],
     states          =   {
                             tb.GRADE_TT_DAY_KEY :   [   MessageHandler((Filters.text(cs.datajson['daylst'])),tb.day_grd_tch_tt),
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),tb.bkGTDC)]
                         },
     allow_reentry   =   True,
@@ -477,7 +519,8 @@ tch_GrdTT_Day_cov   =   ConversationHandler(
     name            =   "tchGradetTtDayCov",
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   tb.GRADE_TT_GRD_KEY
+                            cs.END              :   tb.GRADE_TT_GRD_KEY,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
@@ -485,6 +528,7 @@ tch_GrdTT_Grade_cov =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Grade Timetable")),tb.gradeKb_GTGC)],
     states          =   {
                             tb.GRADE_TT_GRD_KEY :   [   tch_GrdTT_Day_cov,
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),tb.bkGTGC)]
                         },
     allow_reentry   =   True,
@@ -492,7 +536,8 @@ tch_GrdTT_Grade_cov =   ConversationHandler(
     name            =   "tchGradetTtGradeCov",
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   tb.TT_MENU_KEY
+                            cs.END              :   tb.TT_MENU_KEY,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
@@ -501,6 +546,7 @@ tch_DailyTT_Menu_cov=   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Daily Timetable")),tb.dayKb_DTMC)],
     states          =   {
                             tb.DAILY_TT_KEY     :   [   MessageHandler((Filters.text(cs.datajson['daylst'])),tb.day_tch_tt),
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),tb.bkDTMC)]
                         },
     allow_reentry   =   True,
@@ -508,7 +554,8 @@ tch_DailyTT_Menu_cov=   ConversationHandler(
     name            =   "tchDailyTtMenuCov",
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   tb.TT_MENU_KEY
+                            cs.END              :   tb.TT_MENU_KEY,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
                         }
 )
 
@@ -517,6 +564,7 @@ tch_TT_Menu_cov     =   ConversationHandler(
     states          =   {
                             tb.TT_MENU_KEY      :   [   MessageHandler((Filters.text("Today's Timetable")),tb.td_Tch_TT),
                                                         tch_DailyTT_Menu_cov,tch_GrdTT_Grade_cov,
+                                                        CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),tb.bkTTMC)]
                         },
     allow_reentry   =   True,
@@ -524,7 +572,8 @@ tch_TT_Menu_cov     =   ConversationHandler(
     name            =   "tchTtMenucov",
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   tb.MAIN_MENU_KEY
+                            cs.END              :   tb.MAIN_MENU_KEY,
+                            tb.RETURN_MENU      :   tb.MAIN_MENU_KEY
                         }
 )
 
@@ -550,7 +599,7 @@ tch_Menu_cov        =      ConversationHandler(
 tch_auth_cov     =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Professor")),tb.empid)],
     states          =   {
-                            tb.AUTH_KEY      :   [   (MessageHandler((Filters.regex('^[iI][Ii][Ii][Tt][tT]0[0-9][0-9]$')), tb.Authentication )),
+                            tb.AUTH_KEY         :   [   (MessageHandler((Filters.regex('^[iI][Ii][Ii][Tt][tT]0[0-9][0-9]$')), tb.Authentication )),
                                                         MessageHandler((Filters.text("Back")),bkTAC)]
                         },
     allow_reentry   =   True,
