@@ -131,9 +131,11 @@ def td_Std_TT (update,context):
     '''
         Function to send Today's Timetable to the user
     '''
-    text = std_tt(update.effective_chat.id,datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
+    text = std_tt(update.effective_chat.id,update.effective_message.date.strftime("%A"))
+    
     if text == 'No Classes':
         update.message.reply_text(text="No Classes Today")
+        # update.message.date()
     else :
         text = "Todays's Timetable\n" + text
         update.message.reply_text(text=text)
@@ -468,8 +470,10 @@ def callback_daily(context: telegram.ext.CallbackContext):
     '''
     usrlst = db.getallstduid()
     for i in usrlst:
-        text = "*Today's Timetable:*\n" + std_tt(i,datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
+        day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")
+        text = "*Today's Timetable:*\n" + std_tt(i,day)
         context.bot.send_message(chat_id=i,text= text,parse_mode = 'Markdown')
+        del day
         time.sleep(1)
     text = "Total no of STUDENTS using CR_ALT = {}".format(len(usrlst))
     for i in cs.devjson['devChat_id']:
@@ -481,7 +485,8 @@ def class_Remindar(context: telegram.ext.CallbackContext):
         Jobqueue's callback_daily function to send Class_ATD_reminder to user 
     '''
     for i in db.getallstduid():
-        periodlst = db.getStdtt(db.getusrgrd(i),datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
+        day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")
+        periodlst = db.getStdtt(db.getusrgrd(i),day=day)
         perlst = [j[0] for j in periodlst]
         if str(context.job.context) in perlst:
             subject = periodlst[perlst.index(context.job.context)][1]
@@ -494,6 +499,7 @@ def class_Remindar(context: telegram.ext.CallbackContext):
             context.bot.send_message(chat_id=i, text= "Did you attend the class of subject {} @ {}".format(subject,context.job.context),
                         reply_markup=reply_markup)
             time.sleep(1)
+        del day
 
 def inline_set_atd(update,context):
     '''

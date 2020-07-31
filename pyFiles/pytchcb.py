@@ -19,13 +19,14 @@ def update_Day_tt(context: telegram.ext.CallbackContext):
         Jobqueue's Updaytt function
         it will up date day timetable on working days after 04:30 pm
     '''
-    db.upddaytt(datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A"))
+    day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")
+    db.upddaytt(day)
     tchlst = db.getalltchuid()
     for i in tchlst:
-        text = "Professor, Next {} \n timetable was updated.\nYou can make changes in the timetable now".format(
-                    datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
+        text = "Professor, Next {} \n timetable was updated.\nYou can make changes in the timetable now".format(day)
         context.bot.send_message(chat_id=i, text=text, parse_mode= 'Markdown')
         time.sleep(1)
+    del day 
 
 @run_async
 def callback_daily(context: telegram.ext.CallbackContext):
@@ -36,8 +37,10 @@ def callback_daily(context: telegram.ext.CallbackContext):
     tchcnt = len(tchlst)
 
     for i in tchlst:
-        text = "*Today's Timetable*\n"+ tch_tt(i,datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A"))
+        day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")
+        text = "*Today's Timetable*\n"+ tch_tt(i,day)
         context.bot.send_message(chat_id=i, text=text, parse_mode= 'Markdown')
+        del day
         time.sleep(1)
     text = "Total no of Professor using CR_ALT = {}".format(len(tchcnt))
     for i in cs.devjson['devChat_id']:
@@ -163,7 +166,7 @@ def td_Tch_TT(update,context):
     '''
         Function to send Today's Timetable to the user
     '''
-    text = tch_tt(update.effective_chat.id,datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A"))
+    text = tch_tt(update.effective_chat.id,update.effective_message.date.strftime("%A"))
     if text == 'No Classes':
         update.message.reply_text(text="No Classes Today")
     else :
