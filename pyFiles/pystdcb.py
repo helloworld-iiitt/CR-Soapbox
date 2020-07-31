@@ -109,7 +109,7 @@ def bkSTMC(update,context):
 ##
 ##  Student Timetable Reply Functions
 ##
-def std_tt(chat_id,day= datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")):
+def std_tt(chat_id,day):
     '''
         Function to Return student Timetable as a string
     '''
@@ -131,7 +131,7 @@ def td_Std_TT (update,context):
     '''
         Function to send Today's Timetable to the user
     '''
-    text = std_tt(update.effective_chat.id)
+    text = std_tt(update.effective_chat.id,datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
     if text == 'No Classes':
         update.message.reply_text(text="No Classes Today")
     else :
@@ -415,10 +415,10 @@ def Snd_Msg_Dev(update,context):
     more_Menu(update,context)
     return cs.END
 
-@cs.send_action(action=ChatAction.TYPING)
+
 
 ##  Student Dev Message to all users
-
+@cs.send_action(action=ChatAction.TYPING)
 @cs.userauthorized(cs.devjson['devChat_id'])
 def std_dev_msg(update,context):
     '''
@@ -468,11 +468,12 @@ def callback_daily(context: telegram.ext.CallbackContext):
     '''
     usrlst = db.getallstduid()
     for i in usrlst:
-        text = "*Today's Timetable:*\n" + std_tt(i)
+        text = "*Today's Timetable:*\n" + std_tt(i,datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A"))
         context.bot.send_message(chat_id=i,text= text,parse_mode = 'Markdown')
         time.sleep(1)
     text = "Total no of STUDENTS using CR_ALT = {}".format(len(usrlst))
-    cs.SndMsgTolst(context,cs.devjson['devChat_id'],text)
+    for i in cs.devjson['devChat_id']:
+        context.bot.send_message(chat_id=i,text= text,parse_mode = 'Markdown')
 
 @run_async
 def class_Remindar(context: telegram.ext.CallbackContext):

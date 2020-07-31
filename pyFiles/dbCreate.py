@@ -80,7 +80,7 @@ def updatett(): #Update timetable
                 cur.execute('''INSERT OR IGNORE INTO TIMETABLE_TB (day_id,period_id,subject_id) VALUES ( ?, ?, ?)''', (day_id,period_id,subject_id) ) #TimeTable
     conn.commit()
 
-def upddaytt(day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")): #Update timetable
+def upddaytt(day): #Update timetable
     '''
     Updates table - TIMETABLE_TB
     '''

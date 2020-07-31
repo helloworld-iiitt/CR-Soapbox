@@ -36,11 +36,12 @@ def callback_daily(context: telegram.ext.CallbackContext):
     tchcnt = len(tchlst)
 
     for i in tchlst:
-        text = "*Today's Timetable*\n"+ tch_tt(i)
+        text = "*Today's Timetable*\n"+ tch_tt(i,datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A"))
         context.bot.send_message(chat_id=i, text=text, parse_mode= 'Markdown')
         time.sleep(1)
     text = "Total no of Professor using CR_ALT = {}".format(len(tchcnt))
-    cs.SndMsgTolst(context,cs.devjson['devChat_id'],text)
+    for i in cs.devjson['devChat_id']:
+        context.bot.send_message(chat_id=i, text=text, parse_mode= 'Markdown')
 
 @cs.send_action(action=ChatAction.TYPING)
 def empid(update, context):
@@ -140,7 +141,7 @@ def bkTTMC(update,context):
 ##  Teacher Timetable Reply Functions
 ##
 
-def tch_tt(chat_id,day= datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")):
+def tch_tt(chat_id,day):
     '''
         Function to Return Teacher Timetable as a string
     '''
@@ -162,7 +163,7 @@ def td_Tch_TT(update,context):
     '''
         Function to send Today's Timetable to the user
     '''
-    text = tch_tt(update.effective_chat.id)
+    text = tch_tt(update.effective_chat.id,datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A"))
     if text == 'No Classes':
         update.message.reply_text(text="No Classes Today")
     else :
@@ -475,7 +476,7 @@ def Snd_CR8Cls(update,context: telegram.ext.CallbackContext):
             text='''Class for subject {} of {} created on {} : {} by Professor {}\nPlease Check your Timetable'''.format(tcdata[2],tcdata[1],tcdata[4],tcdata[3],tcdata[5])
             usrlst = db.grdstdid(tcdata[1])
             usrlst.append(update.effective_chat.id)
-            cs.SndMsgTolst(context,usrlst,text)
+            cs.SndMsgTolst(update,context,usrlst,text)
             query.edit_message_text(text="Your Message was sent to *{}* students in *{}* Batch".format(len(usrlst)-1,tcdata[1]),parse_mode= 'Markdown')
         else:
             query.edit_message_text(text='''You are late:\n*Selected period has already been taken*,\nBetter luck next time''',parse_mode= 'Markdown' )
@@ -583,7 +584,7 @@ def Snd_CXLCls(update,context: telegram.ext.CallbackContext):
             text='''Class for subject {} of {} on {} : {} was Cancelled by Professor {}\nPlease Check your Timetable'''.format(tcdata[3].upper(),tcdata[2],tcdata[4],tcdata[1],tcdata[5])
             usrlst = db.grdstdid(tcdata[1])
             usrlst.append(update.effective_chat.id)
-            cs.SndMsgTolst(context,usrlst,text)
+            cs.SndMsgTolst(update,context,usrlst,text)
             query.edit_message_text(text="I forwarded your message about Class Cancelation to *{}* students in *{}* Batch".format(len(usrlst)-1,tcdata[1]),parse_mode= 'Markdown')
         else:
             query.edit_message_text(text='''The Class you told me Cancel does not exists''',parse_mode= 'Markdown' )

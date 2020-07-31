@@ -109,7 +109,7 @@ def FwdMsgTolst(update, context, usrlst, is_dev = False,is_teacher = False):
         time.sleep(1)
 
 @run_async
-def SndMsgTolst(context, usrlst , msg):
+def SndMsgTolst(update,context, usrlst , msg):
     '''
         Send the message to all users in the given list
     '''
