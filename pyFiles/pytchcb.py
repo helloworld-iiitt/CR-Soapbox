@@ -13,7 +13,7 @@ MAIN_MENU_KEY, AUTH_KEY, MAIN_MENU_KEY, TT_MENU_KEY, DAILY_TT_KEY, STOPPING, GRA
 CR8CLS_Day_KEY, CR8CLS_Perd_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, MSGSTD_GRD_KEY, MSGSTD_MSG_KEY, MORE_MENU_KEY, CT_MENU_KEY, DEV_MSG_KEY, RETURN_MENU= range(30,40)
 
 ## Jobqueue Functions
-@run_async
+
 def update_Day_tt(context: telegram.ext.CallbackContext):
     '''
         Jobqueue's Updaytt function
@@ -28,8 +28,7 @@ def update_Day_tt(context: telegram.ext.CallbackContext):
         time.sleep(1)
     del day 
 
-@run_async
-def callback_daily(context: telegram.ext.CallbackContext):
+def callback_daily(context: telegram.ext.CallbackContext ):
     '''
         Jobqueue's callback_daily function
     '''
@@ -42,9 +41,9 @@ def callback_daily(context: telegram.ext.CallbackContext):
         context.bot.send_message(chat_id=i, text=text, parse_mode= 'Markdown')
         del day
         time.sleep(1)
-    text = "Total no of Professor using CR_ALT = {}".format(len(tchcnt))
+    text = "Total no of Professor using CR_ALT = {}".format((tchcnt))
     for i in cs.devjson['devChat_id']:
-        context.bot.send_message(chat_id=i, text=text, parse_mode= 'Markdown')
+        context.bot.send_message(chat_id=i, text=text)
 
 @cs.send_action(action=ChatAction.TYPING)
 def empid(update, context):
@@ -459,7 +458,7 @@ def conf_CR8cls_CCPC(update,context):
         update.message.reply_text(text='''This class was already taken\nPlease Take another class''',parse_mode= 'Markdown')
         return CR8CLS_Perd_KEY
         
-@run_async
+
 @cs.send_action(action=ChatAction.TYPING)
 def Snd_CR8Cls(update,context: telegram.ext.CallbackContext):
     '''
@@ -571,7 +570,7 @@ def conf_CXLcls_CxCGC(update,context):
         update.message.reply_text(text='''The Class you told me Cancel does not exists''',parse_mode= 'Markdown')
         return CXLCLS_GSP_KEY
         
-@run_async
+
 @cs.send_action(action=ChatAction.TYPING)
 def Snd_CXLCls(update,context: telegram.ext.CallbackContext):
     '''

@@ -463,7 +463,7 @@ def snd_dev_msg(update,context):
 ##
 ##   JobQueue Functions
 ##
-@run_async
+
 def callback_daily(context):
     '''
         Jobqueue's callback_daily function to send timetable to user at night
@@ -479,7 +479,7 @@ def callback_daily(context):
     for i in cs.devjson['devChat_id']:
         context.bot.send_message(chat_id=i,text= text,parse_mode = 'Markdown')
 
-@run_async
+
 def class_Remindar(context):
     '''
         Jobqueue's callback_daily function to send Class_ATD_reminder to user 
