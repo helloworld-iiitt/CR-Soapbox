@@ -14,7 +14,7 @@ CR8CLS_Day_KEY, CR8CLS_Perd_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, MSGSTD_GRD_KEY,
 
 ## Jobqueue Functions
 
-def update_Day_tt(context: telegram.ext.CallbackContext):
+def update_Day_tt(context):
     '''
         Jobqueue's Updaytt function
         it will up date day timetable on working days after 04:30 pm
@@ -28,7 +28,7 @@ def update_Day_tt(context: telegram.ext.CallbackContext):
         time.sleep(1)
     del day 
 
-def callback_daily(context: telegram.ext.CallbackContext ):
+def callback_daily(context):
     '''
         Jobqueue's callback_daily function
     '''

@@ -477,7 +477,7 @@ def callback_daily(context):
         time.sleep(1)
     text = "Total no of STUDENTS using CR_ALT = {}".format(len(usrlst))
     for i in cs.devjson['devChat_id']:
-        context.bot.send_message(chat_id=i,text= text)
+        context.bot.send_message(chat_id=i,text= text,parse_mode = 'Markdown')
 
 
 def class_Remindar(context):
