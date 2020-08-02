@@ -110,7 +110,7 @@ def upddaytt(day): #Update timetable
     except:
         pass
 
-def getStdtt(grade,day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")):
+def getStdtt(grade,day):
     '''
     Returns the students time table of the given day
         -- default day is set to the present day
@@ -124,7 +124,7 @@ def getStdtt(grade,day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strf
         WHERE GRADE_TB.grade = ? AND DAY_TB.day = ? ORDER BY PERIOD_TB.id''', (grade,day))
     return cur.fetchall()
 
-def getTeachtt(chat_id,day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")):
+def getTeachtt(chat_id,day):
     '''
     Returns the teachers time table of the given day
         -- default day is set to the present day
@@ -139,7 +139,7 @@ def getTeachtt(chat_id,day = datetime.datetime.now(tz= timezone('Asia/Kolkata'))
         WHERE TEACHER_TB.emp_id = ? AND DAY_TB.day = ? ORDER BY PERIOD_TB.id''', (emp_id,day))
     return cur.fetchall()
 
-def delcls (grade,subject,period,day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")):
+def delcls (grade,subject,period,day):
     '''
     Delete the period of the given grade and day
         --default day is set to present day
@@ -161,7 +161,7 @@ def delcls (grade,subject,period,day = datetime.datetime.now(tz= timezone('Asia/
     except:
         return -1
 
-def CR8cls (grade,subject,period,day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")):
+def CR8cls (grade,subject,period,day):
     '''
     Create the period on the given day for the given subject
         --default day is set to present day

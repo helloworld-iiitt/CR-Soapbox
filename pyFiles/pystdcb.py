@@ -114,7 +114,7 @@ def std_tt(chat_id,day):
         Function to Return student Timetable as a string
     '''
     perlst  =   db.getStdtt(db.getusrgrd(chat_id),day)
-    text    =   "Time     : Subject\n"
+    text    =   "Time     : Subject \n"
     no_cls  =   True 
     for i in perlst:
         no_cls  =   False
@@ -131,7 +131,7 @@ def td_Std_TT (update,context):
     '''
         Function to send Today's Timetable to the user
     '''
-    text = std_tt(update.effective_chat.id,update.effective_message.date.strftime("%A"))
+    text = std_tt(update.effective_chat.id,update.effective_message.date.astimezone(timezone('Asia/Kolkata')).strftime("%A"))
     
     if text == 'No Classes':
         update.message.reply_text(text="No Classes Today")
@@ -486,7 +486,7 @@ def class_Remindar(context: telegram.ext.CallbackContext):
     '''
     for i in db.getallstduid():
         day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")
-        periodlst = db.getStdtt(db.getusrgrd(i),day=day)
+        periodlst = db.getStdtt(db.getusrgrd(i),day)
         perlst = [j[0] for j in periodlst]
         if str(context.job.context) in perlst:
             subject = periodlst[perlst.index(context.job.context)][1]

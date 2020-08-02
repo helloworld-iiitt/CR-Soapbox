@@ -166,7 +166,7 @@ def td_Tch_TT(update,context):
     '''
         Function to send Today's Timetable to the user
     '''
-    text = tch_tt(update.effective_chat.id,update.effective_message.date.strftime("%A"))
+    text = tch_tt(update.effective_chat.id,update.effective_message.date.astimezone(timezone('Asia/Kolkata')).strftime("%A"))
     if text == 'No Classes':
         update.message.reply_text(text="No Classes Today")
     else :
