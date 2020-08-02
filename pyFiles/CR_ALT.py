@@ -19,8 +19,8 @@ daytuple = tuple(range(len(cs.datajson['daylst'])))
 
 
 ## JobQueue Dispachers
-jobque.run_daily(callback = tb.update_Day_tt,time = datetime.time(hour = 18, minute = 00, tzinfo = timezone('Asia/Kolkata')),context=telegram.ext.CallbackContext)
-jobque.run_daily(tb.callback_daily,datetime.time(hour = 0, minute = 30, tzinfo = timezone('Asia/Kolkata')),context=telegram.ext.CallbackContext)
+jobque.run_daily(callback = tb.update_Day_tt,time = datetime.time(hour = 18, minute = 0, tzinfo = timezone('Asia/Kolkata')))
+jobque.run_daily(callback = tb.callback_daily,time = datetime.time(hour = 0, minute = 30, tzinfo = timezone('Asia/Kolkata')))
 
 jobque.run_daily(sb.callback_daily,datetime.time(hour = 0, minute = 45, tzinfo = timezone('Asia/Kolkata')))
 for i in cs.datajson["periodlst"]:

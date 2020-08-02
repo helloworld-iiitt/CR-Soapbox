@@ -464,7 +464,7 @@ def snd_dev_msg(update,context):
 ##   JobQueue Functions
 ##
 @run_async
-def callback_daily(context: telegram.ext.CallbackContext):
+def callback_daily(context):
     '''
         Jobqueue's callback_daily function to send timetable to user at night
     '''
@@ -480,7 +480,7 @@ def callback_daily(context: telegram.ext.CallbackContext):
         context.bot.send_message(chat_id=i,text= text,parse_mode = 'Markdown')
 
 @run_async
-def class_Remindar(context: telegram.ext.CallbackContext):
+def class_Remindar(context):
     '''
         Jobqueue's callback_daily function to send Class_ATD_reminder to user 
     '''
