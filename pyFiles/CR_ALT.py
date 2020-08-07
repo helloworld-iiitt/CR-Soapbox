@@ -54,7 +54,7 @@ def start(update, context):
         return tb.MAIN_MENU_KEY
     else:
         text = [['Professor'],['Student']]
-        update.message.reply_text(text='''Hi! {}\nWelcome to your Personal\nTimetable Manager - \n"*CR ALT*"'''.format(update.message.from_user.first_name), parse_mode= 'Markdown')
+        update.message.reply_text(text='''Hi! {}\nWelcome to your Personal\nTimetable Manager - \n"*CR_ALT*"'''.format(update.message.from_user.first_name), parse_mode= 'Markdown')
         update.message.reply_text(text='''Please tell me, *who are you ?*.''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
         return SETUP_KEY
 
@@ -67,14 +67,14 @@ def ivstart (update, context):
     emp_id = db.chktch(update.effective_chat.id)
     rollno = db.chkusr(update.effective_chat.id)
     if emp_id != None and rollno == None :
-        update.message.reply_text(text='''Select *Menu* to see the list\nPlease prefer using\n*CUSTOM KEYBOARD*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup([['Menu']]))
+        update.message.reply_text(text='''Select *Menu* to see the list.\nPlease prefer using\n*CUSTOM KEYBOARD*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup([['Menu']]))
         return tb.MAIN_MENU_KEY
     elif emp_id == None and rollno != None :
-        update.message.reply_text(text='''Select *Menu* to see the list\nPlease prefer using\n*CUSTOM KEYBOARD*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup([['Menu']]))
+        update.message.reply_text(text='''Select *Menu* to see the list.\nPlease prefer using\n*CUSTOM KEYBOARD*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup([['Menu']]))
         return sb.MAIN_MENU_KEY
     else:
         text = [['Professor'],['Student']]
-        update.message.reply_text(text='''Please tell me, *who are you?*\nPlease prefer using\n*CUSTOM KEYBOARD*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+        update.message.reply_text(text='''Please tell me, *who are you?*.\nPlease prefer using\n*CUSTOM KEYBOARD*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
         return SETUP_KEY
 
 ## Back Functions

@@ -51,7 +51,7 @@ def send_action(action=ChatAction.TYPING):
 def error(update, context):
 
     if update.effective_message:
-        text = "Hey. I'm sorry to inform you that an error happened while I tried to handle your update. " \
+        text = "Hey. I'm sorry to inform you that an error happened while I tried to handle your message. " \
                "My developer(s) will be notified." \
                "Try restarting the bot. If the problem presists Contact developer about it with a screenshot "
         update.effective_message.reply_text(text)
@@ -103,8 +103,10 @@ def FwdMsgTolst(update, context, usrlst, is_dev = False,is_teacher = False):
     for i in usrlst:
         if is_dev:
             context.bot.send_message(chat_id = i,text = "A Message from Developer: 👇")
-        if is_teacher:
+        elif is_teacher:
             context.bot.send_message(chat_id = i,text = "A Message from Professor {}: 👇".format(update.message.from_user.first_name))
+        else:
+            context.bot.send_message(chat_id = i,text = "A Message from User {}: 👇".format(update.message.from_user.first_name))
         update.message.forward(i)
         time.sleep(1)
 
