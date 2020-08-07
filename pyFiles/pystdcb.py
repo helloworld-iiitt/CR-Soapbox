@@ -456,7 +456,7 @@ def snd_dev_msg(update,context):
     '''
     usrlst = db.getallstduid() + db.getalltchuid()
     cs.FwdMsgTolst(update = update,context = context, usrlst = usrlst, is_dev = True)
-    update.message.reply_text(text="I had forwarded your message to {} Users".format(list(usrlst)))
+    update.message.reply_text(text="I had forwarded your message to {} Users".format(len(usrlst)))
     more_Menu(update,context)
     return cs.END
 
