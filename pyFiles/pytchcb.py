@@ -676,7 +676,7 @@ def snd_MsgStd_msg(update,context):
     update.message.forward(update.effective_chat.id)
     update.message.reply_text(text="I had forwarded your message to {} Student(s) in {} ".format(len(usrlst), grade))
     Menu(update,context)
-    return cs.STOPPING
+    return STOPPING
 
 ##
 ##  More options Functions

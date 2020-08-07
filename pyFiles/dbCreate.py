@@ -50,11 +50,12 @@ def setup():
     conn.commit()
     
     for i in sublstjson:
-        cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (i["grade"], ))
+        cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (i, ))
         grade_id = cur.fetchone()[0]
-        cur.execute('SELECT id FROM TEACHER_TB WHERE tech_name = ? ', (i["teacher"], )) # Have to change name to employee id
-        teacher_id = cur.fetchone()[0]
-        cur.execute('''INSERT OR IGNORE INTO SUBJECT_TB (subject,grade_id,teacher_id) VALUES ( ?, ?, ?)''', (i["subject"],grade_id,teacher_id ) ) #Subjecttable
+        for j in sublstjson[i]:
+            cur.execute('SELECT id FROM TEACHER_TB WHERE tech_name = ? ', (j["teacher"], )) # Have to change name to employee id
+            teacher_id = cur.fetchone()[0]
+            cur.execute('''INSERT OR IGNORE INTO SUBJECT_TB (subject,grade_id,teacher_id) VALUES ( ?, ?, ?)''', (j["subject"],grade_id,teacher_id ) ) #Subjecttable
     conn.commit()
 
 def updatett(): #Update timetable
