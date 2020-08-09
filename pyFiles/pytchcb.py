@@ -77,7 +77,6 @@ def ivempid(update, context):
     '''
         Function to send error when user enters Invalid emp_id in Authentication Menu
     '''
-    update.message.reply_text()
     cs.RPMsg(update = update, context = context,text='''Its NOT a valid Employee Id or\nSomeone has Already registered with this Employee ID.'''+
                                 '''Please send me\nA Valid Employee ID.\nIf someone else is using your account please contact the Devoloper''',
                                 reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))

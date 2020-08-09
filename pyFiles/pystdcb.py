@@ -414,7 +414,6 @@ def std_dev_msg(update,context):
     '''
         Function to contact the Developer
     '''
-    update.message.reply_text()
     cs.RPMsg(update = update, context = context,text="Send me the message that you want me to pass to Users",
                                     reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
     return DEV_MSG_KEY
