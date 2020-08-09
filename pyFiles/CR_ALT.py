@@ -11,12 +11,11 @@ from pytz import timezone
 bottkn = open('data/bottkn.txt').read()
 ## Updater decleration
 pp = PicklePersistence(filename='data/CRApersistance')
-updater = Updater(token=bottkn,persistence=pp,use_context=True)
+updater = Updater(token=bottkn,persistence=pp,use_context=True, workers=50)
 disp = updater.dispatcher
 jobque = updater.job_queue
 daytuple = tuple(range(len(cs.datajson['daylst'])))
 ## Job Queue Functions
-
 
 ## JobQueue Dispachers
 jobque.run_daily(callback = tb.update_Day_tt,time = datetime.time(hour = 18, minute = 0, tzinfo = timezone('Asia/Kolkata')))

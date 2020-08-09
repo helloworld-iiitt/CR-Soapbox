@@ -101,14 +101,17 @@ def FwdMsgTolst(update, context, usrlst, is_dev = False,is_teacher = False):
         Forward the message to all users in the given list
     '''
     for i in usrlst:
-        if is_dev:
-            context.bot.send_message(chat_id = i,text = "A Message from Developer: 👇")
-        elif is_teacher:
-            context.bot.send_message(chat_id = i,text = "A Message from Professor {}: 👇".format(update.message.from_user.first_name))
-        else:
-            context.bot.send_message(chat_id = i,text = "A Message from User {}: 👇".format(update.message.from_user.first_name))
-        update.message.forward(i)
-        time.sleep(1)
+        FwdMsg(update, context,i, is_dev,is_teacher)
+
+@run_async
+def FwdMsg(update, context,chat_id, is_dev = False,is_teacher = False):
+    if is_dev:
+        context.bot.send_message(chat_id = chat_id,text = "A Message from Developer: 👇")
+    elif is_teacher:
+        context.bot.send_message(chat_id = chat_id,text = "A Message from Professor {}: 👇".format(update.message.from_user.first_name))
+    else:
+        context.bot.send_message(chat_id = chat_id,text = "A Message from User {}: 👇".format(update.message.from_user.first_name))
+    update.message.forward(chat_id)
 
 @run_async
 def SndMsgTolst(update,context, usrlst , msg):
@@ -116,8 +119,21 @@ def SndMsgTolst(update,context, usrlst , msg):
         Send the message to all users in the given list
     '''
     for i in usrlst:
-        context.bot.send_message(chat_id = i,text = msg, parse_mode ='Markdown')
-        time.sleep(1)
+        SndMsg(context, i , msg)    
+
+@run_async
+def SndMsg(context, chat_id , msg):
+    '''
+        Send the message to user
+    '''
+    context.bot.send_message(chat_id = chat_id,text = msg, parse_mode ='Markdown')
+
+@run_async
+def RPMsg(update,context, text,reply_markup):
+    '''
+        Send reply to user
+    '''
+    update.message.reply_text(text = text, reply_markup = reply_markup)
 
 @run_async
 def KnowAbtDev(update,context):

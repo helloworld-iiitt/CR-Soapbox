@@ -22,8 +22,7 @@ def rollno(update, context):
     '''
         Function to ask the user to enter his roll no
     '''
-    update.message.reply_text(text='''Please tell me,\nYour IIITT Roll Number\nto Log you in.''', 
-                                reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
+    cs.RPMsg(update, context,'''Please tell me,\nYour IIITT Roll Number\nto Log you in.''',telegram.ReplyKeyboardMarkup([['Back']]))
     return AUTH_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -31,8 +30,8 @@ def ivrollno(update, context):
     '''
         Function to send error when user enters Invalid rollno in Authentication Menu
     '''
-    update.message.reply_text(text='''Its NOT a valid Roll No or\nSomeone has Already registered with this Roll No.\nPlease tell me A Valid Roll No.\n
-                                        If someone else is using your account please contact the Devoloper''')
+    cs.RPMsg(update,context,'''Its NOT a valid Roll No or\nSomeone has Already registered with this Roll No.\nPlease tell me A Valid Roll No.'''+'''
+                                        If someone else is using your account please contact the Devoloper''',telegram.ReplyKeyboardMarkup([['Back']]))
     return AUTH_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -45,10 +44,7 @@ def Authentication(update, context):
         updusr = True
     rollno = db.usrsetup(update.effective_chat.id,(update.message.text).upper(),updusr)
     if rollno :
-        update.message.reply_text(text="I linked Your Rollno {},\nto your account".format(rollno))
-        update.message.text = rollno
-        update.message.reply_text("Select Menu to see the list of things that you can ask me.",
-                                    reply_markup=telegram.ReplyKeyboardMarkup([['Menu']]))
+        cs.RPMsg(update,context,"I linked Your Rollno {},\nto your account.Select Menu to see the list of things that you can ask me.".format(rollno),telegram.ReplyKeyboardMarkup([['Menu']]))
         return cs.STOP  
     else:
         return ivrollno(update, context)
@@ -64,8 +60,7 @@ def Menu(update,context):
         Function to send Student Main Menu to the user
     '''
     menu = cs.build_menu(buttons=["Timetable","Attendance","More"])
-    update.message.reply_text(text='''Ask me what you want to know from the Below list''',
-                                    reply_markup=telegram.ReplyKeyboardMarkup(menu))
+    cs.RPMsg(update,context,'''Ask me what you want to know from the Below list''',telegram.ReplyKeyboardMarkup(menu))
     return MAIN_MENU_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -85,8 +80,7 @@ def tt_Menu(update,context):
         Function to send Student Timetable Menu to the user
     '''
     menu = cs.build_menu(buttons=["Today's Timetable","Daily Timetable","Back"])
-    update.message.reply_text(text='''what do you want to know about Your Timetable?''',
-                                    reply_markup=telegram.ReplyKeyboardMarkup(menu))
+    cs.RPMsg(update,context, '''what do you want to know about Your Timetable?''',telegram.ReplyKeyboardMarkup(menu))
     return TT_MENU_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -95,8 +89,7 @@ def ivTTMenu(update,context):
         Function to send error when user enters Invalid rollno in Student Timetable Menu
     '''
     menu = cs.build_menu(buttons=["Today's Timetable","Daily Timetable","Back"])
-    update.message.reply_text(text='''Sorry , I can't do that.\nPlease select from the Given list''',
-                                    reply_markup=telegram.ReplyKeyboardMarkup(menu))
+    cs.RPMsg(update,context, '''Sorry , I can't do that.\nPlease select from the Given list''',telegram.ReplyKeyboardMarkup(menu))
     return TT_MENU_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -149,7 +142,7 @@ def dayKb_DTMC (update,context):
         Function to send KeyBoard of Days to the user in Student Timetable/Daily_Timetable path
     '''
     text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-    update.message.reply_text(text='''Which day Timetable do you want ?''', reply_markup=telegram.ReplyKeyboardMarkup(text))
+    cs.RPMsg(update,context, '''Which day Timetable do you want ?''',telegram.ReplyKeyboardMarkup(text))
     return DAILY_TT_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -158,7 +151,7 @@ def ivday_DTMC(update,context):
         Function to send error when user enters Invalid day in Student Timetable/Daily_Timetable path
     '''
     text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-    update.message.reply_text(text='''Its not a Day from the list.\nPlease sent me a day from the list''', reply_markup=telegram.ReplyKeyboardMarkup(text))
+    cs.RPMsg(update,context, '''Its not a Day from the list.\nPlease sent me a day from the list''',telegram.ReplyKeyboardMarkup(text))
     return DAILY_TT_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -194,8 +187,7 @@ def atd_Menu(update,context):
         Function to send Student Attendance Menu to the user
     '''
     menu = cs.build_menu(buttons=["Get Attendance","Set Attendance","Back"])
-    update.message.reply_text(text='''what do you want to know about Your Attendance?''',
-                                    reply_markup=telegram.ReplyKeyboardMarkup(menu))
+    cs.RPMsg(update,context, '''what do you want to know about Your Attendance?''',telegram.ReplyKeyboardMarkup(menu))
     return ATD_MENU_KEY
 
 
@@ -205,8 +197,7 @@ def ivAtdMenu(update,context):
         Function to send error when user enters Invalid rollno in Student Attendance Menu
     '''
     menu = cs.build_menu(buttons=["Get Attendance","Set Attendance","Back"])
-    update.message.reply_text(text='''Sorry , I can't do that.\nPlease select from the Given list''',
-                                    reply_markup=telegram.ReplyKeyboardMarkup(menu))
+    cs.RPMsg(update,context, '''Sorry , I can't do that.\nPlease select from the Given list''',telegram.ReplyKeyboardMarkup(menu))
     return ATD_MENU_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -252,8 +243,7 @@ def subkb_SASUC(update,context):
         Function to send Subject Keyboard to the user
     '''
     sublst = db.getsubgrd(db.getusrgrd(update.effective_chat.id))
-    update.message.reply_text(text='Which subject Attedence do you want to set',
-                                    reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(sublst+['Back'])))
+    cs.RPMsg(update,context, 'Which subject Attedence do you want to set',telegram.ReplyKeyboardMarkup(cs.build_menu(sublst+['Back'])))
     return SETATD_SUB_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -262,8 +252,7 @@ def ivsub_SASC(update,context):
         Function to send error when user enters Invalid Subject in Student Attendance Menu
     '''
     sublst = db.getsubgrd(db.getusrgrd(update.effective_chat.id))
-    update.message.reply_text(text='''Sorry , I can't do that.\nPlease select a Subject from Your Class''',
-                                    reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(sublst+['Back'])))
+    cs.RPMsg(update,context, '''Sorry , I can't do that.\nPlease select a Subject from Your Class''',telegram.ReplyKeyboardMarkup(cs.build_menu(sublst+['Back'])))
     return SETATD_SUB_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -284,7 +273,7 @@ def Statkb_SASTC(update,context):
     '''
     if (update.message.text).upper() in db.getsubgrd(db.getusrgrd(update.effective_chat.id)):
         context.user_data['SetAtdSub'] = (update.message.text).upper()
-        update.message.reply_text(text='So, Tell me the status of {}'.format(context.user_data['SetAtdSub']),
+        cs.RPMsg(update = update, context = context,text='So, Tell me the status of {}'.format(context.user_data['SetAtdSub']),
                                         reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(['Present','Absent','Back'])))
         update.message.reply_text(text='''If you want to enter Attended and Total classes seperatly then enter Them in this pattern-\naa:tt'''
                                             +'''(ex: 05:10)-\n5 out of 10 classes attended''')
@@ -298,7 +287,7 @@ def ivStat_SASC(update,context):
     '''
         Function to send error when user enters Invalid Status in Student Attendance Menu
     '''
-    update.message.reply_text(text='''Sorry , I can't do that.\nPlease select a Valid status of the subject''',
+    cs.RPMsg(update = update, context = context,text='''Sorry , I can't do that.\nPlease select a Valid status of the subject''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(['Present','Absent','Back'])))
     return SETATD_STAT_KEY
 
@@ -348,7 +337,7 @@ def more_Menu(update,context):
     if update.effective_chat.id in cs.devjson['devChat_id']:
         menu = ['Message All\n(Dev option)'] + menu
     menu = cs.build_menu(buttons=menu)
-    update.message.reply_text(text='''These are the extra options\nthat you can use.\nRemember Logging Out Will\nDelete Your Data''',
+    cs.RPMsg(update = update, context = context,text='''These are the extra options\nthat you can use.\nRemember Logging Out Will\nDelete Your Data''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return MORE_MENU_KEY
 
@@ -358,7 +347,7 @@ def ivMoreMenu(update,context):
     '''
         Function to send error when user enters Invalid option in More Menu
     '''
-    update.message.reply_text(text="Sorry , I can't do that.\nPlease select a Valid option from the List",parse_mode  =   'Markdown')
+    update.message.reply_text(text="Sorry , I can't do that.\nPlease select a Valid option from the List")
     return MORE_MENU_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -386,9 +375,9 @@ def std_CT_dev(update,context):
     '''
         Function to contact the Developer
     '''
-    update.message.reply_text(text="Send me the message that you want me to pass to Developer(s)",parse_mode  = 'Markdown',
+    cs.RPMsg(update = update, context = context,text="Send me the message that you want me to pass to Developer(s)",
                                     reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
-    update.message.reply_text(text="Please Send me your feedback (I will accept Stickers too 😉)",parse_mode  = 'Markdown')
+    update.message.reply_text(text="Please Send me your feedback (I will accept Stickers too)")
     return CT_MENU_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -425,7 +414,8 @@ def std_dev_msg(update,context):
     '''
         Function to contact the Developer
     '''
-    update.message.reply_text(text="Send me the message that you want me to pass to Users",parse_mode  = 'Markdown',
+    update.message.reply_text()
+    cs.RPMsg(update = update, context = context,text="Send me the message that you want me to pass to Users",
                                     reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
     return DEV_MSG_KEY
 
@@ -460,10 +450,20 @@ def snd_dev_msg(update,context):
     more_Menu(update,context)
     return cs.END
 
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def std_logout(update,context):
+    '''
+        Function to Logout the user
+    '''
+    db.rmvstd(update.effective_chat.id)
+    update.message.reply_text(text='''You have logged out Successfully.\nByeBye..\n''',reply_markup=telegram.ReplyKeyboardRemove())
+    update.message.reply_text(text='''Send /start to restart the bot''')
+    
+    return STOPPING
 ##
 ##   JobQueue Functions
 ##
-
+@run_async
 def callback_daily(context):
     '''
         Jobqueue's callback_daily function to send timetable to user at night
@@ -472,14 +472,13 @@ def callback_daily(context):
     for i in usrlst:
         day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")
         text = "Today's Timetable:\n" + std_tt(i,day)
-        context.bot.send_message(chat_id=i,text= text)
+        cs.SndMsg(context, i , text)
         del day
-        time.sleep(1)
     text = "Total no of STUDENTS using CR_ALT = {}".format(len(usrlst))
     for i in cs.devjson['devChat_id']:
         context.bot.send_message(chat_id=i,text= text)
 
-
+@run_async
 def class_Remindar(context):
     '''
         Jobqueue's callback_daily function to send Class_ATD_reminder to user 
@@ -498,9 +497,10 @@ def class_Remindar(context):
             reply_markup = InlineKeyboardMarkup(cs.build_menu(keyboard))
             context.bot.send_message(chat_id=i, text= "Did you attend the class of subject {} @ {}".format(subject,context.job.context),
                         reply_markup=reply_markup)
-            time.sleep(1)
+            time.sleep(.2)
         del day
         
+@run_async
 @cs.send_action(action=telegram.ChatAction.TYPING)
 def inline_set_atd(update,context):
     '''
@@ -517,16 +517,7 @@ def inline_set_atd(update,context):
     else:
         query.edit_message_text(text="{} class was CANCELED".format(query.data[1:]))
 
-@cs.send_action(action=telegram.ChatAction.TYPING)
-def std_logout(update,context):
-    '''
-        Function to Logout the user
-    '''
-    db.rmvstd(update.effective_chat.id)
-    update.message.reply_text(text='''You have logged out Successfully.\nByeBye..\n''',reply_markup=telegram.ReplyKeyboardRemove())
-    update.message.reply_text(text='''Send /start to restart the bot''')
-    
-    return STOPPING
+
 
 ##  Return To Menu Function
 
