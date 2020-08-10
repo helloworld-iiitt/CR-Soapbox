@@ -639,17 +639,16 @@ disp.add_handler(CallbackQueryHandler(sb.inline_set_atd,pattern='^[012].*'))
 disp.add_handler(CallbackQueryHandler(tb.Snd_CR8Cls,pattern='^CR8CLS:.*'))
 disp.add_handler(CallbackQueryHandler(tb.Snd_CXLCls,pattern='^CXLCLS:.*'))
 
-## Starting polling
-if cs.serverjson["webhook"]:
-    url = cs.serverjson["webhook_url"] + ":" + cs.serverjson["port"] + "/" + bottkn
-    updater.start_webhook(listen=cs.serverjson["listen"],
-                        port=int(cs.serverjson["port"]),
-                        url_path=bottkn,
-                        key=cs.serverjson["key"],
-                        cert=cs.serverjson["cert"],
-                        webhook_url= url)
-else:
-    updater.start_polling()
+## Starting WebHooking
+url = cs.serverjson["webhook_url"] + ":" + cs.serverjson["port"] + "/" + bottkn
+updater.start_webhook(listen=cs.serverjson["listen"],
+                    port=int(cs.serverjson["port"]),
+                    url_path=bottkn,
+                    key=cs.serverjson["key"],
+                    cert=cs.serverjson["cert"],
+                    webhook_url= url)
+## Start polling
+# updater.start_polling()
 print("Getting Updates from CR_ALT")
 updater.idle()
 
