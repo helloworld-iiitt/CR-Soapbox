@@ -76,8 +76,8 @@ def error(update, context):
            f"</code>"
 
     for dev_id in devs:
-        context.bot.send_message(dev_id, text, parse_mode=ParseMode.HTML)
-    # raise
+        context.bot.send_message(dev_id, text)
+    raise
 
 ##Restricted decorator
 
@@ -90,7 +90,7 @@ def userauthorized(userlst):
             user_id = update.effective_user.id
             if user_id not in userlst:
                 print("Unauthorized access denied for {}.".format(user_id))
-                update.message.reply_text(text="Unauthorized access denied for {}.".format(update.message.from_user.first_name), parse_mode= 'Markdown')
+                update.message.reply_text(text="Unauthorized access denied for {}.".format(update.message.from_user.first_name))
                 return
             return func(update, context, *args, **kwargs)
         return wrapped
@@ -127,7 +127,7 @@ def SndMsg(context, chat_id , msg):
     '''
         Send the message to user
     '''
-    context.bot.send_message(chat_id = chat_id,text = msg, parse_mode ='Markdown')
+    context.bot.send_message(chat_id = chat_id,text = msg)
 
 @run_async
 def RPMsg(update,context, text,reply_markup):
@@ -142,9 +142,9 @@ def KnowAbtDev(update,context):
         Send the details of the Developer(s) to user
     '''
     if len(devjson['devDetails']) == 1:
-        update.message.reply_text(text="This is *My Cool Creator*",parse_mode ='Markdown')
+        update.message.reply_text(text="This is *My Cool Creator*")
     else:
-        update.message.reply_text(text="These are *My Cool Creators*",parse_mode ='Markdown')
+        update.message.reply_text(text="These are *My Cool Creators*")
     for i in devjson['devDetails']:
         text = '<b>Name : {},\n</b><b>Email : </b>\n'.format(i['Name'])
         for j in i['Email']:
