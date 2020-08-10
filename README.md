@@ -13,7 +13,7 @@ To launch the bot :
     2.  Install sqlite, json, datetime, telegram, telegram.ext, logging from pip into your system 
     3.  Run this bash file in terminal : ./start.sh
 
-If you want to launch bot in server:
+If you want to launch bot in webhook mode:
 
     1.  You have to get ssl certificate(self-generated is also fine)
         (   To generate ssl certificate run this command : 
