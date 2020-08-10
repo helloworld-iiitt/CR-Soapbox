@@ -27,7 +27,7 @@ If you want to launch bot in webhook mode:
         (   To generate ssl certificate run this command : 
             openssl req -newkey rsa:2048 -sha256 -nodes -keyout private.key -x509 -days 3650 -out cert.pem
             )
-    2.  Go to json/serverdetails.json file and fill the required details (like port, listen,etc)
+    2.  Replace default private.key and cert.pem files in ssl/ folder with your private.key and cert.pem files
+    3.  Go to json/serverdetails.json file and fill the required details (like port, listen,FQDN)
         (   Refer this url for more details : https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks )
-     
-    3.  To Host this bot in server refer : https://github.com/python-telegram-bot/python-telegram-bot/wiki/Hosting-your-bot
+    4.  To Host this bot in server refer : https://github.com/python-telegram-bot/python-telegram-bot/wiki/Hosting-your-bot
