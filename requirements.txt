@@ -1,4 +1,2 @@
 python-telegram-bot
-telegram
-urllib3
 pytz
