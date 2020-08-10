@@ -18,6 +18,7 @@ STOP = -10
 #Json file access
 datajson = json.loads(open('json/clgdetails.json').read()) #access json file
 devjson = json.loads(open('json/devlst.json').read()) #access json file
+serverjson = json.loads(open('json/serverdetails.json').read())
 
 # developers list
 devs = devjson['devChat_id']
