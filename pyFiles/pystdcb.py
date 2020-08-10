@@ -30,8 +30,8 @@ def ivrollno(update, context):
     '''
         Function to send error when user enters Invalid rollno in Authentication Menu
     '''
-    cs.RPMsg(update,context,'''Its NOT a valid Roll No or\nSomeone has Already registered with this Roll No.\nPlease tell me A Valid Roll No.'''+'''
-                                        If someone else is using your account please contact the Devoloper''',telegram.ReplyKeyboardMarkup([['Back']]))
+    cs.RPMsg(update,context,'''Its NOT a valid Roll No or\nSomeone has Already registered with this Roll No.\nPlease tell me A Valid Roll No.'''+
+                                        '''If someone else is using your account please contact the Devoloper''',telegram.ReplyKeyboardMarkup([['Back']]))
     return AUTH_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
