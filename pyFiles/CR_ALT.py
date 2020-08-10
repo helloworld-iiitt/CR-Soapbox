@@ -48,7 +48,7 @@ def start(update, context):
         return sb.MAIN_MENU_KEY
     elif emp_id != None and rollno == None :
         text = [['Menu']]
-        update.message.reply_text(text='''Welcome Back! {}\nYou have logged in as\na *Professor* with Employee Id: *{}*.'''.format(update.message.from_user.first_name,emp_id), parse_mode= 'Markdown')
+        update.message.reply_text(text='''Welcome Back! {}\nYou have logged in as\na *Professor* with Email Id: *{}*.'''.format(update.message.from_user.first_name,emp_id), parse_mode= 'Markdown')
         update.message.reply_text("Select *Menu* to see the list of things that you can ask me.", parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
         return tb.MAIN_MENU_KEY
     else:
@@ -598,11 +598,11 @@ tch_Menu_cov        =      ConversationHandler(
 tch_auth_cov     =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Professor")),tb.empid)],
     states          =   {
-                            tb.AUTH_KEY         :   [   (MessageHandler((Filters.regex('^[iI][Ii][Ii][Tt][tT]0[0-9][0-9]$')), tb.Authentication )),
+                            tb.AUTH_KEY         :   [   MessageHandler((Filters.text(cs.tchEmaillist)), tb.Authentication ),
                                                         MessageHandler((Filters.text("Back")),bkTAC)]
                         },
     allow_reentry   =   True,
-    fallbacks       =   [MessageHandler((~Filters.regex('^[iI][Ii][Ii][Tt][tT]0[0-9][0-9]$') & ~Filters.text("Back")),tb.ivempid)],
+    fallbacks       =   [MessageHandler((~Filters.text(cs.tchEmaillist) & ~Filters.text("Back")),tb.ivempid)],
     name            =   "tchAuthcov",
     persistent      =   True,
     map_to_parent   =   {

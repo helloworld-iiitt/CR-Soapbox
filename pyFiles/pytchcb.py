@@ -49,7 +49,7 @@ def empid(update, context):
     '''
         Function to ask the user to enter his emp_id
     '''
-    cs.RPMsg(update = update, context = context,text='''Please send me,\nYour IIITT Employee ID\nto Log you in.''',
+    cs.RPMsg(update = update, context = context,text='''Please send me,\nYour IIITT Email ID\nto Log you in.''',
                                 reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
     return AUTH_KEY
 
@@ -61,10 +61,10 @@ def Authentication(update, context):
     updtch = False
     if db.chktch(update.effective_chat.id) != None:
         updtch = True
-    emp_id = db.tchsetup(update.effective_chat.id,(update.message.text).upper(),updtch)
+    emp_id = db.tchsetup(update.effective_chat.id,(update.message.text),updtch)
     if emp_id :
         context.user_data['updtch'] = False
-        update.message.reply_text(text="I linked Your Employee Id {},\nto your account".format(emp_id))
+        update.message.reply_text(text="I linked Your Email Id {},\nto your account".format(emp_id))
         update.message.text = emp_id
         cs.RPMsg(update = update, context = context,text = "Select Menu to see the list of things that you can ask me.",
                                     reply_markup=telegram.ReplyKeyboardMarkup([['Menu']]))
@@ -77,8 +77,8 @@ def ivempid(update, context):
     '''
         Function to send error when user enters Invalid emp_id in Authentication Menu
     '''
-    cs.RPMsg(update = update, context = context,text='''Its NOT a valid Employee Id or\nSomeone has Already registered with this Employee ID.'''+
-                                '''Please send me\nA Valid Employee ID.\nIf someone else is using your account please contact the Devoloper''',
+    cs.RPMsg(update = update, context = context,text='''Its NOT a valid Email Id or\nSomeone has Already registered with this Email ID.'''+
+                                '''Please send me\nA Valid Email ID.\nIf someone else is using your account please contact the Devoloper''',
                                 reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
     return AUTH_KEY
 

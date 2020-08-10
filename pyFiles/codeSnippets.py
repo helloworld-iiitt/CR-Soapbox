@@ -21,7 +21,7 @@ devjson = json.loads(open('json/devlst.json').read()) #access json file
 
 # developers list
 devs = devjson['devChat_id']
-
+tchEmaillist = list (datajson['teacher'].keys())
 ## Code snippets
 # Build Menu
 def build_menu(buttons, n_cols=2,
