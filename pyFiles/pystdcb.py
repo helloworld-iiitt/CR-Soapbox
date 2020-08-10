@@ -44,7 +44,7 @@ def Authentication(update, context):
         updusr = True
     rollno = db.usrsetup(update.effective_chat.id,(update.message.text).upper(),updusr)
     if rollno :
-        cs.RPMsg(update,context,"I linked Your Rollno {},\nto your account.Select Menu to see the list of things that you can ask me.".format(rollno),telegram.ReplyKeyboardMarkup([['Menu']]))
+        cs.RPMsg(update,context,"I linked Your Rollno {},\nto your account.\nSelect Menu to see the list of things that you can ask me.".format(rollno),telegram.ReplyKeyboardMarkup([['Menu']]))
         return cs.STOP  
     else:
         return ivrollno(update, context)

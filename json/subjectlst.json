@@ -1,95 +1,112 @@
 {
     "CSE19" :   [
             {
-                "subject" : "HSIR12",
-                "teacher" : "Dr.V.Sindhu"
+                "subject" : "CSPC21",
+                "teacher" : "Dr.R.Dhanalakshmi"
             },
             {
-                "subject" : "MAIR12",
+                "subject" : "CSPC22",
+                "teacher" : "Dr.G.Seetharaman"
+            },
+            {
+                "subject" : "CSPC23",
+                "teacher" : "Dr.G.Devasena"
+            },
+            {
+                "subject" : "CSPC24",
+                "teacher" : "Ms.R.Shathanaa"
+            },
+            {
+                "subject" : "MAIR37",
                 "teacher" : "Dr.JagadeeshwarPashikanti"
             },
             {
-                "subject" : "PHIR13",
-                "teacher" : "Dr.K.Kamakshi"
-            },
-            {
-                "subject" : "CHIR13",
-                "teacher" : "Dr.Ujwal.O.Bhagwat"
-            },
-            {
-                "subject" : "ENIR11",
-                "teacher" : "Dr.Dharmalingam"
-            },
-            {
-                "subject" : "CSPC11",
+                "subject" : "CSPC25",
                 "teacher" : "Dr.N.Renugadevi"
             },
             {
-                "subject" : "PRIR11",
-                "teacher" : "Dr.Velmurugan.C"
+                "subject" : "CSLR21",
+                "teacher" : "Dr.R.Dhanalakshmi"
+            },
+            {
+                "subject" : "CSLR22",
+                "teacher" : "Ms.Bharathi"
+            },
+            {
+                "subject" : "T&P",
+                "teacher" : "Ms.R.Yamini"
             }
         ],
     "ECE19" :[
             {
-                "subject" : "HSIR12",
-                "teacher" : "Dr.V.Sindhu"
-            },
-            {
-                "subject" : "MAIR12",
+                "subject" : "MAIR34",
                 "teacher" : "Dr.JagadeeshwarPashikanti"
             },
             {
-                "subject" : "PHIR13",
-                "teacher" : "Dr.K.Kamakshi"
+                "subject" : "ECPC31",
+                "teacher" : "Dr.R.Krishnamurthy"
             },
             {
-                "subject" : "CHIR13",
-                "teacher" : "Dr.Ujwal.O.Bhagwat"
+                "subject" : "ECPC32",
+                "teacher" : "Dr.M.SenthilSivakumar"
             },
             {
-                "subject" : "ENIR11",
-                "teacher" : "Dr.Dharmalingam"
+                "subject" : "ECPC33",
+                "teacher" : "Ms.Bharathi"
             },
             {
-                "subject" : "ECPC21",
-                "teacher" : "Dr.Sishaj.P.Simon"
+                "subject" : "ECPC34",
+                "teacher" : "Dr.SureshBalanethiram"
             },
             {
-                "subject" : "PRIR11",
-                "teacher" : "Dr.Velmurugan.C"
+                "subject" : "ECPC35",
+                "teacher" : "Dr.G.Seetharaman"
+            },
+            {
+                "subject" : "ECLR31",
+                "teacher" : "Dr.M.SenthilSivakumar"
+            },
+            {
+                "subject" : "ECLR32",
+                "teacher" : "Dr.G.Seetharaman"
+            },
+            {
+                "subject" : "T&P",
+                "teacher" : "Ms.R.Yamini"
             }
         ],
     "CSE18" :[
             {
-                "subject" : "CSPC26",
-                "teacher" : "Dr.G.Devasena"
-            },
-            {
-                "subject" : "MAIR14",
-                "teacher" : "Mr.D.Murugan"
-            },
-            {
-                "subject" : "CSPC27",
-                "teacher" : "Dr.R.Dhanalakshmi"
-            },
-            {
-                "subject" : "CSPC28",
+                "subject" : "CSPC31",
                 "teacher" : "Ms.R.Shathanaa"
             },
             {
-                "subject" : "CSPC29",
+                "subject" : "CSPC32",
+                "teacher" : "Dr.C.Balaji"
+            },
+            {
+                "subject" : "CSPC33",
+                "teacher" : "Dr.G.Devasena"
+            },
+            {
+                "subject" : "CSPC34",
                 "teacher" : "Dr.AnoopJacobThomas"
             },
             {
-                "subject" : "HSIR14",
-                "teacher" : "Dr.Rinshu"
+                "subject" : "E1",
+                "teacher" : "Dr.C.Balaji"
             },
             {
-                "subject" : "CSLR23",
-                "teacher" : "Dr.AnoopJacobThomas"
+                "subject" : "E2",
+                "teacher" : "Dr.M.Sridevi"
             },
             {
-                "subject" : "CSLR24",
+                "subject" : "CSLR31",
+                "teacher" : "Dr.N.Renugadevi"
+            },
+            
+            {
+                "subject" : "CSLR32",
                 "teacher" : "Dr.G.Devasena"
             },
             {
@@ -99,36 +116,36 @@
         ],
     "ECE18" :   [
             {
-                "subject" : "MAIR45",
+                "subject" : "ECPC51",
+                "teacher" : "Dr.Gopi"
+            },
+            {
+                "subject" : "ECPC52",
+                "teacher" : "Dr.M.SenthilSivakumar"
+            },
+            {
+                "subject" : "ECPC53",
                 "teacher" : "Dr.R.Krishnamurthy"
             },
             {
-                "subject" : "HSIR14",
-                "teacher" : "Dr.V.Sindhu"
-            },
-            {
-                "subject" : "ECPC41",
-                "teacher" : "Dr.G.Seetharaman"
-            },
-            {
-                "subject" : "ECPC42",
-                "teacher" : "Dr.V.Sudha"
-            },
-            {
-                "subject" : "ECPC43",
+                "subject" : "ECPC54",
                 "teacher" : "Dr.SureshBalanethiram"
             },
             {
-                "subject" : "ECPC44",
-                "teacher" : "Dr.M.SenthilSivakumar"
+                "subject" : "ECPC55",
+                "teacher" : "Director"
             },
             {
-                "subject" : "ECLR41",
+                "subject" : "ECOE11",
+                "teacher" : "Ms.R.Shathanaa"
+            },
+            {
+                "subject" : "ECLR51",
                 "teacher" : "Dr.SureshBalanethiram"
             },
             {
-                "subject" : "ECLR42",
-                "teacher" : "Dr.M.SenthilSivakumar"
+                "subject" : "ECLR52",
+                "teacher" : "Dr.R.Krishnamurthy"
             },
             {
                 "subject" : "T&P",
@@ -137,114 +154,16 @@
         ],
     "CSE17" :   [
             {
-                "subject" : "CSPC35",
-                "teacher" : "Dr.C.Balaji"
-            },
-            {
-                "subject" : "CSPC36",
-                "teacher" : "Dr.M.SenthilSivakumar"
-            },
-            {
-                "subject" : "CSPC37",
-                "teacher" : "NewFaculty"
-            },
-            {
-                "subject" : "CSPE14",
-                "teacher" : "Dr.G.Devasena"
-            },
-            {
-                "subject" : "CSOE21",
-                "teacher" : "Dr.JagadeeshwarPashikanti"
-            },
-            {
-                "subject" : "CSPE22",
-                "teacher" : "Ms.R.Shathanaa"
-            },
-            {
-                "subject" : "CSLR33",
-                "teacher" : "NewFaculty"
-            },
-            {
-                "subject" : "CSLR34",
-                "teacher" : "Dr.M.SenthilSivakumar"
-            },
-            {
-                "subject" : "CSIR16",
-                "teacher" : "Dr.G.Devasena"
-            },
-            {
-                "subject" : "CSIR19",
-                "teacher" : "Ms.R.Yamini"
-            }
-        ],
-    "ECE17" :   [
-            {
-                "subject" : "ECPC61",
-                "teacher" : "Dr.R.Krishnamurthy"
-            },
-            {
-                "subject" : "ECPC62",
-                "teacher" : "Dr.P.Muthuchidambaranathan"
-            },
-            {
-                "subject" : "ECPC63",
-                "teacher" : "Dr.SureshBalanethiram"
-            },
-            {
-                "subject" : "ECPC64",
-                "teacher" : "Dr.S.S.Karthikeyan"
-            },
-            {
-                "subject" : "ECOE14",
-                "teacher" : "Dr.R.Dhanalakshmi"
-            },
-            {
-                "subject" : "E3",
-                "teacher" : "Dr.G.Seetharaman"
-            },
-            {
-                "subject" : "ECLR61",
-                "teacher" : "Dr.R.Krishnamurthy"
-            },
-            {
-                "subject" : "ECLR62",
-                "teacher" : "Dr.SureshBalanethiram"
-            },
-            {
-                "subject" : "ECIR16",
-                "teacher" : "Dr.SureshBalanethiram"
-            },
-            {
-                "subject" : "ECIR19",
-                "teacher" : "Ms.R.Yamini"
-            }
-        ],
-    "CSE16" :   [
-            {
-                "subject" : "CSPE23",
-                "teacher" : "Dr.AnoopJacobThomas"
-            },
-            {
-                "subject" : "CSOE17",
-                "teacher" : "Dr.N.Renugadevi"
-            },
-            {
-                "subject" : "CSOE20",
-                "teacher" : "NewFaculty"
-            },
-            {
-                "subject" : "ECOE20",
+                "subject" : "HSIR13",
                 "teacher" : "Dr.Rinshu"
             },
             {
-                "subject" : "CSIR17",
-                "teacher" : "Dr.R.Dhanalakshmi"
-            }
-        ],
-    "ECE16" :   [
+                "subject" : "CSPC41",
+                "teacher" : "Dr.RajeswariSridhar"
+            },
             {
-            "subject" : "ECPC81",
-            "teacher" : "Dr.G.ThavasiRaja"
+                "subject" : "E6",
+                "teacher" : "Dr.R.Dhanalakshmi"
             },
             {
                 "subject" : "E7",
@@ -252,15 +171,37 @@
             },
             {
                 "subject" : "E8",
-                "teacher" : "NewFaculty"
+                "teacher" : "Dr.Brindha"
             },
             {
-                "subject" : "E9",
+                "subject" : "CSIR18",
+                "teacher" : "Dr.C.Balaji"
+            }
+        ],
+    "ECE17" :   [
+            {
+                "subject" : "ECPC71",
+                "teacher" : "Dr.Karthikeyan"
+            },
+            {
+                "subject" : "HSIR13",
                 "teacher" : "Dr.Rinshu"
             },
             {
-                "subject" : "ECIR17",
+                "subject" : "ECPE17",
                 "teacher" : "Dr.G.Seetharaman"
+            },
+            {
+                "subject" : "ECOE15",
+                "teacher" : "Ms.Bharathi"
+            },
+            {
+                "subject" : "ECOE16",
+                "teacher" : "Dr.Deivalakshmi"
+            },
+            {
+                "subject" : "CSIR18",
+                "teacher" : "Dr.R.Krishnamurthy"
             }
         ]
 }
