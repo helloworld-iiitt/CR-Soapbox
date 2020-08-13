@@ -19,11 +19,31 @@ STOP = -10
 datajson = json.loads(open('json/clgdetails.json').read()) #access json file
 devjson = json.loads(open('json/devlst.json').read()) #access json file
 serverjson = json.loads(open('json/serverdetails.json').read())
-
+timetbljson = json.loads(open('json/timetable.json').read()) #access json file
+clgdtlsjson = json.loads(open('json/clgdetails.json').read())#access json file
+sublstjson = json.loads(open('json/subjectlst.json').read())#access json file 
 # developers list
 devs = devjson['devChat_id']
 tchEmaillist = list (datajson['teacher'].keys())
 ## Code snippets
+def jsonupd():
+    global datajson 
+    datajson = json.loads(open('json/clgdetails.json').read())
+    global devjson 
+    devjson = json.loads(open('json/devlst.json').read())
+    global serverjson 
+    serverjson = json.loads(open('json/serverdetails.json').read())
+    global timetbljson
+    timetbljson = json.loads(open('json/timetable.json').read() )
+    global clgdtlsjson
+    clgdtlsjson = json.loads(open('json/clgdetails.json').read())
+    global sublstjson
+    sublstjson = json.loads(open('json/subjectlst.json').read())
+    global devs
+    devs = devjson['devChat_id']
+    global tchEmaillist
+    tchEmaillist = list (datajson['teacher'].keys())
+
 # Build Menu
 def build_menu(buttons, n_cols=2,
                header_buttons=None,

@@ -95,11 +95,19 @@ def bkTAC(update, context):
     update.message.reply_text(text='''Please tell me who are you?''',reply_markup=telegram.ReplyKeyboardMarkup(text))
     return cs.END
 
-
+## Force json update Function 
+@cs.send_action(action=telegram.ChatAction.TYPING)
+@cs.userauthorized(cs.devjson['devChat_id'])
+def forceJsonUpdate(update,context):
+    '''
+        Function to update values of variables from json files
+    '''
+    cs.jsonupd()
+    update.message.reply_text(text='''Json Files updated successfully''')
 
 ###
 ### Conversation Handlers (Main Function)
-###
+###            
 
 ##
 ## Student Handlers
@@ -630,9 +638,10 @@ Setup_cov           =   ConversationHandler(
 
 
 ##  Handler for Starting bot 
+
+disp.add_handler(CommandHandler('jsonupdate',forceJsonUpdate))
 disp.add_handler(Setup_cov)
 disp.add_error_handler(cs.error)
-
 ##  Handler for InlinequaryKeyboard messages
 
 disp.add_handler(CallbackQueryHandler(sb.inline_set_atd,pattern='^[012].*'))
@@ -640,15 +649,15 @@ disp.add_handler(CallbackQueryHandler(tb.Snd_CR8Cls,pattern='^CR8CLS:.*'))
 disp.add_handler(CallbackQueryHandler(tb.Snd_CXLCls,pattern='^CXLCLS:.*'))
 
 ## Starting WebHooking
-url = cs.serverjson["webhook_url"] + ":" + cs.serverjson["port"] + "/" + bottkn
-updater.start_webhook(listen=cs.serverjson["listen"],
-                    port=int(cs.serverjson["port"]),
-                    url_path=bottkn,
-                    key=cs.serverjson["key"],
-                    cert=cs.serverjson["cert"],
-                    webhook_url= url)
+# url = cs.serverjson["webhook_url"] + ":" + cs.serverjson["port"] + "/" + bottkn
+# updater.start_webhook(listen=cs.serverjson["listen"],
+#                     port=int(cs.serverjson["port"]),
+#                     url_path=bottkn,
+#                     key=cs.serverjson["key"],
+#                     cert=cs.serverjson["cert"],
+#                     webhook_url= url)
 ## Start polling
-# updater.start_polling()
+updater.start_polling()
 print("Getting Updates from CR_ALT")
 updater.idle()
 

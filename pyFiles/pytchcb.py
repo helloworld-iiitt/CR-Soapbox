@@ -18,6 +18,7 @@ def update_Day_tt(context):
         Jobqueue's Updaytt function
         it will up date day timetable on working days after 04:30 pm
     '''
+    cs.jsonupd()
     day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")
     db.upddaytt(day)
     tchlst = db.getalltchuid()
