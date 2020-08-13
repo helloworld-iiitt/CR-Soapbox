@@ -10,7 +10,7 @@ import codeSnippets as cs
 
 ## Conversation dict Constants keys
 MAIN_MENU_KEY, AUTH_KEY, MAIN_MENU_KEY, TT_MENU_KEY, DAILY_TT_KEY, STOPPING, GRADE_TT_GRD_KEY, GRADE_TT_DAY_KEY, ANN_MENU_KEY, CR8CLS_GRD_KEY= range(20,30)
-CR8CLS_Day_KEY, CR8CLS_Perd_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, MSGSTD_GRD_KEY, MSGSTD_MSG_KEY, MORE_MENU_KEY, CT_MENU_KEY, DEV_MSG_KEY, RETURN_MENU= range(30,40)
+CR8CLS_Day_KEY, CR8CLS_Perd_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, MSGSTD_GRD_KEY, MSGSTD_MSG_KEY, MORE_MENU_KEY, CT_MENU_KEY, DEV_MSG_KEY,DEV_MENU_KEY, RETURN_MENU= range(30,41)
 
 ## Jobqueue Functions
 def update_Day_tt(context):
@@ -697,7 +697,7 @@ def more_Menu(update,context):
     '''
     menu = ['Know about\nDeveloper(s)',"Contact\nDeveloper(s)","Back","Logout"]
     if update.effective_chat.id in cs.devjson['devChat_id']:
-        menu = ['Message All\n(Dev option)'] + menu
+        menu = ['Message Users\n(Dev option)'] + menu
     menu = cs.build_menu(buttons=menu)
     cs.RPMsg(update = update, context = context,text='''These are the extra options\nthat you can use.\nRemember Logging Out Will\nDelete all Your Data''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
@@ -715,7 +715,7 @@ def ivMoreMenu(update,context):
 @cs.send_action(action=ChatAction.TYPING)
 def bkTMMC(update,context):
     '''
-        Function to send back from std_More_Menu_cov to std_Menu_cov
+        Function to send back from Tch_More_Menu_cov to Tch_Menu_cov
     '''
     Menu(update,context)
     return cs.END
@@ -767,19 +767,50 @@ def Snd_Msg_Dev(update,context):
     more_Menu(update,context)
     return cs.END
 
-##  Student Dev Message to all users
+##  Student Dev Message to users
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=ChatAction.TYPING)
+def tch_devmenu_msg(update,context):
+    '''
+        Function to send dev Msg Menu to the user
+    '''
+    menu = ['Students',"Teachers","All Users","Back"]
+    menu = cs.build_menu(buttons=menu)
+    cs.RPMsg(update = update, context = context,text='''Please Tell me whom you want to send the message.''',
+                                    reply_markup=telegram.ReplyKeyboardMarkup(menu))
+    return DEV_MENU_KEY
+
 
 @cs.userauthorized(cs.devjson['devChat_id'])
-def std_dev_msg(update,context):
+@cs.send_action(action=ChatAction.TYPING)
+def ivDevMenu(update,context):
+    '''
+        Function to send error when user enters Invalid option in More Menu
+    '''
+    update.message.reply_text(text="Sorry, I can't do that.\nPlease select a Valid option from the List")
+    return DEV_MENU_KEY
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=ChatAction.TYPING)
+def bkTDMUC(update,context):
+    '''
+        Function to send back from tch_More_Menu_cov to Tch_Menu_cov
+    '''
+    more_Menu(update,context)
+    return cs.END
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=ChatAction.TYPING)
+def tch_dev_msg(update,context):
     '''
         Function to contact the Developer
     '''
-    cs.RPMsg(update = update, context = context,text="Send me the message that you want me to pass to Users",
+    context.user_data['tchDevUsrOpt'] = update.message.text
+    cs.RPMsg(update = update, context = context,text="Send me the message that you want me to pass to {}".format(update.message.text),
                                     reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
     return DEV_MSG_KEY
 
 @cs.userauthorized(cs.devjson['devChat_id'])
-
 @cs.send_action(action=ChatAction.TYPING)
 def ivDevMsg(update,context):
     '''
@@ -792,9 +823,9 @@ def ivDevMsg(update,context):
 @cs.send_action(action=ChatAction.TYPING)
 def bkTDMC(update,context):
     '''
-        Function to send back from tch_Dev_Msg_cov to tch_More_Menu_cov
+        Function to send back from tch_Dev_Msg_cov to tch_Dev_Menu_cov
     '''
-    more_Menu(update,context)
+    tch_devmenu_msg(update,context)
     return cs.END
 
 @cs.userauthorized(cs.devjson['devChat_id'])
@@ -803,10 +834,15 @@ def snd_dev_msg(update,context):
     '''
         Function to send message to all users
     '''
-    usrlst = db.getallstduid() + db.getalltchuid()
+    if context.user_data['tchDevUsrOpt'] == 'Students':
+        usrlst = db.getallstduid()
+    elif context.user_data['tchDevUsrOpt'] == 'Teachers':
+        usrlst = db.getalltchuid()
+    else:
+        usrlst = db.getallstduid() + db.getalltchuid()
     cs.FwdMsgTolst(update = update,context = context, usrlst = usrlst, is_dev = True)
     update.message.reply_text(text="I had forwarded your message to {} User(s)".format(len(usrlst)))
-    more_Menu(update,context)
+    tch_devmenu_msg(update,context)
     return cs.END
 
 #   LogOut the user 

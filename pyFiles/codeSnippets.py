@@ -162,9 +162,9 @@ def KnowAbtDev(update,context):
         Send the details of the Developer(s) to user
     '''
     if len(devjson['devDetails']) == 1:
-        update.message.reply_text(text="This is *My Cool Creator*")
+        update.message.reply_text(text="This is My Cool Creator")
     else:
-        update.message.reply_text(text="These are *My Cool Creators*")
+        update.message.reply_text(text="These are My Cool Creators")
     for i in devjson['devDetails']:
         text = '<b>Name : {},\n</b><b>Email : </b>\n'.format(i['Name'])
         for j in i['Email']:
