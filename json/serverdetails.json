@@ -3,5 +3,5 @@
     "listen"        :   "0.0.0.0",
     "key"           :   "ssl/private.key",
     "cert"          :   "ssl/cert.pem",
-    "webhook_url"   :   "Make sure you enter the correct FQDN (Fully Qualified Domain Name) (ex : https://example.com)"
+    "webhook_url"   :   "Make sure you enter the correct FQDN (Fully Qualified Domain Name) (Include https:// ahead fo url) (ex : https://example.com)"
 }
