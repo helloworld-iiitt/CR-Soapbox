@@ -75,7 +75,7 @@ def error(update, context):
         text = "Hey. I'm sorry to inform you that an error happened while I tried to handle your message. " \
                "My developer(s) will be notified." \
                "Try restarting the bot. If the problem presists Contact developer about it with a screenshot "
-        update.effective_message.reply_text(text)
+        update.effective_message.reply_text( text = text)
     
     trace = "".join(traceback.format_tb(sys.exc_info()[2]))
     
@@ -140,21 +140,7 @@ def SndMsgTolst(update,context, usrlst , msg):
         Send the message to all users in the given list
     '''
     for i in usrlst:
-        SndMsg(context, i , msg)    
-
-@run_async
-def SndMsg(context, chat_id , msg):
-    '''
-        Send the message to user
-    '''
-    context.bot.send_message(chat_id = chat_id,text = msg)
-
-@run_async
-def RPMsg(update,context, text,reply_markup):
-    '''
-        Send reply to user
-    '''
-    update.message.reply_text(text = text, reply_markup = reply_markup)
+        context.bot.send_message(chat_id = i , text = msg)    
 
 @run_async
 def KnowAbtDev(update,context):
