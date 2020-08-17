@@ -19,7 +19,7 @@
 <p align="center">  CR SOAPBOX is a personalized TIME TABLE Manager for IIITT Students and Teachers. 
 By registering with your IIITT ROLL No or Email ID , you can get the Personalized 
 Daily time table, Bunk manager(for Students ) , Can Make Changes in Timetable (for Teachers) 
-and many more. It's totally an alternative for Class representative
+and many more. It's totally an alternative for Class representative 😉.
     <br> 
 </p>
 
@@ -35,7 +35,7 @@ and many more. It's totally an alternative for Class representative
 
 ## 🧐 About <a name = "about"></a>
 
-CR SOAPBOX is an alternative for Class Representative 😉.
+CR SOAPBOX is an alternative for Class Representative.
 
 Students:
 
@@ -55,14 +55,14 @@ Teachers:
 
 - The bot uses the Telegram API to fetch messages, Python Telegram Bot module to reply to messages and IIITT server as a server.
 
-- The entire bot is written in Python 3.8
+- The entire bot is written in Python 3.8 (.py) and initializing script was written in bash shell script (.sh).
 
 ## 🎈 Usage <a name = "usage"></a>
 
 Start the bot by sending :
 
 ```
-    /start
+  $ /start
 ```
 
 - The bot will ask the user whether he is a student or teacher.
@@ -81,7 +81,7 @@ Teachers:
 
 - Bot will ask the user to send his IIITT Mail address to log in.
 - The bot will check if the user entered email id is of teachers from IIITT.
-- if it not belongs to a teacher from IIITT it will through an error
+- if it not belongs to a teacher from IIITT it will through an error.
 - Then the bot will responds according to the teacher's requests.
 
 - Hear is the demo of Teachers<br><br>
@@ -96,33 +96,37 @@ These instructions will get you a copy of the project up and running on your loc
 You can find the required python modules in requirments.txt file:
 
 ```
-  python-telegram-bot
-  pytz
+  $ python-telegram-bot
+  $ pytz
 ```
 
 You can install these modules by running this command in terminal:
 
 ```
-  pip3 install -r requirements.txt
+  $ pip3 install -r requirements.txt
 ```
 
 ### **Installing**
+
 1. Clone the repository:
 
 ```
-  git clone https://github.com/DattatreyaReddy/CR-Soapbox.git
-  cd CR-Soapbox/
+  $ git clone https://github.com/DattatreyaReddy/CR-Soapbox.git
+  $ cd CR-Soapbox/
 ```
-2. Head to data/bottkn.txt and replace the text with the bot token from [@botfather](https://core.telegram.org/bots#6-botfather) in telegram
 
-3. 
-- To Deploy the bot with polling ignore this step (good for initial development)
-- To Deploy the bot with webhook refer [Python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks) (Good for server deployment)
+2. Head to data/bottkn.txt and replace the text with the bot token from [@botfather](https://core.telegram.org/bots#6-botfather) in telegram.
+
+3. Polling/Web-hooking
+
+- To Deploy the bot with polling ignore this step (good for initial development).
+- To Deploy the bot with web-hook refer [Python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks) (Good for server deployment).
 
 4. Add executable permissions start.sh file and run it:
+
 ```
-  chmod +x start.sh
-  ./start.sh
+  $ chmod +x start.sh
+  $ ./start.sh
 ```
 
 ## ⛏️ Built Using <a name = "built_using"></a>
