@@ -1,6 +1,6 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=200px height=200px src="https://raw.githubusercontent.com/DattatreyaReddy/datta_repo/master/CR_ALT_LOGO.jpg?token=AOABVVCATGPHLKQIM4EOMK27HK5LS" alt="Bot logo"></a>
+ <img width=200px height=200px src="https://raw.githubusercontent.com/DattatreyaReddy/CR-Soapbox/master/media/CR_ALT_LOGO.jpg" alt="Bot logo"></a>
 </p>
 
 <h3 align="center">CR SOAPBOX</h3>
@@ -8,7 +8,7 @@
 <div align="center">
 
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
-[![Platform](https://img.shields.io/badge/platform-reddit-orange.svg)](https://t.me/CR_ALT_BOT)
+[![Platform](https://img.shields.io/badge/platform-telegram-orange)](https://t.me/CR_ALT_BOT)
 [![GitHub Issues](https://img.shields.io/github/issues/helloworld-iiitt/CR-Soapbox)](https://github.com/helloworld-iiitt/CR-Soapbox/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/helloworld-iiitt/CR-Soapbox)](https://github.com/helloworld-iiitt/CR-Soapbox/pulls)
 
@@ -29,10 +29,7 @@ and many more. It's totally an alternative for Class representative
 - [How it works](#working)
 - [Usage](#usage)
 - [Getting Started](#getting_started)
-- [Deploying your own bot](#deployment)
 - [Built Using](#built_using)
-- [TODO](../TODO.md)
-- [Contributing](../CONTRIBUTING.md)
 - [Authors](#authors)
 - [Acknowledgments](#acknowledgement)
 
@@ -77,8 +74,8 @@ Student:
 - if the roll no does not exists then it will send an error message.
 - Then the bot will responds according to the student's requests.
 
-Here is the demo of Students
-![Working](https://media.giphy.com/media/20NLMBm0BkUOwNljwv/giphy.gif)
+- Here is the demo of Students: <br><br>
+![student_demo](https://raw.githubusercontent.com/DattatreyaReddy/CR-Soapbox/master/media/student_demo.gif)
 
 Teachers:
 
@@ -87,8 +84,8 @@ Teachers:
 - if it not belongs to a teacher from IIITT it will through an error
 - Then the bot will responds according to the teacher's requests.
 
-Hear is the demo of Teachers
-![Working](https://media.giphy.com/media/20NLMBm0BkUOwNljwv/giphy.gif)
+- Hear is the demo of Teachers<br><br>
+![teacher_demo](https://raw.githubusercontent.com/DattatreyaReddy/CR-Soapbox/master/media/teacher_demo.gif)
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
@@ -127,8 +124,6 @@ You can install these modules by running this command in terminal:
   chmod +x start.sh
   ./start.sh
 ```
-
-- **Heroku**: https://github.com/kylelobo/Reddit-Bot#deploying_the_bot
 
 ## ⛏️ Built Using <a name = "built_using"></a>
 
