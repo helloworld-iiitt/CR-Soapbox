@@ -1,33 +1,147 @@
-## THE CR SOAPBOX
+<p align="center">
+  <a href="" rel="noopener">
+ <img width=200px height=200px src="https://raw.githubusercontent.com/DattatreyaReddy/datta_repo/master/CR_ALT_LOGO.jpg?token=AOABVVCATGPHLKQIM4EOMK27HK5LS" alt="Bot logo"></a>
+</p>
 
-A platform for Class Teacher to announce any changes or updates to the class schedule or any important announcements
+<h3 align="center">CR SOAPBOX</h3>
 
-    1.  Only The Teacher will make changes to the timetable.
-    2.  Timetable is displayed in a daily schedule format.
-    3.  Timetable must be avalaible round the clock and have a consistent database.
-    4.  Students get notifications about changes in timetable and announcements from Teachers
+<div align="center">
 
-To launch the bot poling mode (for developing):
+[![Status](https://img.shields.io/badge/status-active-success.svg)]()
+[![Platform](https://img.shields.io/badge/platform-reddit-orange.svg)](https://t.me/CR_ALT_BOT)
+[![GitHub Issues](https://img.shields.io/github/issues/helloworld-iiitt/CR-Soapbox)](https://github.com/helloworld-iiitt/CR-Soapbox/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/helloworld-iiitt/CR-Soapbox)](https://github.com/helloworld-iiitt/CR-Soapbox/pulls)
 
-    1.  Replace the text in data/bottkn.txt with bot token of CR_ALT bot
-    2.  Install sqlite, json, datetime, telegram, telegram.ext, logging from pip into your system 
-    3.  comment out  ~  updater.start_webhook(listen=cs.serverjson["listen"],
-                        port=int(cs.serverjson["port"]),
-                        url_path=bottkn,
-                        key=cs.serverjson["key"],
-                        cert=cs.serverjson["cert"],
-                        webhook_url= url) ~
-         these lines and uncomment ~ updater.start_polling() ~
-         line. You can find these lines in pyFiles/CR_ALT.py file. webhook - (643-649), polling - (652)
-    4.  Run this bash file in terminal : ./start.sh
+</div>
 
-If you want to launch bot in webhook mode:
+---
 
-    1.  You have to get ssl certificate(self-generated is also fine)
-        (   To generate ssl certificate run this command : 
-            openssl req -newkey rsa:2048 -sha256 -nodes -keyout private.key -x509 -days 3650 -out cert.pem
-            )
-    2.  Replace default private.key and cert.pem files in ssl/ folder with your private.key and cert.pem files
-    3.  Go to json/serverdetails.json file and fill the required details (like port, listen,FQDN)
-        (   Refer this url for more details : https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks )
-    4.  To Host this bot in server refer : https://github.com/python-telegram-bot/python-telegram-bot/wiki/Hosting-your-bot
+<p align="center">  CR SOAPBOX is a personalized TIME TABLE Manager for IIITT Students and Teachers. 
+By registering with your IIITT ROLL No or Email ID , you can get the Personalized 
+Daily time table, Bunk manager(for Students ) , Can Make Changes in Timetable (for Teachers) 
+and many more. It's totally an alternative for Class representative
+    <br> 
+</p>
+
+## 📝 Table of Contents
+
+- [About](#about)
+- [How it works](#working)
+- [Usage](#usage)
+- [Getting Started](#getting_started)
+- [Deploying your own bot](#deployment)
+- [Built Using](#built_using)
+- [TODO](../TODO.md)
+- [Contributing](../CONTRIBUTING.md)
+- [Authors](#authors)
+- [Acknowledgments](#acknowledgement)
+
+## 🧐 About <a name = "about"></a>
+
+CR SOAPBOX is an alternative for Class Representative 😉.
+
+Students:
+
+- Can get timetable (Up-to-date).
+- Can set & get attendance (Bunk manager).
+- Can receive announcements (Creation and Deletion of classes, Messages, Files, Polls, etc.).
+
+Teachers:
+
+- Can get personal and grade timetables (Up-to-date).
+- Can modify timetable (Create and Cancel classes).
+- Can make announcements (messages,polls,files, etc.)
+
+## 💭 How it works <a name = "working"></a>
+
+- By starting the server the bot will fetch the timetable and other details from the json files in the project.
+
+- The bot uses the Telegram API to fetch messages, Python Telegram Bot module to reply to messages and IIITT server as a server.
+
+- The entire bot is written in Python 3.8
+
+## 🎈 Usage <a name = "usage"></a>
+
+Start the bot by sending :
+
+```
+    /start
+```
+
+- The bot will ask the user whether he is a student or teacher.
+
+Student:
+
+- Bot will ask the user to send the IIITT Roll no to log in.
+- The bot first extracts the grade from the users roll no, process it and store it in database.
+- if the roll no does not exists then it will send an error message.
+- Then the bot will responds according to the student's requests.
+
+Here is the demo of Students
+![Working](https://media.giphy.com/media/20NLMBm0BkUOwNljwv/giphy.gif)
+
+Teachers:
+
+- Bot will ask the user to send his IIITT Mail address to log in.
+- The bot will check if the user entered email id is of teachers from IIITT.
+- if it not belongs to a teacher from IIITT it will through an error
+- Then the bot will responds according to the teacher's requests.
+
+Hear is the demo of Teachers
+![Working](https://media.giphy.com/media/20NLMBm0BkUOwNljwv/giphy.gif)
+
+## 🏁 Getting Started <a name = "getting_started"></a>
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.
+
+### Prerequisites
+
+You can find the required python modules in requirments.txt file:
+
+```
+  python-telegram-bot
+  pytz
+```
+
+You can install these modules by running this command in terminal:
+
+```
+  pip3 install -r requirements.txt
+```
+
+### **Installing**
+1. Clone the repository:
+
+```
+  git clone https://github.com/DattatreyaReddy/CR-Soapbox.git
+  cd CR-Soapbox/
+```
+2. Head to data/bottkn.txt and replace the text with the bot token from [@botfather](https://core.telegram.org/bots#6-botfather) in telegram
+
+3. 
+- To Deploy the bot with polling ignore this step (good for initial development)
+- To Deploy the bot with webhook refer [Python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks) (Good for server deployment)
+
+4. Add executable permissions start.sh file and run it:
+```
+  chmod +x start.sh
+  ./start.sh
+```
+
+- **Heroku**: https://github.com/kylelobo/Reddit-Bot#deploying_the_bot
+
+## ⛏️ Built Using <a name = "built_using"></a>
+
+- [Telegram API](https://core.telegram.org/bots)
+- [python-telegram-bot](https://python-telegram-bot.readthedocs.io/en/stable/) - Python Telegram API Wrapper
+
+## ✍️ Authors <a name = "authors"></a>
+
+- [@dattatreyareddy](https://github.com/DattatreyaReddy) - Idea & Initial work
+
+See also the list of [contributors](https://github.com/helloworld-iiitt/CR-Soapbox/graphs/contributors) who participated in this project.
+
+## 🎉 Acknowledgements <a name = "acknowledgement"></a>
+
+- code - [python-telegram-bot_Code_Snippets](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Code-snippets) , [pythontelegrambotgroup](https://t.me/pythontelegrambotgroup)
+- people - [@anoopjt](https://github.com/anoopjt), [@fahad](https://github.com/fahad-israr)
