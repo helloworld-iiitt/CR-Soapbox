@@ -55,7 +55,7 @@ Teachers:
 
 - The bot uses the Telegram API to fetch messages, Python Telegram Bot module to reply to messages.
 
-- The entire bot is written in Python 3.8 (.py) and initializing script was written in bash shell script (.sh).
+- The entire bot was written in Python 3.8 (.py) and initializing script was written in bash shell script (.sh).
 
 ## 🎈 Usage <a name = "usage"></a>
 
@@ -122,12 +122,15 @@ You can install these modules by running this command in terminal:
 - To Deploy the bot with polling ignore this step (good for initial development).
 - To Deploy the bot with web-hook refer [Python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks) (Good for server deployment).
 
-4. Add executable permissions start.sh file and run it:
+4. Add executable permissions to start.sh file and run it:
 
 ```
   $ chmod +x start.sh
   $ ./start.sh
 ```
+- Screen shot :<br><br>
+![termial_SC](https://raw.githubusercontent.com/DattatreyaReddy/CR-Soapbox/master/media/termial_SC.jpg)
+
 
 ## ⛏️ Built Using <a name = "built_using"></a>
 
