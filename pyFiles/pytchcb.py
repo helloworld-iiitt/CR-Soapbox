@@ -10,7 +10,7 @@ import codeSnippets as cs
 
 ## Conversation dict Constants keys
 MAIN_MENU_KEY, AUTH_KEY, MAIN_MENU_KEY, TT_MENU_KEY, DAILY_TT_KEY, STOPPING, GRADE_TT_GRD_KEY, GRADE_TT_DAY_KEY, ANN_MENU_KEY, CR8CLS_GRD_KEY= range(20,30)
-CR8CLS_Day_KEY, CR8CLS_Perd_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, MSGSTD_GRD_KEY, MSGSTD_MSG_KEY, MORE_MENU_KEY, CT_MENU_KEY, DEV_MSG_KEY, RETURN_MENU= range(30,40)
+CR8CLS_Day_KEY, CR8CLS_Perd_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, MSGSTD_GRD_KEY, MSGSTD_MSG_KEY, MORE_MENU_KEY, CT_MENU_KEY, DEV_MSG_KEY,DEV_MENU_KEY, RETURN_MENU= range(30,41)
 
 ## Jobqueue Functions
 def update_Day_tt(context):
@@ -18,6 +18,7 @@ def update_Day_tt(context):
         Jobqueue's Updaytt function
         it will up date day timetable on working days after 04:30 pm
     '''
+    cs.jsonupd()
     day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")
     db.upddaytt(day)
     tchlst = db.getalltchuid()
@@ -49,7 +50,7 @@ def empid(update, context):
     '''
         Function to ask the user to enter his emp_id
     '''
-    cs.RPMsg(update = update, context = context,text='''Please send me,\nYour IIITT Employee ID\nto Log you in.''',
+    update.message.reply_text(text='''Please send me,\nYour IIITT Email ID\nto Log you in.''',
                                 reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
     return AUTH_KEY
 
@@ -61,12 +62,12 @@ def Authentication(update, context):
     updtch = False
     if db.chktch(update.effective_chat.id) != None:
         updtch = True
-    emp_id = db.tchsetup(update.effective_chat.id,(update.message.text).upper(),updtch)
+    emp_id = db.tchsetup(update.effective_chat.id,(update.message.text),updtch)
     if emp_id :
         context.user_data['updtch'] = False
-        update.message.reply_text(text="I linked Your Employee Id {},\nto your account".format(emp_id))
+        update.message.reply_text(text="I linked Your Email Id {},\nto your account".format(emp_id))
         update.message.text = emp_id
-        cs.RPMsg(update = update, context = context,text = "Select Menu to see the list of things that you can ask me.",
+        update.message.reply_text(text = "Select Menu to see the list of things that you can ask me.",
                                     reply_markup=telegram.ReplyKeyboardMarkup([['Menu']]))
         return cs.STOP  
     else:
@@ -77,9 +78,8 @@ def ivempid(update, context):
     '''
         Function to send error when user enters Invalid emp_id in Authentication Menu
     '''
-    update.message.reply_text()
-    cs.RPMsg(update = update, context = context,text='''Its NOT a valid Employee Id or\nSomeone has Already registered with this Employee ID.'''+
-                                '''Please send me\nA Valid Employee ID.\nIf someone else is using your account please contact the Devoloper''',
+    update.message.reply_text(text='''Its NOT a valid Email Id or\nSomeone has Already registered with this Email ID.'''+
+                                '''Please send me\nA Valid Email ID.\nIf someone else is using your account please contact the Devoloper''',
                                 reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
     return AUTH_KEY
 
@@ -94,7 +94,7 @@ def Menu(update,context):
         Function to send Teacher Menu to the user
     '''
     menu = cs.build_menu(buttons=["Timetable","Announcements","More"])
-    cs.RPMsg(update = update, context = context,text='''Ask me what you want to know from the Below list''',
+    update.message.reply_text(text='''Ask me what you want to know from the Below list''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return MAIN_MENU_KEY
 
@@ -116,7 +116,7 @@ def tt_Menu(update,context):
         Function to send Teacher Timetable Menu to the user
     '''
     menu = cs.build_menu(buttons=["Today's Timetable","Daily Timetable","Grade Timetable","Back"])
-    cs.RPMsg(update = update, context = context,text='''what do you want to know about Your Timetable?''',
+    update.message.reply_text(text='''what do you want to know about Your Timetable?''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return TT_MENU_KEY
 
@@ -126,7 +126,7 @@ def ivTTMenu(update,context):
         Function to send error when user enters Invalid Option in Teacher Timetable Menu
     '''
     menu = cs.build_menu(buttons=["Today's Timetable","Daily Timetable","Grade Timetable","Back"])
-    cs.RPMsg(update = update, context = context,text='''Sorry, I can't do that.\nPlease select from the Given list''',
+    update.message.reply_text(text='''Sorry, I can't do that.\nPlease select from the Given list''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return TT_MENU_KEY
 
@@ -189,7 +189,7 @@ def ivday_DTMC(update,context):
         Function to send error when user enters Invalid day in Teacher_Timetable/Daily_Timetable path
     '''
     text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-    cs.RPMsg(update = update, context = context,text='''Its not a Day from the list.\nPlease send me a day from the list''',
+    update.message.reply_text(text='''Its not a Day from the list.\nPlease send me a day from the list''',
                             reply_markup=telegram.ReplyKeyboardMarkup(text))
 
     return DAILY_TT_KEY
@@ -228,7 +228,7 @@ def gradeKb_GTGC(update,context):
     for i in tchgrdsublst:
         tchgrd.add(i[0])
     context.user_data['tchGrdTTGrdLst'] = list(tchgrd)
-    cs.RPMsg(update = update, context = context,text='''Which Grade Timetable do you want ?''', 
+    update.message.reply_text(text='''Which Grade Timetable do you want ?''', 
                             reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['tchGrdTTGrdLst']+['Back'])))
     return GRADE_TT_GRD_KEY
 
@@ -258,7 +258,7 @@ def dayKb_GTDC (update,context):
     if (update.message.text).upper() in context.user_data['tchGrdTTGrdLst']:
         context.user_data['GetGradeTTGrade'] = (update.message.text).upper()
         text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-        cs.RPMsg(update = update, context = context,
+        update.message.reply_text(
         text='''Which day Timetable of {} do you want ?'''.format((update.message.text).upper()), reply_markup=telegram.ReplyKeyboardMarkup(text))
         return GRADE_TT_DAY_KEY
     else:
@@ -272,7 +272,7 @@ def ivday_GTDC(update,context):
         Function to send error when user enters Invalid day in Teacher_Timetable/Daily_Timetable path
     '''
     text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-    cs.RPMsg(update = update, context = context,text='''Its not a Day from the list.\nPlease sent me a day from the list''',
+    update.message.reply_text(text='''Its not a Day from the list.\nPlease sent me a day from the list''',
                      reply_markup=telegram.ReplyKeyboardMarkup(text))
     return GRADE_TT_DAY_KEY
 
@@ -312,7 +312,7 @@ def ann_Menu (update,context):
         Function to send Teacher's Announcement Menu to the user
     '''
     menu = cs.build_menu(buttons=["Create Class","Cancel Class","Message Students","Back"])
-    cs.RPMsg(update = update, context = context,text='''what you want to Announce now?''',
+    update.message.reply_text(text='''what you want to Announce now?''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return ANN_MENU_KEY
 
@@ -322,7 +322,7 @@ def ivAnnMenu(update,context):
         Function to send error when user enters Invalid Option in Teacher Announcement Menu
     '''
     menu = cs.build_menu(buttons=["Create Class","Cancel Class","Message Students","Back"])
-    cs.RPMsg(update = update, context = context,text='''Sorry, I can't do that.\nPlease select from the Given list''',
+    update.message.reply_text(text='''Sorry, I can't do that.\nPlease select from the Given list''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return ANN_MENU_KEY
 
@@ -346,7 +346,7 @@ def grdsubkb_CCGC(update,context):
     for i in tchgrdsublst:
         tchgrd.add(i[0]+":"+i[1])
     context.user_data['tchgrdsubkb'] = list(tchgrd)
-    cs.RPMsg(update = update, context = context,text='''Tell me, For which Grade and subject you want me to create class ?''', 
+    update.message.reply_text(text='''Tell me, For which Grade and subject you want me to create class ?''', 
                             reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['tchgrdsubkb']+['Back'])))
     return CR8CLS_GRD_KEY
 
@@ -355,7 +355,7 @@ def ivgrdsub_CCGC(update,context):
     '''
         Function to send error when user enters Invalid day in Teacher_Timetable/Daily_Timetable path
     '''
-    cs.RPMsg(update = update, context = context,text='''Its not a Grade and Subject from the list.\nPlease sent me a Grade and Subject from the list''',
+    update.message.reply_text(text='''Its not a Grade and Subject from the list.\nPlease sent me a Grade and Subject from the list''',
                              reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['tchgrdsubkb']+['Back'])))
     return CR8CLS_GRD_KEY
 
@@ -378,7 +378,7 @@ def dayKb_CCDC(update,context):
         if (update.message.text) != 'Back':
             context.user_data['CR8ClsGrdSub'] = (update.message.text).upper()
         text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-        cs.RPMsg(update = update, context = context,
+        update.message.reply_text(
             text='''Which day do you want to take class for {}?'''.format((update.message.text)), reply_markup=telegram.ReplyKeyboardMarkup(text))
         return CR8CLS_Day_KEY
     else:
@@ -392,7 +392,7 @@ def ivday_CCDC(update,context):
         Function to send error when user enters Invalid day in Teacher_Announcements/Create_Class path
     '''
     text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-    cs.RPMsg(update = update, context = context,
+    update.message.reply_text(
             text='''Its not a Day from the list.\nPlease sent me a day from the list''', reply_markup=telegram.ReplyKeyboardMarkup(text))
     return CR8CLS_Day_KEY
 
@@ -420,7 +420,7 @@ def period_CCPC(update,context):
         if (i not in stdperiodlst) and (i not in tchperiodlst):
             availableperlst.append(i)
     context.user_data['availableperlst'] = availableperlst
-    cs.RPMsg(update = update, context = context,text='''Which period of {} do you want ?'''.format((update.message.text)),
+    update.message.reply_text(text='''Which period of {} do you want ?'''.format((update.message.text)),
                                 reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['availableperlst']+['Back'])))
     return CR8CLS_Perd_KEY
     
@@ -430,7 +430,7 @@ def ivperiod_CCPC(update,context):
     '''
         Function to send error when user enters Invalid Period in Teacher_Announcements/Create_Class path
     '''
-    cs.RPMsg(update = update, context = context,text='''Its not a Day from the list.\nPlease sent me a day from the list''',
+    update.message.reply_text(text='''Its not a Day from the list.\nPlease sent me a day from the list''',
                                 reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['availableperlst']+['Back'])))
     return CR8CLS_Perd_KEY
 
@@ -459,7 +459,7 @@ def conf_CR8cls_CCPC(update,context):
                                     InlineKeyboardButton("No",callback_data= 'CR8CLS:No' ) ],
                                 ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        cs.RPMsg(update = update, context = context,text = text, reply_markup=reply_markup)
+        update.message.reply_text(text = text, reply_markup=reply_markup)
         Menu(update,context)
         return STOPPING
     else:
@@ -501,7 +501,7 @@ def daykb_CxCDC(update,context):
         Function to send KeyBoard of Days to the user in Teacher_Announcements/Cancel_Class path
     '''
     text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-    cs.RPMsg(update = update, context = context,text='''Can you Which day class do you want to cancel ?''', reply_markup=telegram.ReplyKeyboardMarkup(text))
+    update.message.reply_text(text='''Can you Which day class do you want to cancel ?''', reply_markup=telegram.ReplyKeyboardMarkup(text))
     return CXLCLS_DAY_KEY
     
 
@@ -511,7 +511,7 @@ def ivday_CxCDC(update,context):
         Function to send error when user enters Invalid day in Teacher_Announcements/Cancel_Class path
     '''
     text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-    cs.RPMsg(update = update, context = context,text='''Its not a Day from the list.\nPlease sent me a day from the list''', reply_markup=telegram.ReplyKeyboardMarkup(text))
+    update.message.reply_text(text='''Its not a Day from the list.\nPlease sent me a day from the list''', reply_markup=telegram.ReplyKeyboardMarkup(text))
     return CXLCLS_DAY_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -531,7 +531,7 @@ def GSP_CxCGC(update,context):
     '''
     context.user_data['CXLClsDay'] = (update.message.text)
     context.user_data['avGSPlst'] = [i[0] + ":" + i[1] + ":" + i[2] for i in db.getTeachtt((update.effective_chat.id),context.user_data['CXLClsDay'])]
-    cs.RPMsg(update = update, context = context,text='''Which Class do you want to cancel on {} ?'''.format((update.message.text)),
+    update.message.reply_text(text='''Which Class do you want to cancel on {} ?'''.format((update.message.text)),
                                 reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['avGSPlst']+['Back'],n_cols=1)))
     return CXLCLS_GSP_KEY
     
@@ -541,7 +541,7 @@ def ivGSP_CxCGC(update,context):
     '''
         Function to send error when user enters Invalid Class in Teacher_Announcements/Cancel_Class path
     '''
-    cs.RPMsg(update = update, context = context,text='''Its not a Class from the list.\nPlease sent me a class from the list''',
+    update.message.reply_text(text='''Its not a Class from the list.\nPlease sent me a class from the list''',
                                 reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['avGSPlst']+['Back'],n_cols=1)))
     return CXLCLS_GSP_KEY
 
@@ -571,7 +571,7 @@ def conf_CXLcls_CxCGC(update,context):
                                     InlineKeyboardButton("No",callback_data= 'CXLCLS:No' ) ],
                                 ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        cs.RPMsg(update = update, context = context,text = text, reply_markup=reply_markup)
+        update.message.reply_text(text = text, reply_markup=reply_markup)
         Menu(update,context)
         return STOPPING
     else:
@@ -591,7 +591,7 @@ def Snd_CXLCls(update,context: telegram.ext.CallbackContext):
         chkCXLCls = db.delcls(tcdata[2],tcdata[3],tcdata[1],tcdata[4])
         if not chkCXLCls == -1:
             query.edit_message_text(text='''Please wait I am  forwarding Your message about Cancelled Class to students''' )
-            text='''Class for subject {} of {} on{} : {} was Cancelled by Professor {}.\nPlease Check your Timetable'''.format(tcdata[3].upper(),tcdata[2],tcdata[4],tcdata[1],tcdata[5])
+            text='''Class for subject {} of {} on {} : {} was Cancelled by Professor {}.\nPlease Check your Timetable'''.format(tcdata[3].upper(),tcdata[2],tcdata[4],tcdata[1],tcdata[5])
             usrlst = db.grdstdid(tcdata[2])
             usrlst.append(update.effective_chat.id)
             cs.SndMsgTolst(update,context,usrlst,text)
@@ -610,7 +610,7 @@ def avgrdkb_MSGC(update,context):
     '''  
     tchgrdsublst = db.tchgrdsub(update.effective_chat.id)
     context.user_data['tchMsgStdGrdLst'] = list({grd[0] for grd in tchgrdsublst})
-    cs.RPMsg(update = update, context = context,text='''For which grade do you want to send the message ?''', 
+    update.message.reply_text(text='''For which grade do you want to send the message ?''', 
                                 reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['tchMsgStdGrdLst']+['Message All','Back'])))
     return MSGSTD_GRD_KEY
 
@@ -640,7 +640,7 @@ def msgstd_MSMC(update,context):
     if ((update.message.text) in (context.user_data['tchMsgStdGrdLst'] + ['Message All','Back'])) :
         if (update.message.text) != 'Back':
             context.user_data['tchMsgStdGrd'] = (update.message.text)
-        cs.RPMsg(update = update, context = context,text="Send me the message that you want me to pass to Students",
+        update.message.reply_text(text="Send me the message that you want me to pass to Students",
                                     reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
         update.message.reply_text(text="You can Send POLLs too\n(You can find Poll in PAPERCLIP button(For SmartPhone) and"
                                         +" Kebab (3 dots or ellipsis) Menu (For Computer)).")
@@ -697,9 +697,9 @@ def more_Menu(update,context):
     '''
     menu = ['Know about\nDeveloper(s)',"Contact\nDeveloper(s)","Back","Logout"]
     if update.effective_chat.id in cs.devjson['devChat_id']:
-        menu = ['Message All\n(Dev option)'] + menu
+        menu = ['Message Users\n(Dev option)'] + menu
     menu = cs.build_menu(buttons=menu)
-    cs.RPMsg(update = update, context = context,text='''These are the extra options\nthat you can use.\nRemember Logging Out Will\nDelete all Your Data''',
+    update.message.reply_text(text='''These are the extra options\nthat you can use.\nRemember Logging Out Will\nDelete all Your Data''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return MORE_MENU_KEY
 
@@ -715,7 +715,7 @@ def ivMoreMenu(update,context):
 @cs.send_action(action=ChatAction.TYPING)
 def bkTMMC(update,context):
     '''
-        Function to send back from std_More_Menu_cov to std_Menu_cov
+        Function to send back from Tch_More_Menu_cov to Tch_Menu_cov
     '''
     Menu(update,context)
     return cs.END
@@ -737,7 +737,7 @@ def tch_CT_dev(update,context):
     '''
         Function to contact the Developer
     '''
-    cs.RPMsg(update = update, context = context,text="Send me the message that you want me to pass to Developer(s)\nTip: Send me a message if you want a permanent change in time table",
+    update.message.reply_text(text="Send me the message that you want me to pass to Developer(s)\nTip: Send me a message if you want a permanent change in time table",
                                     reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
     return CT_MENU_KEY
 
@@ -767,19 +767,50 @@ def Snd_Msg_Dev(update,context):
     more_Menu(update,context)
     return cs.END
 
-##  Student Dev Message to all users
+##  Student Dev Message to users
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=ChatAction.TYPING)
+def tch_devmenu_msg(update,context):
+    '''
+        Function to send dev Msg Menu to the user
+    '''
+    menu = ['Students',"Teachers","All Users","Back"]
+    menu = cs.build_menu(buttons=menu)
+    update.message.reply_text(text='''Please Tell me whom you want to send the message.''',
+                                    reply_markup=telegram.ReplyKeyboardMarkup(menu))
+    return DEV_MENU_KEY
+
 
 @cs.userauthorized(cs.devjson['devChat_id'])
-def std_dev_msg(update,context):
+@cs.send_action(action=ChatAction.TYPING)
+def ivDevMenu(update,context):
+    '''
+        Function to send error when user enters Invalid option in More Menu
+    '''
+    update.message.reply_text(text="Sorry, I can't do that.\nPlease select a Valid option from the List")
+    return DEV_MENU_KEY
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=ChatAction.TYPING)
+def bkTDMUC(update,context):
+    '''
+        Function to send back from tch_More_Menu_cov to Tch_Menu_cov
+    '''
+    more_Menu(update,context)
+    return cs.END
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=ChatAction.TYPING)
+def tch_dev_msg(update,context):
     '''
         Function to contact the Developer
     '''
-    cs.RPMsg(update = update, context = context,text="Send me the message that you want me to pass to Users",
+    context.user_data['tchDevUsrOpt'] = update.message.text
+    update.message.reply_text(text="Send me the message that you want me to pass to {}".format(update.message.text),
                                     reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
     return DEV_MSG_KEY
 
 @cs.userauthorized(cs.devjson['devChat_id'])
-
 @cs.send_action(action=ChatAction.TYPING)
 def ivDevMsg(update,context):
     '''
@@ -792,9 +823,9 @@ def ivDevMsg(update,context):
 @cs.send_action(action=ChatAction.TYPING)
 def bkTDMC(update,context):
     '''
-        Function to send back from tch_Dev_Msg_cov to tch_More_Menu_cov
+        Function to send back from tch_Dev_Msg_cov to tch_Dev_Menu_cov
     '''
-    more_Menu(update,context)
+    tch_devmenu_msg(update,context)
     return cs.END
 
 @cs.userauthorized(cs.devjson['devChat_id'])
@@ -803,10 +834,15 @@ def snd_dev_msg(update,context):
     '''
         Function to send message to all users
     '''
-    usrlst = db.getallstduid() + db.getalltchuid()
+    if context.user_data['tchDevUsrOpt'] == 'Students':
+        usrlst = db.getallstduid()
+    elif context.user_data['tchDevUsrOpt'] == 'Teachers':
+        usrlst = db.getalltchuid()
+    else:
+        usrlst = db.getallstduid() + db.getalltchuid()
     cs.FwdMsgTolst(update = update,context = context, usrlst = usrlst, is_dev = True)
     update.message.reply_text(text="I had forwarded your message to {} User(s)".format(len(usrlst)))
-    more_Menu(update,context)
+    tch_devmenu_msg(update,context)
     return cs.END
 
 #   LogOut the user 

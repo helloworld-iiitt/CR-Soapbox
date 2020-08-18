@@ -43,18 +43,18 @@ def start(update, context):
     
     if emp_id == None and rollno != None :
         text = [['Menu']]
-        update.message.reply_text(text='''Welcome Back ! {}\nYou have logged in as\na *Student* with Roll no: *{}*.'''.format(update.message.from_user.first_name,rollno), parse_mode= 'Markdown')
-        update.message.reply_text("Select *Menu* to see the list of things that you can ask me.", parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+        update.message.reply_text(text='''Welcome Back ! {}\nYou have logged in as\na Student with Roll no: {}.'''.format(update.message.from_user.first_name,rollno))
+        update.message.reply_text("Select Menu to see the list of things that you can ask me.",reply_markup=telegram.ReplyKeyboardMarkup(text))
         return sb.MAIN_MENU_KEY
     elif emp_id != None and rollno == None :
         text = [['Menu']]
-        update.message.reply_text(text='''Welcome Back! {}\nYou have logged in as\na *Professor* with Employee Id: *{}*.'''.format(update.message.from_user.first_name,emp_id), parse_mode= 'Markdown')
-        update.message.reply_text("Select *Menu* to see the list of things that you can ask me.", parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+        update.message.reply_text(text='''Welcome Back! {}\nYou have logged in as\na Professor with Email Id: {}.'''.format(update.message.from_user.first_name,emp_id))
+        update.message.reply_text("Select Menu to see the list of things that you can ask me.",reply_markup=telegram.ReplyKeyboardMarkup(text))
         return tb.MAIN_MENU_KEY
     else:
         text = [['Professor'],['Student']]
-        update.message.reply_text(text='''Hi! {}\nWelcome to your Personal\nTimetable Manager - \n"*CR_ALT*"'''.format(update.message.from_user.first_name), parse_mode= 'Markdown')
-        update.message.reply_text(text='''Please tell me, *who are you ?*.''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+        update.message.reply_text(text='''Hi! {}\nWelcome to your Personal\nTimetable Manager - \n"CR_ALT"'''.format(update.message.from_user.first_name))
+        update.message.reply_text(text='''Please tell me, who are you ?.''',reply_markup=telegram.ReplyKeyboardMarkup(text))
         return SETUP_KEY
 
 ## Invalid functions
@@ -66,14 +66,14 @@ def ivstart (update, context):
     emp_id = db.chktch(update.effective_chat.id)
     rollno = db.chkusr(update.effective_chat.id)
     if emp_id != None and rollno == None :
-        update.message.reply_text(text='''Select *Menu* to see the list.\nPlease prefer using\n*CUSTOM KEYBOARD*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup([['Menu']]))
+        update.message.reply_text(text='''Select Menu to see the list.\nPlease prefer using\nCUSTOM KEYBOARD''',reply_markup=telegram.ReplyKeyboardMarkup([['Menu']]))
         return tb.MAIN_MENU_KEY
     elif emp_id == None and rollno != None :
-        update.message.reply_text(text='''Select *Menu* to see the list.\nPlease prefer using\n*CUSTOM KEYBOARD*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup([['Menu']]))
+        update.message.reply_text(text='''Select Menu to see the list.\nPlease prefer using\nCUSTOM KEYBOARD''',reply_markup=telegram.ReplyKeyboardMarkup([['Menu']]))
         return sb.MAIN_MENU_KEY
     else:
         text = [['Professor'],['Student']]
-        update.message.reply_text(text='''Please tell me, *who are you?*.\nPlease prefer using\n*CUSTOM KEYBOARD*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+        update.message.reply_text(text='''Please tell me, who are you?.\nPlease prefer using\nCUSTOM KEYBOARD''',reply_markup=telegram.ReplyKeyboardMarkup(text))
         return SETUP_KEY
 
 ## Back Functions
@@ -83,7 +83,7 @@ def bkSAC(update, context):
         Function to send back from std_auth_cov to start
     '''
     text = [['Professor'],['Student']]
-    update.message.reply_text(text='''Please tell me *who are you?*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+    update.message.reply_text(text='''Please tell me who are you?''',reply_markup=telegram.ReplyKeyboardMarkup(text))
     return cs.END
 
 @cs.send_action(action=telegram.ChatAction.TYPING)
@@ -92,14 +92,22 @@ def bkTAC(update, context):
         Function to send back from tch_auth_cov to start
     '''
     text = [['Professor'],['Student']]
-    update.message.reply_text(text='''Please tell me *who are you?*''', parse_mode= 'Markdown',reply_markup=telegram.ReplyKeyboardMarkup(text))
+    update.message.reply_text(text='''Please tell me who are you?''',reply_markup=telegram.ReplyKeyboardMarkup(text))
     return cs.END
 
-
+## Force json update Function 
+@cs.send_action(action=telegram.ChatAction.TYPING)
+@cs.userauthorized(cs.devjson['devChat_id'])
+def forceJsonUpdate(update,context):
+    '''
+        Function to update values of variables from json files
+    '''
+    cs.jsonupd()
+    update.message.reply_text(text='''Json Files updated successfully''')
 
 ###
 ### Conversation Handlers (Main Function)
-###
+###            
 
 ##
 ## Student Handlers
@@ -108,7 +116,7 @@ def bkTAC(update, context):
 ## Student More option Menu Cov handler
 
 std_Dev_Msg_cov    =   ConversationHandler(
-    entry_points    =   [MessageHandler((Filters.text("Message All\n(Dev option)")),sb.std_dev_msg)],
+    entry_points    =   [MessageHandler((Filters.text(['Students','Teachers','All Users'])),sb.std_dev_msg)],
     states          =   {
                             sb.DEV_MSG_KEY      :   [    MessageHandler(~Filters.text("Back") & ~Filters.command,sb.snd_dev_msg),
                                                         CommandHandler('menu',sb.Return_menu),
@@ -117,6 +125,22 @@ std_Dev_Msg_cov    =   ConversationHandler(
     allow_reentry   =   True,
     fallbacks       =   [MessageHandler(~Filters.all,sb.ivDevMsg)],
     name            =   'stdDevMsgcov',
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.DEV_MENU_KEY,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                        }
+)
+
+std_Dev_Menu_cov    =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("Message Users\n(Dev option)")),sb.std_devmenu_msg)],
+    states          =   {
+                            sb.DEV_MENU_KEY      :   [    std_Dev_Msg_cov,CommandHandler('menu',sb.Return_menu),
+                                                        MessageHandler(Filters.text("Back"),sb.bkSDMUC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler(~Filters.all,sb.ivDevMenu)],
+    name            =   'stdDevMenucov',
     persistent      =   True,
     map_to_parent   =   {
                             cs.END              :   sb.MORE_MENU_KEY,
@@ -146,7 +170,7 @@ std_More_Menu_cov   =   ConversationHandler(
     states          =   {
                             sb.MORE_MENU_KEY    :   [   MessageHandler(( Filters.text('Know about\nDeveloper(s)')),sb.Std_Know_Abt_Dev),
                                                         MessageHandler(( Filters.text('Logout')),sb.std_logout),
-                                                        std_CT_Dev_cov,std_Dev_Msg_cov,
+                                                        std_CT_Dev_cov,std_Dev_Menu_cov,
                                                         CommandHandler('menu',sb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),sb.bkSMMC)]
                         },
@@ -298,15 +322,31 @@ std_auth_cov     =   ConversationHandler(
 ## Teacher More option Menu Cov handler
 
 tch_Dev_Msg_cov    =   ConversationHandler(
-    entry_points    =   [MessageHandler((Filters.text("Message All\n(Dev option)")),tb.std_dev_msg)],
+    entry_points    =   [MessageHandler((Filters.text(['Students','Teachers','All Users'])),tb.tch_dev_msg)],
     states          =   {
-                            tb.DEV_MSG_KEY      :   [    MessageHandler(~Filters.text("Back") & ~Filters.command,tb.snd_dev_msg),
+                            tb.DEV_MSG_KEY   :   [    MessageHandler(~Filters.text("Back") & ~Filters.command,tb.snd_dev_msg),
                                                         CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler(Filters.text("Back"),tb.bkTDMC)]
                         },
     allow_reentry   =   True,
     fallbacks       =   [MessageHandler(~Filters.all,tb.ivDevMsg)],
     name            =   'tchDevMsgcov',
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   tb.DEV_MENU_KEY,
+                            tb.RETURN_MENU      :   tb.RETURN_MENU
+                        }
+)
+
+tch_Dev_Menu_cov  =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("Message Users\n(Dev option)")),tb.tch_devmenu_msg)],
+    states          =   {
+                            tb.DEV_MENU_KEY      :   [    tch_Dev_Msg_cov,CommandHandler('menu',tb.Return_menu),
+                                                        MessageHandler(Filters.text("Back"),tb.bkTDMUC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler(~Filters.all,tb.ivDevMenu)],
+    name            =   'tchDevMenucov',
     persistent      =   True,
     map_to_parent   =   {
                             cs.END              :   tb.MORE_MENU_KEY,
@@ -336,7 +376,7 @@ tch_More_Menu_cov   =   ConversationHandler(
     states          =   {
                             tb.MORE_MENU_KEY    :   [   MessageHandler(( Filters.text('Know about\nDeveloper(s)')),tb.Tch_Know_Abt_Dev),
                                                         MessageHandler(( Filters.text('Logout')),tb.tch_logout),
-                                                        tch_CT_Dev_cov,tch_Dev_Msg_cov,
+                                                        tch_CT_Dev_cov,tch_Dev_Menu_cov,
                                                         CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),tb.bkTMMC)]
                         },
@@ -598,11 +638,11 @@ tch_Menu_cov        =      ConversationHandler(
 tch_auth_cov     =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Professor")),tb.empid)],
     states          =   {
-                            tb.AUTH_KEY         :   [   (MessageHandler((Filters.regex('^[iI][Ii][Ii][Tt][tT]0[0-9][0-9]$')), tb.Authentication )),
+                            tb.AUTH_KEY         :   [   MessageHandler((Filters.text(cs.tchEmaillist)), tb.Authentication ),
                                                         MessageHandler((Filters.text("Back")),bkTAC)]
                         },
     allow_reentry   =   True,
-    fallbacks       =   [MessageHandler((~Filters.regex('^[iI][Ii][Ii][Tt][tT]0[0-9][0-9]$') & ~Filters.text("Back")),tb.ivempid)],
+    fallbacks       =   [MessageHandler((~Filters.text(cs.tchEmaillist) & ~Filters.text("Back")),tb.ivempid)],
     name            =   "tchAuthcov",
     persistent      =   True,
     map_to_parent   =   {
@@ -630,16 +670,25 @@ Setup_cov           =   ConversationHandler(
 
 
 ##  Handler for Starting bot 
+
+disp.add_handler(CommandHandler('jsonupdate',forceJsonUpdate))
 disp.add_handler(Setup_cov)
 disp.add_error_handler(cs.error)
-
 ##  Handler for InlinequaryKeyboard messages
 
 disp.add_handler(CallbackQueryHandler(sb.inline_set_atd,pattern='^[012].*'))
 disp.add_handler(CallbackQueryHandler(tb.Snd_CR8Cls,pattern='^CR8CLS:.*'))
 disp.add_handler(CallbackQueryHandler(tb.Snd_CXLCls,pattern='^CXLCLS:.*'))
 
-## Starting polling
+## Starting WebHooking
+# url = cs.serverjson["webhook_url"] + ":" + cs.serverjson["port"] + "/" + bottkn
+# updater.start_webhook(listen=cs.serverjson["listen"],
+#                     port=int(cs.serverjson["port"]),
+#                     url_path=bottkn,
+#                     key=cs.serverjson["key"],
+#                     cert=cs.serverjson["cert"],
+#                     webhook_url= url)
+## Start polling
 updater.start_polling()
 print("Getting Updates from CR_ALT")
 updater.idle()

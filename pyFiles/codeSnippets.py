@@ -18,11 +18,32 @@ STOP = -10
 #Json file access
 datajson = json.loads(open('json/clgdetails.json').read()) #access json file
 devjson = json.loads(open('json/devlst.json').read()) #access json file
-
+serverjson = json.loads(open('json/serverdetails.json').read())
+timetbljson = json.loads(open('json/timetable.json').read()) #access json file
+clgdtlsjson = json.loads(open('json/clgdetails.json').read())#access json file
+sublstjson = json.loads(open('json/subjectlst.json').read())#access json file 
 # developers list
 devs = devjson['devChat_id']
-
+tchEmaillist = list (datajson['teacher'].keys())
 ## Code snippets
+def jsonupd():
+    global datajson 
+    datajson = json.loads(open('json/clgdetails.json').read())
+    global devjson 
+    devjson = json.loads(open('json/devlst.json').read())
+    global serverjson 
+    serverjson = json.loads(open('json/serverdetails.json').read())
+    global timetbljson
+    timetbljson = json.loads(open('json/timetable.json').read() )
+    global clgdtlsjson
+    clgdtlsjson = json.loads(open('json/clgdetails.json').read())
+    global sublstjson
+    sublstjson = json.loads(open('json/subjectlst.json').read())
+    global devs
+    devs = devjson['devChat_id']
+    global tchEmaillist
+    tchEmaillist = list (datajson['teacher'].keys())
+
 # Build Menu
 def build_menu(buttons, n_cols=2,
                header_buttons=None,
@@ -54,7 +75,7 @@ def error(update, context):
         text = "Hey. I'm sorry to inform you that an error happened while I tried to handle your message. " \
                "My developer(s) will be notified." \
                "Try restarting the bot. If the problem presists Contact developer about it with a screenshot "
-        update.effective_message.reply_text(text)
+        update.effective_message.reply_text( text = text)
     
     trace = "".join(traceback.format_tb(sys.exc_info()[2]))
     
@@ -75,8 +96,8 @@ def error(update, context):
            f"</code>"
 
     for dev_id in devs:
-        context.bot.send_message(dev_id, text, parse_mode=ParseMode.HTML)
-    # raise
+        context.bot.send_message(dev_id, text)
+    raise
 
 ##Restricted decorator
 
@@ -89,7 +110,7 @@ def userauthorized(userlst):
             user_id = update.effective_user.id
             if user_id not in userlst:
                 print("Unauthorized access denied for {}.".format(user_id))
-                update.message.reply_text(text="Unauthorized access denied for {}.".format(update.message.from_user.first_name), parse_mode= 'Markdown')
+                update.message.reply_text(text="Unauthorized access denied for {}.".format(update.message.from_user.first_name))
                 return
             return func(update, context, *args, **kwargs)
         return wrapped
@@ -119,21 +140,7 @@ def SndMsgTolst(update,context, usrlst , msg):
         Send the message to all users in the given list
     '''
     for i in usrlst:
-        SndMsg(context, i , msg)    
-
-@run_async
-def SndMsg(context, chat_id , msg):
-    '''
-        Send the message to user
-    '''
-    context.bot.send_message(chat_id = chat_id,text = msg, parse_mode ='Markdown')
-
-@run_async
-def RPMsg(update,context, text,reply_markup):
-    '''
-        Send reply to user
-    '''
-    update.message.reply_text(text = text, reply_markup = reply_markup)
+        context.bot.send_message(chat_id = i , text = msg)    
 
 @run_async
 def KnowAbtDev(update,context):
@@ -141,9 +148,9 @@ def KnowAbtDev(update,context):
         Send the details of the Developer(s) to user
     '''
     if len(devjson['devDetails']) == 1:
-        update.message.reply_text(text="This is *My Cool Creator*",parse_mode ='Markdown')
+        update.message.reply_text(text="This is My Cool Creator")
     else:
-        update.message.reply_text(text="These are *My Cool Creators*",parse_mode ='Markdown')
+        update.message.reply_text(text="These are My Cool Creators")
     for i in devjson['devDetails']:
         text = '<b>Name : {},\n</b><b>Email : </b>\n'.format(i['Name'])
         for j in i['Email']:

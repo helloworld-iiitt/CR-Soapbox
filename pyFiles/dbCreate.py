@@ -2,39 +2,31 @@ import json
 import sqlite3
 import datetime
 from pytz import timezone
+import codeSnippets as cs
 
 dbfname = 'database/teleBot.sqlite'
 conn =  sqlite3.connect(dbfname, check_same_thread=False)
 cur=conn.cursor()
 
-## Json files 
-timetbl = open('json/timetable.json').read() #access json file
-timetbljson = json.loads(timetbl)
-
-clgdtls = open('json/clgdetails.json').read() #access json file
-clgdtlsjson = json.loads(clgdtls)
-
-sublst = open('json/subjectlst.json').read() #access json file 
-sublstjson = json.loads(sublst)
 
 def setup(): 
     '''
     update tables - BRANCH_TB, YEAR_TB, GRADE_TB, TEACHER_TB, SUBJECT_TB
     '''
-    for i in clgdtlsjson["daylst"]:
+    for i in cs.clgdtlsjson["daylst"]:
         cur.execute('''INSERT OR IGNORE INTO DAY_TB (day) VALUES ( ? )''', ( i, ) ) #daytable
     
-    for i in clgdtlsjson["periodlst"]:
+    for i in cs.clgdtlsjson["periodlst"]:
         cur.execute('''INSERT OR IGNORE INTO PERIOD_TB (period) VALUES ( ? )''', ( i, ) ) #periodtable
     
-    for i in clgdtlsjson["branch"]:
+    for i in cs.clgdtlsjson["branch"]:
         cur.execute('''INSERT OR IGNORE INTO BRANCH_TB (branch) VALUES ( ? )''', ( i, ) ) #Branchtable
     
-    for i in clgdtlsjson["year"]:
+    for i in cs.clgdtlsjson["year"]:
         cur.execute('''INSERT OR IGNORE INTO YEAR_TB (year) VALUES ( ? )''', ( i, ) )  #Yeartable
 
-    for i in clgdtlsjson["branch"]:
-        for j in clgdtlsjson["year"]:
+    for i in cs.clgdtlsjson["branch"]:
+        for j in cs.clgdtlsjson["year"]:
             cur.execute('SELECT id FROM BRANCH_TB WHERE branch = (?) ', (i, ))
             branch_id = cur.fetchone()[0]
             cur.execute('SELECT id FROM YEAR_TB WHERE year = ? ', (j, ))
@@ -42,17 +34,17 @@ def setup():
             grade = i+str(j%100)
             cur.execute('''INSERT OR IGNORE INTO GRADE_TB (grade,branch_id,year_id) VALUES ( ?, ?, ?)''', (grade,branch_id,year_id ) ) #Gradetable
 
-    for i in clgdtlsjson["teacher"]:
+    for i in cs.clgdtlsjson["teacher"]:
         emp_id= i
-        tname= clgdtlsjson["teacher"] [emp_id]
+        tname= cs.clgdtlsjson["teacher"] [emp_id]
         cur.execute('''INSERT OR IGNORE INTO TEACHER_TB (tech_name,emp_id) VALUES ( ?,? )''', ( tname,emp_id ) )
     
     conn.commit()
     
-    for i in sublstjson:
+    for i in cs.sublstjson:
         cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (i, ))
         grade_id = cur.fetchone()[0]
-        for j in sublstjson[i]:
+        for j in cs.sublstjson[i]:
             cur.execute('SELECT id FROM TEACHER_TB WHERE tech_name = ? ', (j["teacher"], )) # Have to change name to employee id
             teacher_id = cur.fetchone()[0]
             cur.execute('''INSERT OR IGNORE INTO SUBJECT_TB (subject,grade_id,teacher_id) VALUES ( ?, ?, ?)''', (j["subject"],grade_id,teacher_id ) ) #Subjecttable
@@ -62,13 +54,15 @@ def updatett(): #Update timetable
     '''
     Updates table - TIMETABLE_TB
     '''
-    gradelst = timetbljson.keys()
+    timetbl = open('json/timetable.json').read() #access json file
+    cs.timetbljson = json.loads(timetbl)
+    gradelst = cs.timetbljson.keys()
     for i in gradelst:
-        daylst = timetbljson[i].keys()
+        daylst = cs.timetbljson[i].keys()
         for j in daylst:
-            periodlst = timetbljson[i][j].keys()
+            periodlst = cs.timetbljson[i][j].keys()
             for k in periodlst:
-                subject = timetbljson[i][j][k]
+                subject = cs.timetbljson[i][j][k]
 
                 cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (i, ))
                 grade_id = cur.fetchone()[0]
@@ -85,18 +79,18 @@ def upddaytt(day): #Update timetable
     '''
     Updates table - TIMETABLE_TB
     '''
-    gradelst = timetbljson.keys()
+    gradelst = cs.timetbljson.keys()
     try:
         cur.execute('SELECT id FROM DAY_TB WHERE day = ? ', (day.capitalize(), ))
         day_id = cur.fetchone()[0]
         cur.execute('''DELETE FROM TIMETABLE_TB WHERE day_id = ?''',(day_id,))#delete the present day timetable 
         for i in gradelst:
-            daylst = timetbljson[i].keys()
+            daylst = cs.timetbljson[i].keys()
             j = day
             if j in daylst:
-                periodlst = timetbljson[i][j].keys()
+                periodlst = cs.timetbljson[i][j].keys()
                 for k in periodlst:
-                    subject = timetbljson[i][j][k]
+                    subject = cs.timetbljson[i][j][k]
 
                     cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (i, ))
                     grade_id = cur.fetchone()[0]
