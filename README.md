@@ -69,7 +69,7 @@ Start the bot by sending :
 
 Student:
 
-- Bot will ask the user to send the IIITT Roll no to log in.
+- Bot will ask the user to send IIITT Roll no to log in.
 - The bot first extracts the grade from the users roll no, process it and store it in database.
 - if the roll no does not exists then it will send an error message.
 - Then the bot will responds according to the student's requests.
@@ -79,7 +79,7 @@ Student:
 
 Teachers:
 
-- Bot will ask the user to send his IIITT Mail address to log in.
+- Bot will ask the user to send IIITT Mail address to log in.
 - The bot will check if the user entered email id is of teachers from IIITT.
 - if it not belongs to a teacher from IIITT it will through an error.
 - Then the bot will responds according to the teacher's requests.
