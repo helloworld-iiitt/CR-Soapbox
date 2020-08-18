@@ -1,6 +1,6 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=200px height=200px src="https://raw.githubusercontent.com/DattatreyaReddy/CR-Soapbox/master/media/CR_ALT_LOGO.jpg" alt="Bot logo"></a>
+ <img width=200px height=200px src="media/CR_ALT_LOGO.jpg" alt="Bot logo"></a>
 </p>
 
 <h3 align="center">CR SOAPBOX</h3>
@@ -70,12 +70,12 @@ Start the bot by sending :
 Student:
 
 - Bot will ask the user to send IIITT Roll no to log in.
-- The bot first extracts the grade from the users roll no, process it and store it in database.
+- The bot first extracts the grade from the user's roll no, process it and store it in database.
 - if the roll no does not exists then it will send an error message.
 - Then the bot will responds according to the student's requests.
 
 - Here is the demo of Students: <br><br>
-![student_demo](https://raw.githubusercontent.com/DattatreyaReddy/CR-Soapbox/master/media/student_demo.gif)
+![student_demo](media/student_demo.gif)
 
 Teachers:
 
@@ -85,7 +85,7 @@ Teachers:
 - Then the bot will responds according to the teacher's requests.
 
 - Hear is the demo of Teachers<br><br>
-![teacher_demo](https://raw.githubusercontent.com/DattatreyaReddy/CR-Soapbox/master/media/teacher_demo.gif)
+![teacher_demo](media/teacher_demo.gif)
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
@@ -129,7 +129,7 @@ You can install these modules by running this command in terminal:
   $ ./start.sh
 ```
 - Screen shot :<br><br>
-![termial_SC](https://raw.githubusercontent.com/DattatreyaReddy/CR-Soapbox/master/media/termial_SC.jpg)
+![termial_SC](media/termial_SC.jpg)
 
 
 ## ⛏️ Built Using <a name = "built_using"></a>
