@@ -591,7 +591,7 @@ def Snd_CXLCls(update,context: telegram.ext.CallbackContext):
         chkCXLCls = db.delcls(tcdata[2],tcdata[3],tcdata[1],tcdata[4])
         if not chkCXLCls == -1:
             query.edit_message_text(text='''Please wait I am  forwarding Your message about Cancelled Class to students''' )
-            text='''Class for subject {} of {} on{} : {} was Cancelled by Professor {}.\nPlease Check your Timetable'''.format(tcdata[3].upper(),tcdata[2],tcdata[4],tcdata[1],tcdata[5])
+            text='''Class for subject {} of {} on {} : {} was Cancelled by Professor {}.\nPlease Check your Timetable'''.format(tcdata[3].upper(),tcdata[2],tcdata[4],tcdata[1],tcdata[5])
             usrlst = db.grdstdid(tcdata[2])
             usrlst.append(update.effective_chat.id)
             cs.SndMsgTolst(update,context,usrlst,text)
