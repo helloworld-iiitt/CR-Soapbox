@@ -53,7 +53,7 @@ Teachers:
 
 - By starting the server the bot will fetch the timetable and other details from the json files in the project.
 
-- The bot uses the Telegram API to fetch messages, Python Telegram Bot module to reply to messages and IIITT server as a server.
+- The bot uses the Telegram API to fetch messages, Python Telegram Bot module to reply to messages.
 
 - The entire bot is written in Python 3.8 (.py) and initializing script was written in bash shell script (.sh).
 
