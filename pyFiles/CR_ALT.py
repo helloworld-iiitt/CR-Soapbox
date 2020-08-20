@@ -16,7 +16,6 @@ disp = updater.dispatcher
 jobque = updater.job_queue
 daytuple = tuple(range(len(cs.datajson['daylst'])))
 ## Job Queue Functions
-
 ## JobQueue Dispachers
 jobque.run_daily(callback = tb.update_Day_tt,time = datetime.time(hour = 18, minute = 0, tzinfo = timezone('Asia/Kolkata')))
 jobque.run_daily(callback = tb.callback_daily,time = datetime.time(hour = 0, minute = 30, tzinfo = timezone('Asia/Kolkata')))
@@ -52,6 +51,8 @@ def start(update, context):
         update.message.reply_text("Select Menu to see the list of things that you can ask me.",reply_markup=telegram.ReplyKeyboardMarkup(text))
         return tb.MAIN_MENU_KEY
     else:
+        db.rmvtch(update.effective_chat.id)
+        db.rmvstd(update.effective_chat.id)
         text = [['Professor'],['Student']]
         update.message.reply_text(text='''Hi! {}\nWelcome to your Personal\nTimetable Manager - \n"CR_ALT"'''.format(update.message.from_user.first_name))
         update.message.reply_text(text='''Please tell me, who are you ?.''',reply_markup=telegram.ReplyKeyboardMarkup(text))
@@ -95,56 +96,76 @@ def bkTAC(update, context):
     update.message.reply_text(text='''Please tell me who are you?''',reply_markup=telegram.ReplyKeyboardMarkup(text))
     return cs.END
 
-## Force json update Function 
-@cs.send_action(action=telegram.ChatAction.TYPING)
-@cs.userauthorized(cs.devjson['devChat_id'])
-def forceJsonUpdate(update,context):
-    '''
-        Function to update values of variables from json files
-    '''
-    cs.jsonupd()
-    update.message.reply_text(text='''Json Files updated successfully''')
 
 ###
 ### Conversation Handlers (Main Function)
-###            
+###     
 
-##
-## Student Handlers
-##
+## Dev menu handler
 
-## Student More option Menu Cov handler
+std_Dev_RMV_ACC_cov =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("Remove User\nAccount")),sb.devgetRmvUsrid)],
+    states          =   {
+                            sb.DEV_RMV_ACC_KEY :   [   MessageHandler(Filters.text(db.getalltchempid()) | Filters.regex('^[CcEe][SsCc][Ee][1-2][0-9][Uu]0[0-3][0-9]$'),sb.devRmvUsr),
+                                                        MessageHandler(Filters.text("Back"),sb.bkDRAC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler(~Filters.text(db.getallstduid() + db.getalltchuid() + db.getallstdrollno() + db.getalltchempid()+["Back"]),sb.ivDevRmvAcc)],
+    name            =   'stdDevRmvAccCov',
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.DEV_MENU_KEY
+                        }
+)  
 
-std_Dev_Msg_cov    =   ConversationHandler(
-    entry_points    =   [MessageHandler((Filters.text(['Students','Teachers','All Users'])),sb.std_dev_msg)],
+std_Dev_Msg_cov     =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text(['Students','Teachers','All Users']+db.getallstduid()+db.getalltchuid()+ db.getallstdrollno() + db.getalltchempid())),sb.dev_msg_usr)],
     states          =   {
                             sb.DEV_MSG_KEY      :   [    MessageHandler(~Filters.text("Back") & ~Filters.command,sb.snd_dev_msg),
-                                                        CommandHandler('menu',sb.Return_menu),
-                                                        MessageHandler(Filters.text("Back"),sb.bkSDMC)]
+                                                        MessageHandler(Filters.text("Back"),sb.bkSDMC)],
                         },
     allow_reentry   =   True,
     fallbacks       =   [MessageHandler(~Filters.all,sb.ivDevMsg)],
     name            =   'stdDevMsgcov',
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   sb.DEV_MENU_KEY,
-                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                            cs.END              :   sb.DEV_MSG_MENU_KEY
                         }
 )
 
-std_Dev_Menu_cov    =   ConversationHandler(
-    entry_points    =   [MessageHandler((Filters.text("Message Users\n(Dev option)")),sb.std_devmenu_msg)],
+std_Dev_Msg_Menu_cov    =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("Message Users")),sb.devmenu_msg)],
     states          =   {
-                            sb.DEV_MENU_KEY      :   [    std_Dev_Msg_cov,CommandHandler('menu',sb.Return_menu),
-                                                        MessageHandler(Filters.text("Back"),sb.bkSDMUC)]
+                            sb.DEV_MSG_MENU_KEY :   [   std_Dev_Msg_cov,
+                                                        MessageHandler(Filters.text("Back"),sb.bkDMMC)]
                         },
     allow_reentry   =   True,
-    fallbacks       =   [MessageHandler(~Filters.all,sb.ivDevMenu)],
-    name            =   'stdDevMenucov',
+    fallbacks       =   [MessageHandler(~Filters.text(['Students','Teachers',"One User",'All Users']),sb.ivDevMsgMenu)],
+    name            =   'stdDevMsgMenucov',
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   sb.MORE_MENU_KEY,
-                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                            cs.END              :   sb.DEV_MENU_KEY
+                        }
+)       
+
+##
+## Student Handlers
+##
+
+std_Dev_Menu_cov    =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("DEV Menu")),sb.dev_Menu)],
+    states          =   {
+                            sb.DEV_MENU_KEY     :   [   MessageHandler((Filters.text("No of Users")),sb.dev_no_usr),
+                                                        MessageHandler((Filters.text("Json Update")),sb.forceJsonUpdate),
+                                                        std_Dev_Msg_Menu_cov,std_Dev_RMV_ACC_cov,
+                                                        MessageHandler((Filters.text("Back")),sb.bkSTMENUC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler(( ~Filters.text("No of Users") & ~Filters.text("Back")),sb.ivDMenu)],
+    name            =   "stdDevMenucov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.MAIN_MENU_KEY
                         }
 )
 
@@ -170,7 +191,7 @@ std_More_Menu_cov   =   ConversationHandler(
     states          =   {
                             sb.MORE_MENU_KEY    :   [   MessageHandler(( Filters.text('Know about\nDeveloper(s)')),sb.Std_Know_Abt_Dev),
                                                         MessageHandler(( Filters.text('Logout')),sb.std_logout),
-                                                        std_CT_Dev_cov,std_Dev_Menu_cov,
+                                                        std_CT_Dev_cov,
                                                         CommandHandler('menu',sb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),sb.bkSMMC)]
                         },
@@ -283,10 +304,11 @@ std_Menu_cov        =   ConversationHandler(
     states          =   {
                             sb.MAIN_MENU_KEY    :   [   std_TT_Menu_cov,
                                                         std_Atd_Menu_cov,
-                                                        std_More_Menu_cov]
+                                                        std_More_Menu_cov,
+                                                        std_Dev_Menu_cov,]
                         },
     allow_reentry   =   True,
-    fallbacks       =   [MessageHandler((~Filters.text(['Timetable','Attendance','More'])),sb.ivmenu)],
+    fallbacks       =   [MessageHandler((~Filters.text(['Timetable','Attendance','Dev Menu','More'])),sb.ivmenu)],
     name            =   "stdMenucov",
     persistent      =   True,
     map_to_parent   =   {
@@ -321,36 +343,69 @@ std_auth_cov     =   ConversationHandler(
 
 ## Teacher More option Menu Cov handler
 
-tch_Dev_Msg_cov    =   ConversationHandler(
-    entry_points    =   [MessageHandler((Filters.text(['Students','Teachers','All Users'])),tb.tch_dev_msg)],
+###     
+
+## Dev menu handler
+
+tch_Dev_RMV_ACC_cov =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("Remove User\nAccount")),tb.devgetRmvUsrid)],
     states          =   {
-                            tb.DEV_MSG_KEY   :   [    MessageHandler(~Filters.text("Back") & ~Filters.command,tb.snd_dev_msg),
-                                                        CommandHandler('menu',tb.Return_menu),
-                                                        MessageHandler(Filters.text("Back"),tb.bkTDMC)]
+                            tb.DEV_RMV_ACC_KEY :   [   MessageHandler(Filters.text(db.getallstduid() + db.getalltchuid() + db.getallstdrollno() + db.getalltchempid()),tb.devRmvUsr),
+                                                        MessageHandler(Filters.text("Back"),tb.bkDRAC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler(~Filters.text(db.getallstduid() + db.getalltchuid() + db.getallstdrollno() + db.getalltchempid()+["Back"]),tb.ivDevRmvAcc)],
+    name            =   'tchDevRmvAccCov',
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   tb.DEV_MENU_KEY
+                        }
+)  
+
+tch_Dev_Msg_cov     =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text(['Students','Teachers','All Users']+db.getallstduid()+db.getalltchuid()+ db.getallstdrollno() + db.getalltchempid())),tb.dev_msg_usr)],
+    states          =   {
+                            tb.DEV_MSG_KEY      :   [    MessageHandler(~Filters.text("Back") & ~Filters.command,tb.snd_dev_msg),
+                                                        MessageHandler(Filters.text("Back"),tb.bkSDMC)],
                         },
     allow_reentry   =   True,
     fallbacks       =   [MessageHandler(~Filters.all,tb.ivDevMsg)],
     name            =   'tchDevMsgcov',
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   tb.DEV_MENU_KEY,
-                            tb.RETURN_MENU      :   tb.RETURN_MENU
+                            cs.END              :   tb.DEV_MSG_MENU_KEY
                         }
 )
 
-tch_Dev_Menu_cov  =   ConversationHandler(
-    entry_points    =   [MessageHandler((Filters.text("Message Users\n(Dev option)")),tb.tch_devmenu_msg)],
+tch_Dev_Msg_Menu_cov    =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("Message Users")),tb.devmenu_msg)],
     states          =   {
-                            tb.DEV_MENU_KEY      :   [    tch_Dev_Msg_cov,CommandHandler('menu',tb.Return_menu),
-                                                        MessageHandler(Filters.text("Back"),tb.bkTDMUC)]
+                            tb.DEV_MSG_MENU_KEY :   [   tch_Dev_Msg_cov,
+                                                        MessageHandler(Filters.text("Back"),tb.bkDMMC)]
                         },
     allow_reentry   =   True,
-    fallbacks       =   [MessageHandler(~Filters.all,tb.ivDevMenu)],
-    name            =   'tchDevMenucov',
+    fallbacks       =   [MessageHandler(~Filters.text(['Students','Teachers',"One User",'All Users']),tb.ivDevMsgMenu)],
+    name            =   'tchDevMsgMenucov',
     persistent      =   True,
     map_to_parent   =   {
-                            cs.END              :   tb.MORE_MENU_KEY,
-                            tb.RETURN_MENU      :   tb.RETURN_MENU
+                            cs.END              :   tb.DEV_MENU_KEY
+                        }
+)       
+
+tch_Dev_Menu_cov    =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("DEV Menu")),tb.dev_Menu)],
+    states          =   {
+                            tb.DEV_MENU_KEY     :   [   MessageHandler((Filters.text("No of Users")),tb.dev_no_usr),
+                                                        MessageHandler((Filters.text("Json Update")),tb.forceJsonUpdate),
+                                                        tch_Dev_Msg_Menu_cov,tch_Dev_RMV_ACC_cov,
+                                                        MessageHandler((Filters.text("Back")),tb.bkTDMENUC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler(( ~Filters.text("No of Users") & ~Filters.text("Back")),tb.ivDMenu)],
+    name            =   "tchDevMenucov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   tb.MAIN_MENU_KEY
                         }
 )
 
@@ -621,10 +676,10 @@ tch_TT_Menu_cov     =   ConversationHandler(
 tch_Menu_cov        =      ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Menu")),tb.Menu)],
     states          =   {
-                            tb.MAIN_MENU_KEY    :   [   tch_TT_Menu_cov,tch_Ann_Menu_cov,tch_More_Menu_cov]
+                            tb.MAIN_MENU_KEY    :   [   tch_Dev_Menu_cov,tch_TT_Menu_cov,tch_Ann_Menu_cov,tch_More_Menu_cov]
                         },
     allow_reentry   =   True,
-    fallbacks       =   [MessageHandler((~Filters.text(['Timetable','Announcements','More'])),tb.ivmenu)],
+    fallbacks       =   [MessageHandler((~Filters.text(['Timetable','Dev Menu','Announcements','More'])),tb.ivmenu)],
     name            =   "tchMenucov",
     persistent      =   True,
     map_to_parent   =   {
@@ -670,8 +725,6 @@ Setup_cov           =   ConversationHandler(
 
 
 ##  Handler for Starting bot 
-
-disp.add_handler(CommandHandler('jsonupdate',forceJsonUpdate))
 disp.add_handler(Setup_cov)
 disp.add_error_handler(cs.error)
 ##  Handler for InlinequaryKeyboard messages

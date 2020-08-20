@@ -296,6 +296,26 @@ def chktch(chat_id):
     except:
         return None
 
+def getStdChatId(roll_no):
+    '''
+        Returns the chat id of student with the given roll no
+    '''
+    cur.execute('SELECT chat_id FROM USER_TB WHERE roll_no = ?',(roll_no,))
+    try:
+        return cur.fetchone()[0]
+    except:
+        return None
+
+def getTchChatId(emp_id):
+    '''
+        Returns the chat id of student with the given emp_id
+    '''
+    cur.execute('SELECT chat_id FROM TCHUSR_TB WHERE emp_id = ?',(emp_id,))
+    try:
+        return cur.fetchone()[0]
+    except:
+        return None
+
 def grdstdid(grade):
     '''
         Returns List of chat_id of students in the grade
@@ -341,6 +361,28 @@ def getalltchuid():
         Returns List of chat_id of Teachers in bot 
     '''
     cur.execute('''SELECT chat_id FROM TCHUSR_TB''')
+    usrtpl = cur.fetchall()
+    usrlst = list()
+    for i in usrtpl:
+        usrlst.append(i[0])
+    return usrlst
+
+def getallstdrollno():
+    '''
+        Returns List of chat_id of students in bot 
+    '''
+    cur.execute('''SELECT roll_no FROM USER_TB ''')
+    usrtpl = cur.fetchall()
+    usrlst = list()
+    for i in usrtpl:
+        usrlst.append(i[0])
+    return usrlst
+
+def getalltchempid():
+    '''
+        Returns List of chat_id of Teachers in bot 
+    '''
+    cur.execute('''SELECT emp_id FROM TCHUSR_TB''')
     usrtpl = cur.fetchall()
     usrlst = list()
     for i in usrtpl:

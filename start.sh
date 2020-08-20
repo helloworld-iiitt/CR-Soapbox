@@ -29,5 +29,6 @@ then
 fi
 echo "initialising the bot..."
 python pyFiles/CR_ALT.py
+rm "dbbackup/teleBot.sqlite"
 cp "database/teleBot.sqlite" "dbbackup/teleBot.sqlite"
 echo "Database Backup completed"
