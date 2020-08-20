@@ -641,9 +641,7 @@ def msgstd_MSMC(update,context):
         if (update.message.text) != 'Back':
             context.user_data['tchMsgStdGrd'] = (update.message.text)
         update.message.reply_text(text="Send me the message that you want me to pass to Students",
-                                    reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
-        update.message.reply_text(text="You can Send POLLs too\n(You can find Poll in PAPERCLIP button(For SmartPhone) and"
-                                        +" Kebab (3 dots or ellipsis) Menu (For Computer)).")
+                                    reply_markup=telegram.ReplyKeyboardMarkup([[telegram.KeyboardButton(text='Send Poll',request_poll=telegram.KeyboardButtonPollType(type=None))],['Back']]))
         return MSGSTD_MSG_KEY
     else:
         update.message.reply_text(text='''I know you won't attend this class.\nSo, I can't DO IT''')
