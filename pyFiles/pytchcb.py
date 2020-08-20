@@ -10,7 +10,7 @@ import codeSnippets as cs
 
 ## Conversation dict Constants keys
 MAIN_MENU_KEY, AUTH_KEY, MAIN_MENU_KEY, TT_MENU_KEY, DAILY_TT_KEY, STOPPING, GRADE_TT_GRD_KEY, GRADE_TT_DAY_KEY, ANN_MENU_KEY, CR8CLS_GRD_KEY= range(20,30)
-CR8CLS_Day_KEY, CR8CLS_Perd_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, MSGSTD_GRD_KEY, MSGSTD_MSG_KEY, MORE_MENU_KEY, CT_MENU_KEY, DEV_MSG_KEY,DEV_MENU_KEY, RETURN_MENU= range(30,41)
+CR8CLS_Day_KEY, CR8CLS_Perd_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, MSGSTD_GRD_KEY, MSGSTD_MSG_KEY, MORE_MENU_KEY, CT_MENU_KEY,DEV_MENU_KEY,DEV_MSG_MENU_KEY, DEV_MSG_KEY, RETURN_MENU, DEV_RMV_ACC_KEY= range(30,43)
 
 ## Jobqueue Functions
 def update_Day_tt(context):
@@ -93,7 +93,10 @@ def Menu(update,context):
     '''
         Function to send Teacher Menu to the user
     '''
-    menu = cs.build_menu(buttons=["Timetable","Announcements","More"])
+    menu = (["Timetable","Announcements","More"])
+    if update.effective_chat.id in cs.devjson['devChat_id']:
+        menu = menu  + ['DEV Menu']
+    menu = cs.build_menu(buttons=menu)
     update.message.reply_text(text='''Ask me what you want to know from the Below list''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return MAIN_MENU_KEY
@@ -138,6 +141,15 @@ def bkTTMC(update,context):
     Menu(update,context)
     return cs.END
 
+##  Student Dev Message to users
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=ChatAction.TYPING)
+def bkTDMENUC(update,context):
+    '''
+        Function to send back from tch_More_Menu_cov to Tch_Menu_cov
+    '''
+    Menu(update,context)
+    return cs.END
 ##
 ##  Teacher Timetable Reply Functions
 ##
@@ -641,9 +653,7 @@ def msgstd_MSMC(update,context):
         if (update.message.text) != 'Back':
             context.user_data['tchMsgStdGrd'] = (update.message.text)
         update.message.reply_text(text="Send me the message that you want me to pass to Students",
-                                    reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
-        update.message.reply_text(text="You can Send POLLs too\n(You can find Poll in PAPERCLIP button(For SmartPhone) and"
-                                        +" Kebab (3 dots or ellipsis) Menu (For Computer)).")
+                                    reply_markup=telegram.ReplyKeyboardMarkup([[telegram.KeyboardButton(text='Send Poll',request_poll=telegram.KeyboardButtonPollType(type=None))],['Back']]))
         return MSGSTD_MSG_KEY
     else:
         update.message.reply_text(text='''I know you won't attend this class.\nSo, I can't DO IT''')
@@ -696,8 +706,6 @@ def more_Menu(update,context):
         Function to send More Menu to the user
     '''
     menu = ['Know about\nDeveloper(s)',"Contact\nDeveloper(s)","Back","Logout"]
-    if update.effective_chat.id in cs.devjson['devChat_id']:
-        menu = ['Message Users\n(Dev option)'] + menu
     menu = cs.build_menu(buttons=menu)
     update.message.reply_text(text='''These are the extra options\nthat you can use.\nRemember Logging Out Will\nDelete all Your Data''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
@@ -858,6 +866,195 @@ def tch_logout(update,context):
     return STOPPING
 
 #   Return To Menu Functon
+
+## Dev functions
+
+## DEV Menu Functions
+@cs.send_action(action=telegram.ChatAction.TYPING)
+@cs.userauthorized(cs.devjson['devChat_id'])
+def dev_Menu(update,context):
+    '''
+        Developer's Menu function
+    '''
+    menu = cs.build_menu(buttons=["No of Users","Message Users","Remove User\nAccount","Json Update",'Back'])
+    update.message.reply_text( text = '''Ask me what you want to do from the Below list''',reply_markup=telegram.ReplyKeyboardMarkup(menu))
+    return DEV_MENU_KEY
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def ivDMenu(update,context):
+    '''
+        Function to send error when user enters Invalid option in Dev Menu
+    '''
+    update.message.reply_text(text="Sorry, I can't do that.\nPlease select a Valid option from the List")
+    if update.message.text == "/menu":
+        update.message.reply_text(text="/menu command is not supported in dev options")
+    return DEV_MENU_KEY
+
+@cs.send_action(action=telegram.ChatAction.TYPING)
+@cs.userauthorized(cs.devjson['devChat_id'])
+def dev_no_usr(update,context):
+    '''
+        Developer's function - No of Users
+    '''
+    stdcnt = len(db.getallstduid())
+    tchcnt = len(db.getalltchuid())
+    text = '''Total no of Students = {}\nTotal no of Teachers = {}\nTotal no of devs = {}\nTotal no of users = {}'''.format(stdcnt,tchcnt,len(cs.devjson['devChat_id']),stdcnt+tchcnt)
+    update.message.reply_text(text = text)
+    return DEV_MENU_KEY
+
+## DEV Option - Message users
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def devmenu_msg(update,context):
+    '''
+        Function to send dev Msg Menu to the user
+    '''
+    menu = ['Students',"Teachers","All Users","Back"]
+    menu = cs.build_menu(buttons=menu)
+    update.message.reply_text(text='''Please Tell me whom you want to send the message.\nYou can also send the RollNo (or) EmailId (or) ChatId of the user''',
+                                    reply_markup=telegram.ReplyKeyboardMarkup(menu))
+    return DEV_MSG_MENU_KEY
+
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def ivDevMsgMenu(update,context):
+    '''
+        Function to send error when user enters Invalid option in dev msg Menu
+    '''
+    update.message.reply_text(text="Sorry, I can't do that.\nPlease select a Valid option from the List")
+    return DEV_MSG_MENU_KEY
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def bkDMMC(update,context):
+    '''
+        Function to send back from DEV_MSG_Menu_cov to DEV_Menu_cov
+    '''
+    dev_Menu(update,context)
+    return cs.END
+
+## Dev msg menu - select grade 
+
+@cs.send_action(action=telegram.ChatAction.TYPING)
+@cs.userauthorized(cs.devjson['devChat_id'])
+def dev_msg_usr(update,context):
+    '''
+        Function to contact the Developer
+    '''
+    context.user_data['DevUsrOpt'] = update.message.text
+    update.message.reply_text(text="Send me the message that you want me to pass to {}".format(update.message.text),
+                                    reply_markup=telegram.ReplyKeyboardMarkup([['Back'],[telegram.KeyboardButton(text='Send Poll',request_poll=telegram.KeyboardButtonPollType(type=None))]]))
+    return DEV_MSG_KEY
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def ivDevMsg(update,context):
+    '''
+        Function to send error when user se to dev
+    '''
+    update.message.reply_text(text="There was an error, I was unable to forward your message")
+    return DEV_MSG_KEY
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def bkSDMC(update,context):
+    '''
+        Function to send back from std_Dev_Msg_cov to std_Dev_Menu_cov
+    '''
+    devmenu_msg(update,context)
+    return cs.END
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def ivDevRmvAcc(update,context):
+    '''
+        Function to send error when user enters Invalid data in dev_rmv_usr 
+    '''
+    update.message.reply_text(text="Sorry, I can't do that.\nThere was no such user with data - {}".format(update.message.text))
+    return DEV_RMV_ACC_KEY
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def snd_dev_msg(update,context):
+    '''
+        Function to send message to all users
+    '''
+    if context.user_data['DevUsrOpt'] == 'Students':
+        usrlst = db.getallstduid()
+    elif context.user_data['DevUsrOpt'] == 'Teachers':
+        usrlst = db.getalltchuid()
+    elif context.user_data['DevUsrOpt'] == 'All Users':
+        usrlst = db.getallstduid() + db.getalltchuid()
+    elif context.user_data['DevUsrOpt'] in db.getalltchempid():
+        usrlst = [db.getTchChatId(context.user_data['DevUsrOpt'])]
+    elif context.user_data['DevUsrOpt'] in db.getallstdrollno():
+        usrlst = [db.getStdChatId(context.user_data['DevUsrOpt'])]
+    else:
+        usrlst = [context.user_data['DevUsrOpt']]
+    cs.FwdMsgTolst(update = update,context = context, usrlst = usrlst, is_dev = True)
+    update.message.reply_text(text="I had forwarded your message to {} User(s)".format(len(usrlst)))
+    devmenu_msg(update,context)
+    return cs.END
+
+@cs.send_action(action=telegram.ChatAction.TYPING)
+@cs.userauthorized(cs.devjson['devChat_id'])
+def devgetRmvUsrid(update,context):
+    '''
+        Function to Ask dev to send chat id or roll no or emp id to remove account
+    '''
+    update.message.reply_text(text="Send me send the RollNo (or) EmailId (or) ChatId of the user you want to remove",
+                                    reply_markup=telegram.ReplyKeyboardMarkup([['Back']]))
+    return DEV_RMV_ACC_KEY
+
+@cs.userauthorized(cs.devjson['devChat_id'])
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def bkDRAC(update,context):
+    '''
+        Function to send back from Dev_RMV_ACC_cov to DEV_Menu_cov
+    '''
+    dev_Menu(update,context)
+    return cs.END
+
+@cs.send_action(action=telegram.ChatAction.TYPING)
+@cs.userauthorized(cs.devjson['devChat_id'])
+def devRmvUsr(update,context):
+    '''
+        Function to remove account of the user with the given chat id or roll no or emp id to remove account
+    '''
+    usrid = None
+    if update.message.text.lower() in db.getalltchempid():
+        usrid = db.getTchChatId(update.message.text.lower())
+        db.rmvtch(usrid)
+    elif update.message.text.upper() in db.getallstdrollno():
+        usrid = db.getStdChatId(update.message.text.upper())
+        db.rmvstd(usrid)
+    elif update.message.text in db.getalltchuid():
+        usrid = update.message.text
+        db.rmvtch(update.message.text)
+    elif update.message.text in db.getalltchuid():
+        usrid = update.message.text
+        db.rmvstd(update.message.text)
+    if usrid == None:
+        update.message.reply_text(text="There was no such user with given data - {}".format(update.message.text))
+    else:
+        context.bot.send_message(chat_id =  usrid, text = "We got a complaint that you are using another user's account.\nSo,We are removing your account.\
+                                                        Please contact the developer for any query\nPlease send /start to start the bot",reply_markup=telegram.ReplyKeyboardRemove())
+        update.message.reply_text(text="Account of {} removed successfully.".format(update.message.text))
+    return bkDRAC(update,context)
+
+## Force json update Function 
+@cs.send_action(action=telegram.ChatAction.TYPING)
+@cs.userauthorized(cs.devjson['devChat_id'])
+def forceJsonUpdate(update,context):
+    '''
+        Function to update values of variables from json files
+    '''
+    cs.jsonupd()
+    update.message.reply_text(text='''Json Files updated successfully''')
+    return DEV_MENU_KEY
 
 @cs.send_action(action=ChatAction.TYPING)
 def Return_menu(update,context):

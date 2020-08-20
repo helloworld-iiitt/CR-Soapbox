@@ -1,0 +1,6 @@
+**/bottkn2.txt
+**/teleBot.sqlite
+dbbackup/**
+database/**
+*.pyc
+data/CRApersistance

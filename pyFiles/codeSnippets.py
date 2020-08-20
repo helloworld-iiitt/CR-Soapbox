@@ -15,6 +15,9 @@ logger = logging.getLogger(__name__)
 END = ConversationHandler.END
 STOP = -10
 
+## Default constants
+DEV_MENU_KEY, DEV_MSG_MENU_KEY, DEV_MSG_KEY, DEV_RMV_ACC_KEY= range(100,104)
+
 #Json file access
 datajson = json.loads(open('json/clgdetails.json').read()) #access json file
 devjson = json.loads(open('json/devlst.json').read()) #access json file
@@ -121,18 +124,19 @@ def FwdMsgTolst(update, context, usrlst, is_dev = False,is_teacher = False):
     '''
         Forward the message to all users in the given list
     '''
+    usrnm = ''
+    if update.effective_chat.username:
+        usrnm = '(@{})'.format(update.effective_chat.username)
     for i in usrlst:
-        FwdMsg(update, context,i, is_dev,is_teacher)
+        if is_dev:
+            context.bot.send_message(chat_id = update.effective_chat.id,text = "A Message from Developer: 👇")
+        elif is_teacher:
+            context.bot.send_message(chat_id = update.effective_chat.id,text = "A Message from Professor {}: 👇".format((update.message.from_user.first_name) + usrnm))
+        else:
+            context.bot.send_message(chat_id = update.effective_chat.id,text = "A Message from User {}: 👇".format((update.message.from_user.first_name) + usrnm + '(' + (update.effective_chat.id) + ")"))
+        update.message.forward(update.effective_chat.id)
+        time.sleep(.2)   
 
-@run_async
-def FwdMsg(update, context,chat_id, is_dev = False,is_teacher = False):
-    if is_dev:
-        context.bot.send_message(chat_id = chat_id,text = "A Message from Developer: 👇")
-    elif is_teacher:
-        context.bot.send_message(chat_id = chat_id,text = "A Message from Professor {}: 👇".format(update.message.from_user.first_name))
-    else:
-        context.bot.send_message(chat_id = chat_id,text = "A Message from User {}: 👇".format(update.message.from_user.first_name))
-    update.message.forward(chat_id)
 
 @run_async
 def SndMsgTolst(update,context, usrlst , msg):
@@ -140,7 +144,8 @@ def SndMsgTolst(update,context, usrlst , msg):
         Send the message to all users in the given list
     '''
     for i in usrlst:
-        context.bot.send_message(chat_id = i , text = msg)    
+        context.bot.send_message(chat_id = i , text = msg)
+        time.sleep(.2)    
 
 @run_async
 def KnowAbtDev(update,context):
