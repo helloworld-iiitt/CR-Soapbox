@@ -191,7 +191,7 @@ std_setAtd_Stat_cov  =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text(db.getallsub())),sb.Statkb_SASTC)],
     states          =   {
                             sb.SETATD_STAT_KEY   :   [   MessageHandler(( Filters.text(['Present','Absent']) | 
-                                                        Filters.regex(r"[0-9][0-9]?:[0-9][0-9]?")),sb.set_atd),
+                                                        Filters.regex(r"^[0-9][0-9]?:[0-9]?[0-9]$")),sb.set_atd),
                                                         CommandHandler('menu',sb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),sb.bkSSASTC)]
                         },
