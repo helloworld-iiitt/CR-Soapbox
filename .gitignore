@@ -2,3 +2,5 @@
 **/teleBot.sqlite
 dbbackup/**
 database/**
+*.pyc
+data/CRApersistance
