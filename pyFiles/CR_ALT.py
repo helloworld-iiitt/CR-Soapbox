@@ -8,7 +8,7 @@ from telegram.ext.dispatcher import run_async
 import telegram, datetime
 from pytz import timezone
 ##
-bottkn = open('data/bottkn.txt').read()
+bottkn = open('data/bottkn.txt').read().strip()
 ## Updater decleration
 pp = PicklePersistence(filename='data/CRApersistance')
 updater = Updater(token=bottkn,persistence=pp,use_context=True, workers=50)
