@@ -103,6 +103,146 @@ def bkTAC(update, context):
 
 ## Dev menu handler
 
+##  Create class Option Handler
+
+std_CR8Cls_Perd_cov =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text([ str(S) for (G,S) in db.getallgrdsub() ])),sb.period_CCPC)],
+    states          =   {
+                            sb.CR8CLS_PERD_KEY  :   [   MessageHandler((Filters.text(cs.datajson['periodlst'])),sb.conf_CR8cls_CCPC),
+                                                        CommandHandler('menu',sb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),sb.bkCCPC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler((~Filters.text("Back")),sb.ivperiod_CCPC)],
+    name            =   "stdCRCR8ClsPerdcov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.CR8CLS_SUB_KEY,
+                            sb.STOPPING         :   sb.STOPPING,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                        }
+)
+
+std_CR_CR8Cls_Sub_cov=   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text(cs.datajson['daylst'])),sb.subkb_CCGC)],
+    states          =   {
+                            sb.CR8CLS_SUB_KEY   :   [   std_CR8Cls_Perd_cov,
+                                                        CommandHandler('menu',sb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),sb.bkCCGC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler((~Filters.text("Back")),sb.ivsub_CCGC)],
+    name            =   "stdCRCR8ClsSubcov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.CR8CLS_Day_KEY,
+                            sb.STOPPING         :   sb.STOPPING,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                        }
+)
+
+std_CR_CR8Cls_Day_cov=   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("Create Class")),sb.dayKb_CCDC)],
+    states          =   {
+                            sb.CR8CLS_Day_KEY   :   [   std_CR_CR8Cls_Sub_cov,
+                                                        CommandHandler('menu',sb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),sb.bkCCDC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler((~Filters.text("Back")),sb.ivday_CCDC)],
+    name            =   "stdCRCR8ClsGrdcov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.CR_MENU_KEY,
+                            sb.STOPPING         :   cs.END,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                        }
+)
+
+std_CR_CXLCls_GSP_cov=   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text(cs.datajson['daylst'])),sb.GSP_CxCGC)],
+    states          =   {
+                            sb.CXLCLS_GSP_KEY   :   [   MessageHandler((Filters.text([(P +  ":" + S) for P in cs.datajson['periodlst'] 
+                                                                        for (G,S) in db.getallgrdsub() ])),sb.conf_CXLcls_CxCGC),
+                                                        CommandHandler('menu',sb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),sb.bkCxCGC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler((~Filters.text("Back")),sb.ivGSP_CxCGC)],
+    name            =   "stdCXLClsGSPcov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.CXLCLS_DAY_KEY,
+                            sb.STOPPING         :   sb.STOPPING,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                        }
+)
+
+std_CR_CXLCls_Day_cov=   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("Cancel Class")),sb.daykb_CxCDC)],
+    states          =   {
+                            sb.CXLCLS_DAY_KEY   :   [   std_CR_CXLCls_GSP_cov,
+                                                        CommandHandler('menu',sb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),sb.bkCxCDC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler((~Filters.text("Back")),sb.ivday_CxCDC)],
+    name            =   "stdCXLClsDaycov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.CR_MENU_KEY,
+                            sb.STOPPING         :   cs.END,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                        }
+)
+std_CR_MsgStd_cov   =   ConversationHandler(
+    entry_points    =   [MessageHandler(Filters.text('"Message Students"'),sb.msgstd_SCMC)],
+    states          =   {
+                            sb.CR_MSG_KEY   :   [   MessageHandler(~Filters.text("Back") & ~Filters.command,sb.snd_MsgStd_msg),
+                                                        CommandHandler('menu',sb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),sb.bkSCMC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler((Filters.command),sb.ivmsg_SCMC)],
+    name            =   "stdCRMsgStdcov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.CR_MENU_KEY,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                        }
+)
+Std_CR_Menu_cov    =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("CR Menu")),sb.CR_Menu)],
+    states          =   {
+                            sb.CR_MENU_KEY     :   [   std_CR_CR8Cls_Day_cov,std_CR_CXLCls_Day_cov,std_CR_MsgStd_cov,
+                                                        CommandHandler('menu',sb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),sb.bkCRMC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler((~Filters.text("Back")),sb.ivCRMenu)],
+    name            =   "stdCrMenucov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.MAIN_MENU_KEY,
+                            sb.RETURN_MENU      :   sb.MAIN_MENU_KEY
+                        }
+)
+
+std_Dev_MNG_CR_cov  =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("Manage CR")),sb.devgetCRRoll)],
+    states          =   {
+                            sb.DEV_MNG_CR_KEY :   [   MessageHandler(Filters.regex('^[CcEe][SsCc][Ee][1-2][0-9][Uu]0[0-3][0-9]$'),sb.devMngCR),
+                                                        MessageHandler(Filters.text("Back"),sb.bkDRAC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler(~Filters.regex('^[CcEe][SsCc][Ee][1-2][0-9][Uu]0[0-3][0-9]$') & ~Filters.text("Back"),sb.ivDevMngCR)],
+    name            =   'stdDevMngCRCov',
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.DEV_MENU_KEY
+                        }
+)  
+
 std_Dev_RMV_ACC_cov =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Remove User\nAccount")),sb.devgetRmvUsrid)],
     states          =   {
@@ -157,7 +297,7 @@ std_Dev_Menu_cov    =   ConversationHandler(
     states          =   {
                             sb.DEV_MENU_KEY     :   [   MessageHandler((Filters.text("No of Users")),sb.dev_no_usr),
                                                         MessageHandler((Filters.text("Json Update")),sb.forceJsonUpdate),
-                                                        std_Dev_Msg_Menu_cov,std_Dev_RMV_ACC_cov,
+                                                        std_Dev_Msg_Menu_cov,std_Dev_RMV_ACC_cov,std_Dev_MNG_CR_cov,
                                                         MessageHandler((Filters.text("Back")),sb.bkSTMENUC)]
                         },
     allow_reentry   =   True,
@@ -305,7 +445,8 @@ std_Menu_cov        =   ConversationHandler(
                             sb.MAIN_MENU_KEY    :   [   std_TT_Menu_cov,
                                                         std_Atd_Menu_cov,
                                                         std_More_Menu_cov,
-                                                        std_Dev_Menu_cov,]
+                                                        std_Dev_Menu_cov,
+                                                        Std_CR_Menu_cov]
                         },
     allow_reentry   =   True,
     fallbacks       =   [MessageHandler((~Filters.text(['Timetable','Attendance','Dev Menu','More'])),sb.ivmenu)],
@@ -346,6 +487,20 @@ std_auth_cov     =   ConversationHandler(
 ###     
 
 ## Dev menu handler
+tch_Dev_MNG_CR_cov  =   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("Manage CR")),tb.devgetCRRoll)],
+    states          =   {
+                            sb.DEV_MNG_CR_KEY :   [   MessageHandler(Filters.regex('^[CcEe][SsCc][Ee][1-2][0-9][Uu]0[0-3][0-9]$'),tb.devMngCR),
+                                                        MessageHandler(Filters.text("Back"),tb.bkDRAC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler(~Filters.regex('^[CcEe][SsCc][Ee][1-2][0-9][Uu]0[0-3][0-9]$') & ~Filters.text("Back"),tb.ivDevMngCR)],
+    name            =   'tchDevMngCRCov',
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   tb.DEV_MENU_KEY
+                        }
+)  
 
 tch_Dev_RMV_ACC_cov =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Remove User\nAccount")),tb.devgetRmvUsrid)],
@@ -397,7 +552,7 @@ tch_Dev_Menu_cov    =   ConversationHandler(
     states          =   {
                             tb.DEV_MENU_KEY     :   [   MessageHandler((Filters.text("No of Users")),tb.dev_no_usr),
                                                         MessageHandler((Filters.text("Json Update")),tb.forceJsonUpdate),
-                                                        tch_Dev_Msg_Menu_cov,tch_Dev_RMV_ACC_cov,
+                                                        tch_Dev_Msg_Menu_cov,tch_Dev_RMV_ACC_cov,tch_Dev_MNG_CR_cov,
                                                         MessageHandler((Filters.text("Back")),tb.bkTDMENUC)]
                         },
     allow_reentry   =   True,
@@ -527,7 +682,7 @@ tch_CXLCls_Day_cov  =   ConversationHandler(
 tch_CR8Cls_Perd_cov =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text(cs.datajson['daylst'])),tb.period_CCPC)],
     states          =   {
-                            tb.CR8CLS_Perd_KEY  :   [   MessageHandler((Filters.text(cs.datajson['periodlst'])),tb.conf_CR8cls_CCPC),
+                            tb.CR8CLS_PERD_KEY  :   [   MessageHandler((Filters.text(cs.datajson['periodlst'])),tb.conf_CR8cls_CCPC),
                                                         CommandHandler('menu',tb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),tb.bkCCPC)]
                         },

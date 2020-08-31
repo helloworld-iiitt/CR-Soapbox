@@ -120,7 +120,7 @@ def userauthorized(userlst):
     return decorator
 
 @run_async
-def FwdMsgTolst(update, context, usrlst, is_dev = False,is_teacher = False):
+def FwdMsgTolst(update, context, usrlst, is_dev = False,is_teacher = False,is_CR = False):
     '''
         Forward the message to all users in the given list
     '''
@@ -129,14 +129,15 @@ def FwdMsgTolst(update, context, usrlst, is_dev = False,is_teacher = False):
         usrnm = '(@{})'.format(update.effective_chat.username)
     for i in usrlst:
         if is_dev:
-            context.bot.send_message(chat_id = update.effective_chat.id,text = "A Message from Developer: 👇")
+            context.bot.send_message(chat_id = i,text = "A Message from Developer: 👇")
         elif is_teacher:
-            context.bot.send_message(chat_id = update.effective_chat.id,text = "A Message from Professor {}: 👇".format((update.message.from_user.first_name) + usrnm))
+            context.bot.send_message(chat_id = i,text = "A Message from Professor {}: 👇".format((update.message.from_user.first_name) + usrnm))
+        elif is_CR:
+            context.bot.send_message(chat_id =i,text = "A Message from CR {}: 👇".format((update.message.from_user.first_name) + usrnm))
         else:
-            context.bot.send_message(chat_id = update.effective_chat.id,text = "A Message from User {}: 👇".format((update.message.from_user.first_name) + usrnm + '(' + (update.effective_chat.id) + ")"))
-        update.message.forward(update.effective_chat.id)
+            context.bot.send_message(chat_id = i,text = "A Message from User {}: 👇".format((update.message.from_user.first_name) + usrnm + '(' + str(update.effective_chat.id) + ")"))
+        update.message.forward(i)
         time.sleep(.2)   
-
 
 @run_async
 def SndMsgTolst(update,context, usrlst , msg):
