@@ -26,6 +26,12 @@ def update_Day_tt(context):
         text = "Professor, Next {}\ntimetable was updated.\nYou can make changes in the timetable now".format(day)
         context.bot.send_message(chat_id=i, text=text)
         time.sleep(.2)
+    for i in getCR:
+        text = "CR, Next {}\ntimetable was updated.\nYou can make changes in the timetable now".format(day)
+        chat_id = db.getStdChatId(i)
+        if chat_id:
+            context.bot.send_message(chat_id=i, text=text)
+        time.sleep(.2)
     del day 
 
 def callback_daily(context):
@@ -39,7 +45,6 @@ def callback_daily(context):
         day = datetime.datetime.now(tz=timezone('Asia/Kolkata')).strftime("%A")
         text = "Today's Timetable\n"+ tch_tt(i,day)
         context.bot.send_message(chat_id=i, text=text)
-        del day
         time.sleep(.2)
     text = "Total no of Professor using CR_ALT = {}".format((tchcnt))
     for i in cs.devjson['devChat_id']:
@@ -479,30 +484,6 @@ def conf_CR8cls_CCPC(update,context):
         return CR8CLS_PERD_KEY
         
 
-@cs.send_action(action=ChatAction.TYPING)
-def Snd_CR8Cls(update,context: telegram.ext.CallbackContext):
-    '''
-        Function to Send message to users about created class
-    '''
-    query = update.callback_query
-    query.answer()
-    if query.data != 'CR8CLS:No':
-        tcdata = query.data[1:].split(':')
-        if not tcdata[3] in [grade[0] for grade in db.getTeachtt((update.effective_chat.id),tcdata[4])] :
-            chkCR8Cls = db.CR8cls(tcdata[1],tcdata[2],tcdata[3],tcdata[4])
-        else:
-            query.edit_message_text(text='''You already have a class at that time:\nCreate class at another period''')
-            return
-        if not chkCR8Cls == -1:
-            query.edit_message_text(text='''Please wait I am  forwarding Your message about Created Class to students''')
-            text='''Class for subject {} of {} created on {} : {} by {}.\nPlease Check your Timetable'''.format(tcdata[2],tcdata[1],tcdata[4],tcdata[3],tcdata[5])
-            usrlst = db.grdstdid(tcdata[1])
-            cs.SndMsgTolst(update,context,usrlst,text)
-            query.edit_message_text(text="Your Message was sent to {} students in {} Batch".format(len(usrlst),tcdata[1]))
-        else:
-            query.edit_message_text(text='''You are late:\nSelected period has already been taken,\nBetter luck next time''' )
-    else:
-        query.edit_message_text(text="You have Cancelled your request to create class")
 
 ##  Cancel Class Functions (level 3) - Send Days Keyboard to user
 
@@ -512,7 +493,7 @@ def daykb_CxCDC(update,context):
         Function to send KeyBoard of Days to the user in Teacher_Announcements/Cancel_Class path
     '''
     text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-    update.message.reply_text(text='''Can you Which day class do you want to cancel ?''', reply_markup=telegram.ReplyKeyboardMarkup(text))
+    update.message.reply_text(text='''Which day class do you want to cancel ?''', reply_markup=telegram.ReplyKeyboardMarkup(text))
     return CXLCLS_DAY_KEY
     
 
@@ -589,28 +570,6 @@ def conf_CXLcls_CxCGC(update,context):
         update.message.reply_text(text='''The Class you told me Cancel does not exists''')
         return CXLCLS_GSP_KEY
         
-
-@cs.send_action(action=ChatAction.TYPING)
-def Snd_CXLCls(update,context: telegram.ext.CallbackContext):
-    '''
-        Function to Send message to users about created class
-    '''
-    query = update.callback_query
-    query.answer()
-    if query.data != 'CXLCLS:No':
-        tcdata = query.data[1:].split(':')
-        chkCXLCls = db.delcls(tcdata[2],tcdata[3],tcdata[1],tcdata[4])
-        if not chkCXLCls == -1:
-            query.edit_message_text(text='''Please wait I am  forwarding Your message about Cancelled Class to students''' )
-            text='''Class for subject {} of {} on {} : {} was Cancelled by {}.\nPlease Check your Timetable'''.format(tcdata[3].upper(),tcdata[2],tcdata[4],tcdata[1],tcdata[5])
-            usrlst = db.grdstdid(tcdata[2])
-            cs.SndMsgTolst(update,context,usrlst,text)
-            query.edit_message_text(text="I forwarded your message about Class Cancelation to {} students in {} Batch".format(len(usrlst),tcdata[2]))
-        else:
-            query.edit_message_text(text='''The Class you told me to Cancel does not exists''')
-    else:
-        query.edit_message_text(text="You have Cancelled your request to Cancel class")
-
 ##  Message Students Functions (level 3) - Send Grade Keyboard to user
 
 @cs.send_action(action=ChatAction.TYPING)
@@ -911,7 +870,7 @@ def devmenu_msg(update,context):
     '''
     menu = ['Students',"Teachers","All Users","Back"]
     menu = cs.build_menu(buttons=menu)
-    update.message.reply_text(text='''Please Tell me whom you want to send the message.\nYou can also send the RollNo (or) EmailId (or) ChatId of the user''',
+    update.message.reply_text(text='''Please Tell me whom you want to send the message.''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return DEV_MSG_MENU_KEY
 
@@ -1070,13 +1029,15 @@ def devMngCR(update,context):
     roll_no = update.message.text.upper()
     if roll_no in db.getCR():
         db.delCR(roll_no)
-        context.bot.send_message(chat_id = db.getStdChatId(roll_no) , text = 'You are No longer a CR now.\nContact Dev if you want to be a CR')
+        if db.getStdChatId(roll_no):
+                context.bot.send_message(chat_id = db.getStdChatId(roll_no) , text = 'You are No longer a CR now.\nContact Dev if you want to be a CR')
         update.message.reply_text(text='''{} removed from CR list successfully'''.format(roll_no))
         return bkDRAC(update,context)
     else:
         rn = db.addCR(roll_no)
         if roll_no == rn:
-            context.bot.send_message(chat_id = db.getStdChatId(roll_no) , text = 'Congrats! You are A CR Now.You can Find CR Menu in Main Menu(/menu)')
+            if db.getStdChatId(roll_no):
+                context.bot.send_message(chat_id = db.getStdChatId(roll_no) , text = 'Congrats! You are A CR Now.You can Find CR Menu in Main Menu(/menu)')
             update.message.reply_text(text='''CR Added successfully''')
             return bkDRAC(update,context)
         else:

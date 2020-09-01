@@ -96,12 +96,139 @@ def bkTAC(update, context):
     update.message.reply_text(text='''Please tell me who are you?''',reply_markup=telegram.ReplyKeyboardMarkup(text))
     return cs.END
 
+## Function to send message to student about class creation
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def Snd_CR8Cls(update,context: telegram.ext.CallbackContext):
+    '''
+        Function to Send message to users about created class
+    '''
+    query = update.callback_query
+    query.answer()
+    if query.data != 'CR8CLS:No':
+        tcdata = query.data[1:].split(':')
+        if not tcdata[3] in [grade[0] for grade in db.getTeachtt((update.effective_chat.id),tcdata[4])] :
+            chkCR8Cls = db.CR8cls(tcdata[1],tcdata[2],tcdata[3],tcdata[4])
+        else:
+            query.edit_message_text(text='''You already have a class at that time:\nCreate class at another period''')
+            return
+        if not chkCR8Cls == -1:
+            query.edit_message_text(text='''Please wait I am  forwarding Your message about Created Class to students''')
+            text='''Class for subject {} of {} created on {} : {} by {}.\nPlease Check your Timetable'''.format(tcdata[2],tcdata[1],tcdata[4],tcdata[3],tcdata[5])
+            usrlst = db.grdstdid(tcdata[1])
+            cs.SndMsgTolst(update,context,usrlst,text)
+            query.edit_message_text(text="Your Message was sent to {} students in {} Batch".format(len(usrlst),tcdata[1]))
+        else:
+            query.edit_message_text(text='''You are late:\nSelected period has already been taken,\nBetter luck next time!''' )
+    else:
+        query.edit_message_text(text="You have Cancelled your request to create class")
+
+
+## Function to send message to student about class Cancelation
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def Snd_CXLCls(update,context: telegram.ext.CallbackContext):
+    '''
+        Function to Send message to users about created class
+    '''
+    query = update.callback_query
+    query.answer()
+    if query.data != 'CXLCLS:No':
+        tcdata = query.data[1:].split(':')
+        if not db.delcls(tcdata[2],tcdata[3],tcdata[1],tcdata[4]) == -1:
+            query.edit_message_text(text='''Please wait I am  forwarding Your message about Cancelled Class to students''' )
+            text='''Class for subject {} of {} on {} : {} was Cancelled by {}.\nPlease Check your Timetable'''.format(tcdata[3].upper(),tcdata[2],tcdata[4],tcdata[1],tcdata[5])
+            usrlst = db.grdstdid(tcdata[2])
+            cs.SndMsgTolst(update,context,usrlst,text)
+            query.edit_message_text(text="I forwarded your message about Class Cancelation to {} students in {} Batch".format(len(usrlst),tcdata[2]))
+        else:
+            query.edit_message_text(text='''The Class you told me to Cancel does not exists''')
+    else:
+        query.edit_message_text(text="You have Cancelled your request to Cancel class")
+
+## Function to send message to student about class Replacement
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def Snd_RPLCls(update,context: telegram.ext.CallbackContext):
+    '''
+        Function to Send message to users about created class
+    '''
+    query = update.callback_query
+    query.answer()
+    # RPLCLS:period:grade:subject:day:RPLSub:Name
+    if query.data != 'RPLCLS:No':
+        tcdata = query.data[1:].split(':')
+        if not db.delcls(tcdata[2],tcdata[3],tcdata[1],tcdata[4]) == -1:
+            if not db.CR8cls(tcdata[2],tcdata[5],tcdata[1],tcdata[4]) == -1:
+                query.edit_message_text(text='''Please wait I am  forwarding Your message about Replaced Class to students''' )
+                text='''Class for subject {} of {} on {} : {} was Replaced by subject {}  by CR - {}.\nPlease Check your Timetable'''.format(tcdata[3].upper(),tcdata[2],tcdata[4],tcdata[1],tcdata[5],tcdata[6])
+                usrlst = db.grdstdid(tcdata[2])
+                cs.SndMsgTolst(update,context,usrlst,text)
+                query.edit_message_text(text="I forwarded your message about Replacement of Class to {} students in {} Batch".format(len(usrlst),tcdata[2]))
+            else:
+                query.edit_message_text(text='''You are late:\nSelected period has already been taken,\nBetter luck next time!''')
+        else:
+            query.edit_message_text(text='''The Class you told me to Replace does not exists''')
+    else:
+        query.edit_message_text(text="You have Cancelled your request to Replace class")
+
 
 ###
 ### Conversation Handlers (Main Function)
 ###     
 
-## Dev menu handler
+std_CR_RPLCls_Sub_cov=   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text([(P +  ":" + S) for P in cs.datajson['periodlst'] 
+                                                for (G,S) in db.getallgrdsub() ])),sb.subkb_CRSC)],
+    states          =   {
+                            sb.RPLCLS_SUB_KEY   :   [   MessageHandler((Filters.text([ str(S) for (G,S) in db.getallgrdsub() ])),sb.conf_RPLcls_CRGC),
+                                                        CommandHandler('menu',sb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),sb.bkCRSC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler((~Filters.text("Back")),sb.ivsub_CRSC)],
+    name            =   "stdCRRPLClsSubcov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.RPLCLS_GSP_KEY,
+                            sb.STOPPING         :   sb.STOPPING,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                        }
+)
+
+std_CR_RPLCls_GSP_cov=   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text(cs.datajson['daylst'])),sb.GSP_CRGC)],
+    states          =   {
+                            sb.RPLCLS_GSP_KEY   :   [   std_CR_RPLCls_Sub_cov,
+                                                        CommandHandler('menu',sb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),sb.bkCRGC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler((~Filters.text("Back")),sb.ivGSP_CRGC)],
+    name            =   "stdCXLClsGSPcov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.RPLCLS_DAY_KEY,
+                            sb.STOPPING         :   sb.STOPPING,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                        }
+)
+
+std_CR_RPLCls_Day_cov=   ConversationHandler(
+    entry_points    =   [MessageHandler((Filters.text("Replace Class")),sb.daykb_CRDC)],
+    states          =   {
+                            sb.RPLCLS_DAY_KEY   :   [   std_CR_RPLCls_GSP_cov,
+                                                        CommandHandler('menu',sb.Return_menu),
+                                                        MessageHandler((Filters.text("Back")),sb.bkCRDC)]
+                        },
+    allow_reentry   =   True,
+    fallbacks       =   [MessageHandler((~Filters.text("Back")),sb.ivday_CRDC)],
+    name            =   "stdRplClsDaycov",
+    persistent      =   True,
+    map_to_parent   =   {
+                            cs.END              :   sb.CR_MENU_KEY,
+                            sb.STOPPING         :   cs.END,
+                            sb.RETURN_MENU      :   sb.RETURN_MENU
+                        }
+)
+
 
 ##  Create class Option Handler
 
@@ -159,6 +286,8 @@ std_CR_CR8Cls_Day_cov=   ConversationHandler(
                         }
 )
 
+##  Cancel Class
+
 std_CR_CXLCls_GSP_cov=   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text(cs.datajson['daylst'])),sb.GSP_CxCGC)],
     states          =   {
@@ -195,6 +324,9 @@ std_CR_CXLCls_Day_cov=   ConversationHandler(
                             sb.RETURN_MENU      :   sb.RETURN_MENU
                         }
 )
+
+## message students
+
 std_CR_MsgStd_cov   =   ConversationHandler(
     entry_points    =   [MessageHandler(Filters.text('"Message Students"'),sb.msgstd_SCMC)],
     states          =   {
@@ -214,7 +346,7 @@ std_CR_MsgStd_cov   =   ConversationHandler(
 Std_CR_Menu_cov    =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("CR Menu")),sb.CR_Menu)],
     states          =   {
-                            sb.CR_MENU_KEY     :   [   std_CR_CR8Cls_Day_cov,std_CR_CXLCls_Day_cov,std_CR_MsgStd_cov,
+                            sb.CR_MENU_KEY     :   [   std_CR_CR8Cls_Day_cov,std_CR_CXLCls_Day_cov,std_CR_MsgStd_cov,std_CR_RPLCls_Day_cov,
                                                         CommandHandler('menu',sb.Return_menu),
                                                         MessageHandler((Filters.text("Back")),sb.bkCRMC)]
                         },
@@ -227,6 +359,7 @@ Std_CR_Menu_cov    =   ConversationHandler(
                             sb.RETURN_MENU      :   sb.MAIN_MENU_KEY
                         }
 )
+## Dev menu handler
 
 std_Dev_MNG_CR_cov  =   ConversationHandler(
     entry_points    =   [MessageHandler((Filters.text("Manage CR")),sb.devgetCRRoll)],
@@ -885,8 +1018,9 @@ disp.add_error_handler(cs.error)
 ##  Handler for InlinequaryKeyboard messages
 
 disp.add_handler(CallbackQueryHandler(sb.inline_set_atd,pattern='^[012].*'))
-disp.add_handler(CallbackQueryHandler(tb.Snd_CR8Cls,pattern='^CR8CLS:.*'))
-disp.add_handler(CallbackQueryHandler(tb.Snd_CXLCls,pattern='^CXLCLS:.*'))
+disp.add_handler(CallbackQueryHandler(Snd_CR8Cls,pattern='^CR8CLS:.*'))
+disp.add_handler(CallbackQueryHandler(Snd_CXLCls,pattern='^CXLCLS:.*'))
+disp.add_handler(CallbackQueryHandler(Snd_RPLCls,pattern='^RPLCLS:.*'))
 
 ## Starting WebHooking
 # url = cs.serverjson["webhook_url"] + ":" + cs.serverjson["port"] + "/" + bottkn

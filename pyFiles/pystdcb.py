@@ -11,8 +11,71 @@ import codeSnippets as cs
 ## Conversation dict Constants keys
 MAIN_MENU_KEY, AUTH_KEY, TT_MENU_KEY, DAILY_TT_KEY, ATD_MENU_KEY, SETATD_SUB_KEY= range(0,6)
 SETATD_STAT_KEY, MORE_MENU_KEY, CT_MENU_KEY, STOPPING, DEV_MSG_KEY, RETURN_MENU, DEV_MENU_KEY, DEV_MSG_MENU_KEY, DEV_MSG_KEY, DEV_RMV_ACC_KEY, DEV_MNG_CR_KEY= range(6,17)
-CR_MENU_KEY, CR_MSG_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, CR8CLS_Day_KEY, CR8CLS_PERD_KEY, CR8CLS_SUB_KEY = range(17,24)
+CR_MENU_KEY, CR_MSG_KEY, CXLCLS_DAY_KEY, CXLCLS_GSP_KEY, CR8CLS_Day_KEY, CR8CLS_PERD_KEY, CR8CLS_SUB_KEY, RPLCLS_DAY_KEY, RPLCLS_GSP_KEY, RPLCLS_SUB_KEY= range(17,27)
 
+
+##
+##   JobQueue Functions
+##
+@run_async
+def callback_daily(context):
+    '''
+        Jobqueue's callback_daily function to send timetable to user at night
+    '''
+    usrlst = db.getallstduid()
+    
+    for i in usrlst:
+        try:
+            day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")
+            text = "Today's Timetable:\n" + std_tt(i,day)
+            context.bot.send_message(chat_id=i , text = text)
+            time.sleep(.2)
+        except:
+            pass
+    text = "Total no of STUDENTS using CR_ALT = {}".format(len(usrlst))
+    for i in cs.devjson['devChat_id']:
+        context.bot.send_message(chat_id=i,text= text)
+
+@run_async
+def class_Remindar(context):
+    '''
+        Jobqueue's callback_daily function to send Class_ATD_reminder to user 
+    '''
+    for i in db.getallstduid():
+        try:
+            day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")
+            periodlst = db.getStdtt(db.getusrgrd(i),day)
+            perlst = [j[0] for j in periodlst]
+            if str(context.job.context) in perlst:
+                subject = periodlst[perlst.index(context.job.context)][1]
+                keyboard = [
+                    InlineKeyboardButton("Yes",callback_data= str('1'+subject)),
+                    InlineKeyboardButton("No",callback_data= str('0'+subject)),
+                    InlineKeyboardButton("Cancel",callback_data= str('2'+subject))
+                ]
+                reply_markup = InlineKeyboardMarkup(cs.build_menu(keyboard))
+                context.bot.send_message(chat_id=i, text= "Did you attend the class of subject {} @ {}".format(subject,context.job.context),
+                            reply_markup=reply_markup)
+                time.sleep(.2)
+        except:
+            pass
+        
+@run_async
+@cs.send_action(action=telegram.ChatAction.TYPING)
+def inline_set_atd(update,context):
+    '''
+        Inline function to set attendance
+    '''
+    query = update.callback_query
+    query.answer()
+    if query.data[:1] == '1':
+        db.setstdatt(update.effective_chat.id,query.data[1:],1,1)
+        query.edit_message_text(text="You were PRESENT for {} class".format(query.data[1:]))
+    elif query.data[:1] == '0':
+        db.setstdatt(update.effective_chat.id,query.data[1:],0,1)
+        query.edit_message_text(text="You were ABSENT for {} class".format(query.data[1:]))
+    else:
+        query.edit_message_text(text="{} class was CANCELED".format(query.data[1:]))
 
 ##
 ##   Authentication Cov Functions (Level- 0(part-i))
@@ -508,63 +571,6 @@ def std_logout(update,context):
     update.message.reply_text(text='''Send /start to restart the bot''')
     
     return STOPPING
-##
-##   JobQueue Functions
-##
-@run_async
-def callback_daily(context):
-    '''
-        Jobqueue's callback_daily function to send timetable to user at night
-    '''
-    usrlst = db.getallstduid()
-    for i in usrlst:
-        day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")
-        text = "Today's Timetable:\n" + std_tt(i,day)
-        context.bot.send_message(chat_id=i , text = text)
-        time.sleep(.2)
-        del day
-    text = "Total no of STUDENTS using CR_ALT = {}".format(len(usrlst))
-    for i in cs.devjson['devChat_id']:
-        context.bot.send_message(chat_id=i,text= text)
-
-@run_async
-def class_Remindar(context):
-    '''
-        Jobqueue's callback_daily function to send Class_ATD_reminder to user 
-    '''
-    for i in db.getallstduid():
-        day = datetime.datetime.now(tz= timezone('Asia/Kolkata')).strftime("%A")
-        periodlst = db.getStdtt(db.getusrgrd(i),day)
-        perlst = [j[0] for j in periodlst]
-        if str(context.job.context) in perlst:
-            subject = periodlst[perlst.index(context.job.context)][1]
-            keyboard = [
-                InlineKeyboardButton("Yes",callback_data= str('1'+subject)),
-                InlineKeyboardButton("No",callback_data= str('0'+subject)),
-                InlineKeyboardButton("Cancel",callback_data= str('2'+subject))
-            ]
-            reply_markup = InlineKeyboardMarkup(cs.build_menu(keyboard))
-            context.bot.send_message(chat_id=i, text= "Did you attend the class of subject {} @ {}".format(subject,context.job.context),
-                        reply_markup=reply_markup)
-            time.sleep(.2)
-        del day
-        
-@run_async
-@cs.send_action(action=telegram.ChatAction.TYPING)
-def inline_set_atd(update,context):
-    '''
-        Inline function to set attendance
-    '''
-    query = update.callback_query
-    query.answer()
-    if query.data[:1] == '1':
-        db.setstdatt(update.effective_chat.id,query.data[1:],1,1)
-        query.edit_message_text(text="You were PRESENT for {} class".format(query.data[1:]))
-    elif query.data[:1] == '0':
-        db.setstdatt(update.effective_chat.id,query.data[1:],0,1)
-        query.edit_message_text(text="You were ABSENT for {} class".format(query.data[1:]))
-    else:
-        query.edit_message_text(text="{} class was CANCELED".format(query.data[1:]))
 
 ## DEV Functions
 
@@ -612,7 +618,7 @@ def devmenu_msg(update,context):
     '''
     menu = ['Students',"Teachers","All Users","Back"]
     menu = cs.build_menu(buttons=menu)
-    update.message.reply_text(text='''Please Tell me whom you want to send the message.\nYou can also send the RollNo (or) EmailId (or) ChatId of the user''',
+    update.message.reply_text(text='''Please Tell me whom you want to send the message.''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return DEV_MSG_MENU_KEY
 
@@ -782,13 +788,15 @@ def devMngCR(update,context):
     roll_no = update.message.text.upper()
     if roll_no in db.getCR():
         db.delCR(roll_no)
-        context.bot.send_message(chat_id = db.getStdChatId(roll_no) , text = 'You are No longer a CR now.\nContact Dev if you want to be a CR')
+        if db.getStdChatId(roll_no):
+                context.bot.send_message(chat_id = db.getStdChatId(roll_no) , text = 'You are No longer a CR now.\nContact Dev if you want to be a CR')
         update.message.reply_text(text='''{} removed from CR list successfully'''.format(roll_no))
         return bkDRAC(update,context)
     else:
         rn = db.addCR(roll_no)
         if roll_no == rn:
-            context.bot.send_message(chat_id = db.getStdChatId(roll_no) , text = 'Congrats! You are A CR Now.You can Find CR Menu in Main Menu(/menu)')
+            if db.getStdChatId(roll_no):
+                context.bot.send_message(chat_id = db.getStdChatId(roll_no) , text = 'Congrats! You are A CR Now.You can Find CR Menu in Main Menu(/menu)')
             update.message.reply_text(text='''CR Added successfully''')
             return bkDRAC(update,context)
         else:
@@ -814,7 +822,7 @@ def CR_Menu (update,context):
         Function to send CR's Announcement Menu to the user
     '''
     if (db.chkusr(update.effective_chat.id)) in db.getCR():
-        menu = cs.build_menu(buttons=["Create Class","Cancel Class","Message Students","Back"])
+        menu = cs.build_menu(buttons=["Create Class","Cancel Class","Replace Class","Message Students","Back"])
         update.message.reply_text(text='''what you want to Announce now?''',
                                         reply_markup=telegram.ReplyKeyboardMarkup(menu))
         return CR_MENU_KEY
@@ -827,7 +835,7 @@ def ivCRMenu(update,context):
     '''
         Function to send error when user enters Invalid Option in CR Announcement Menu
     '''
-    menu = cs.build_menu(buttons=["Create Class","Cancel Class","Message Students","Back"])
+    menu = cs.build_menu(buttons=["Create Class","Cancel Class","Replace Class","Message Students","Back"])
     update.message.reply_text(text='''Sorry, I can't do that.\nPlease select from the Given list''',
                                     reply_markup=telegram.ReplyKeyboardMarkup(menu))
     return CR_MENU_KEY
@@ -888,7 +896,7 @@ def daykb_CxCDC(update,context):
         Function to send KeyBoard of Days to the user in CR Menu/Cancel_Class path
     '''
     text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
-    update.message.reply_text(text='''Can you Which day class do you want to cancel ?''', reply_markup=telegram.ReplyKeyboardMarkup(text))
+    update.message.reply_text(text=''' Which day class do you want to cancel ?''', reply_markup=telegram.ReplyKeyboardMarkup(text))
     return CXLCLS_DAY_KEY
     
 
@@ -1101,3 +1109,127 @@ def Return_menu(update,context):
     '''
     Menu(update,context)
     return RETURN_MENU
+
+##  Replace Class Functions - Send Days Keyboard to user
+
+@cs.send_action(action=ChatAction.TYPING)
+def daykb_CRDC(update,context):
+    '''
+        Function to send KeyBoard of Days to the user in CR Menu/Replace_Class path
+    '''
+    text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
+    update.message.reply_text(text=''' Which day class do you want to replace ?''', reply_markup=telegram.ReplyKeyboardMarkup(text))
+    return RPLCLS_DAY_KEY
+    
+
+@cs.send_action(action=ChatAction.TYPING)
+def ivday_CRDC(update,context):
+    '''
+        Function to send error when user enters Invalid day in Teacher_Announcements/Replace_Class path
+    '''
+    text = cs.build_menu(buttons=(cs.datajson['daylst']+['Back']))
+    update.message.reply_text(text='''Its not a Day from the list.\nPlease sent me a day from the list''', reply_markup=telegram.ReplyKeyboardMarkup(text))
+    return RPLCLS_DAY_KEY
+
+@cs.send_action(action=ChatAction.TYPING)
+def bkCRDC(update,context):
+    '''
+        Function to send back from std_CR_RPLCls_Day_cov to std_CR_Menu_cov
+    '''
+    CR_Menu(update,context)
+    return cs.END
+
+##  Cancel Class Functions - Send Grade,Subject,Period Keyboard to user
+
+@cs.send_action(action=ChatAction.TYPING)
+def GSP_CRGC(update,context):
+    '''
+        Function to send KeyBoard of Period,Grade,Subject to the user in CR Menu/Replace_Class path
+    '''
+    grade   = (db.chkusr(update.effective_chat.id)).split('U')[0]
+    if not (update.message.text) == 'Back':
+        context.user_data['CRRPLClsDay'] = (update.message.text)
+    context.user_data['RPLavlGSPlst'] = [i[0] + ":" + i[1] for i in db.getStdtt(grade,context.user_data['CRRPLClsDay'])]
+    update.message.reply_text(text='''Which Class do you want to Replace on {} ?'''.format(context.user_data['CRRPLClsDay']),
+                                reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['RPLavlGSPlst']+['Back'],n_cols=1)))
+    return RPLCLS_GSP_KEY
+    
+
+@cs.send_action(action=ChatAction.TYPING)
+def ivGSP_CRGC(update,context):
+    '''
+        Function to send error when user enters Invalid Class in Teacher_Announcements/Cancel_Class path
+    '''
+    update.message.reply_text(text='''Its not a Class from the list.\nPlease sent me a class from the list''',
+                                reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['RPLavlGSPlst']+['Back'],n_cols=1)))
+    return RPLCLS_GSP_KEY
+
+@cs.send_action(action=ChatAction.TYPING)
+def bkCRGC(update,context):
+    '''
+        Function to send back from std_CR_RPLCls_GSP_cov to std_CR_RPLCls_Day_cov
+    '''
+    daykb_CRDC(update,context)
+    return cs.END
+
+## 
+@cs.send_action(action=ChatAction.TYPING)
+def subkb_CRSC(update,context):
+    '''
+        Function to send KeyBoard of Subject to the user in CR Menu/Replace_Class path
+    '''
+    if update.message.text in context.user_data['RPLavlGSPlst'] + ['back']:
+        if not update.message.text == 'Back':
+            context.user_data['stdRPLGSP'] = update.message.text
+        context.user_data['stdCRsubkb'] = db.getsubgrd((db.chkusr(update.effective_chat.id)).split('U')[0])
+        update.message.reply_text(text='''Tell me, For which subject do you want me to Replace class on {} ?'''.format(context.user_data['stdRPLGSP']), 
+                                reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['stdCRsubkb']+['Back'])))
+        return RPLCLS_SUB_KEY
+    else:
+        update.message.reply_text(text='''The Class you told me to Cancel does not exists''')
+        return cs.END
+
+@cs.send_action(action=ChatAction.TYPING)
+def ivsub_CRSC(update,context):
+    '''
+        Function to send error when user enters Invalid subject in CR Menu/Replace_Class path
+    '''
+    update.message.reply_text(text='''Its not a Subject from the list.\nPlease sent me a Grade and Subject from the list''',
+                             reply_markup=telegram.ReplyKeyboardMarkup(cs.build_menu(context.user_data['stdCRsubkb']+['Back'])))
+    return RPLCLS_SUB_KEY
+
+@cs.send_action(action=ChatAction.TYPING)
+def bkCRSC(update,context):
+    '''
+        Function to send back from std_CR_RPLCls_Sub_cov to std_CR_RPLCls_GSP_cov
+    '''
+    GSP_CRGC(update,context)
+    return cs.END
+
+##  InlineKeyboard for Class Cancelation
+
+@cs.send_action(action=ChatAction.TYPING)
+def conf_RPLcls_CRGC(update,context):
+    '''
+        Function to Ask conformation before class Replacement
+    '''
+    if (update.message.text) in context.user_data['stdCRsubkb']:
+        RPLClsdata = (context.user_data['stdRPLGSP']).split(':')
+        grade   = (db.chkusr(update.effective_chat.id)).split('U')[0]
+        RPLSub  = update.message.text
+        inlneCBdata = RPLClsdata[0] + ':' + grade + ':' + RPLClsdata[1] + ":" + context.user_data['CRRPLClsDay'] +":" + RPLSub + ":"+ update.message.from_user.first_name 
+        # period:grade:subject:day:RPLSub:Name
+        text='''You want me to Replace Class for \nsubject {} of {} \non {} : {} with {}'''.format(RPLClsdata[1].upper(),grade.upper(),context.user_data['CRRPLClsDay'] ,RPLClsdata[0],RPLSub)
+    
+        keyboard = [
+                                    [InlineKeyboardButton("Yes",callback_data= 'RPLCLS:' + inlneCBdata),
+                                    InlineKeyboardButton("No",callback_data= 'RPLCLS:No' ) ],
+                                ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        update.message.reply_text(text = text, reply_markup=reply_markup)
+        Menu(update,context)
+        return STOPPING
+    else:
+        update.message.reply_text(text='''The Subject you told me to replace is not for your class''')
+        subkb_CCGC(update,context)
+        return RPLCLS_SUB_KEY
