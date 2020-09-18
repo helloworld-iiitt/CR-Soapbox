@@ -432,6 +432,38 @@ def rmvtch(chat_id):
     cur.execute('DELETE FROM TCHUSR_TB WHERE chat_id = ?',(chat_id,))
     conn.commit()
 
+def addCR(roll_no):
+    '''
+        Function to add CR to DB returns rollno of the cr of the class
+    '''
+    grade = roll_no.split('U')[0]
+    cur.execute('SELECT id FROM GRADE_TB WHERE grade = ? ', (grade, ))
+    grade_id = cur.fetchone()[0]
+    try:
+        cur.execute('''INSERT INTO CR_TB (grade_id,roll_no) VALUES ( ?, ?)''', (grade_id,roll_no) )
+        conn.commit()
+        return roll_no
+    except:
+        cur.execute('SELECT roll_no FROM CR_TB WHERE grade_id = ? ', (grade_id, ))
+        return cur.fetchone()[0]
+
+def getCR():
+    '''
+        return the list of roll no of CR 
+    '''
+    cur.execute('SELECT roll_no FROM CR_TB ')
+    rolltpl = cur.fetchall()
+    rolllst = list()
+    for i in rolltpl:
+        rolllst.append(i[0])
+    return rolllst
+
+def delCR(roll_no):
+    '''
+        Function to delete CR from DB
+    '''
+    cur.execute('DELETE FROM CR_TB WHERE roll_no = ?',(roll_no,))
+    conn.commit()
 '''
 --init--
 Create tables - BRANCH_TB, YEAR_TB, GRADE_TB, TEACHER_TB, SUBJECT_TB, USER_TB, ATTEND_TB 
