@@ -26,7 +26,7 @@ def update_Day_tt(context):
         text = "Professor, Next {}\ntimetable was updated.\nYou can make changes in the timetable now".format(day)
         context.bot.send_message(chat_id=i, text=text)
         time.sleep(.2)
-    for i in getCR:
+    for i in db.getCR():
         text = "CR, Next {}\ntimetable was updated.\nYou can make changes in the timetable now".format(day)
         chat_id = db.getStdChatId(i)
         if chat_id:
